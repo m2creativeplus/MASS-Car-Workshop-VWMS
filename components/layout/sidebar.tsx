@@ -13,8 +13,12 @@ import {
   Bot,
   ChevronLeft,
   ChevronRight,
+  FileText,
+  Calculator,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useAuth } from "../auth/auth-provider"
+import { UserMenu } from "./user-menu"
 
 interface SidebarProps {
   activeSection: string
@@ -23,17 +27,23 @@ interface SidebarProps {
 
 export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const { user, hasPermission } = useAuth()
 
-  const menuItems = [
+  const allMenuItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "customers", label: "Customers", icon: Users },
     { id: "vehicles", label: "Vehicles", icon: Car },
     { id: "appointments", label: "Appointments", icon: Calendar },
     { id: "technicians", label: "Technicians", icon: Wrench },
+    { id: "suppliers", label: "Suppliers", icon: Package },
+    { id: "inspections", label: "Inspections", icon: FileText },
+    { id: "estimates", label: "Estimates", icon: Calculator },
     { id: "inventory", label: "Inventory", icon: Package },
     { id: "reports", label: "Reports", icon: BarChart3 },
     { id: "ai-tools", label: "LOVABLE AI", icon: Bot },
   ]
+
+  const menuItems = allMenuItems.filter((item) => hasPermission(item.id, "read"))
 
   return (
     <div
@@ -89,10 +99,19 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
 
       {/* Footer */}
       <div className="p-4 border-t border-slate-700">
-        {!isCollapsed && (
-          <div className="text-xs text-slate-400">
-            <p>Hargeisa, Somaliland</p>
-            <p className="mt-1">v2.1.0</p>
+        {!isCollapsed ? (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <UserMenu />
+            </div>
+            <div className="text-xs text-slate-400">
+              <p>Hargeisa, Somaliland</p>
+              <p className="mt-1">v2.1.0</p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-center">
+            <UserMenu />
           </div>
         )}
       </div>

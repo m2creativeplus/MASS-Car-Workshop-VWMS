@@ -9,10 +9,14 @@ import { Appointments } from "./components/appointments/appointments"
 import { AITools } from "./components/ai-tools/ai-tools"
 import { TechnicianDashboard } from "./components/technicians/technician-dashboard"
 import { ReportsAnalytics } from "./components/reports/reports-analytics"
+import { AuthProvider, useAuth } from "./components/auth/auth-provider"
+import { LoginForm } from "./components/auth/login-form"
 
-export default function MassWorkshopSystem() {
+function MassWorkshopContent() {
+  const { user } = useAuth()
   const [activeSection, setActiveSection] = useState("dashboard")
 
+  // Move all the existing renderContent logic here
   const renderContent = () => {
     switch (activeSection) {
       case "dashboard":
@@ -41,6 +45,10 @@ export default function MassWorkshopSystem() {
     }
   }
 
+  if (!user) {
+    return null // This will be handled by the parent component
+  }
+
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
@@ -49,4 +57,32 @@ export default function MassWorkshopSystem() {
       </main>
     </div>
   )
+}
+
+export default function MassWorkshopSystem() {
+  return (
+    <AuthProvider>
+      <MassWorkshopApp />
+    </AuthProvider>
+  )
+}
+
+function MassWorkshopApp() {
+  const { user, login, isLoading } = useAuth()
+  const [loginError, setLoginError] = useState<string | null>(null)
+
+  const handleLogin = async (email: string, password: string) => {
+    setLoginError(null)
+    const success = await login(email, password)
+    if (!success) {
+      setLoginError("Invalid email or password. Please try again.")
+    }
+    return success
+  }
+
+  if (!user) {
+    return <LoginForm onLogin={handleLogin} isLoading={isLoading} error={loginError || undefined} />
+  }
+
+  return <MassWorkshopContent />
 }
