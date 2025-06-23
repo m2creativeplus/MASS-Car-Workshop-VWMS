@@ -1,43 +1,36 @@
 "use client"
 
 import { useState } from "react"
-import { SupabaseAuthProvider, useSupabaseAuth } from "./components/auth/supabase-auth-provider"
-import { SupabaseLoginForm } from "./components/auth/supabase-login-form"
-import { Sidebar } from "./components/layout/sidebar"
-import { Dashboard } from "./components/dashboard/dashboard"
-import { Customers } from "./components/customers/customers"
-import { Vehicles } from "./components/vehicles/vehicles"
-import { Appointments } from "./components/appointments/appointments"
-import { TechnicianDashboard } from "./components/technicians/technician-dashboard"
-import { SuppliersModule } from "./components/suppliers/suppliers-module"
-import { InspectionsModule } from "./components/inspections/inspections-module"
-import { EstimatesModule } from "./components/estimates/estimates-module"
-import { ReportsAnalytics } from "./components/reports/reports-analytics"
-import { AITools } from "./components/ai-tools/ai-tools"
+import { SupabaseAuthProvider } from "@/components/auth/supabase-auth-provider"
+import { SupabaseLoginForm } from "@/components/auth/supabase-login-form"
+import { useSupabaseAuth } from "@/components/auth/supabase-auth-provider"
+import { Sidebar } from "@/components/layout/sidebar"
+import { UserMenu } from "@/components/layout/user-menu"
+import { ConnectionStatus } from "@/components/connection-status"
+
+// Import all modules
+import { Dashboard } from "@/components/dashboard/dashboard"
+import { Customers } from "@/components/customers/customers"
+import { Vehicles } from "@/components/vehicles/vehicles"
+import { Appointments } from "@/components/appointments/appointments"
+import { TechnicianDashboard } from "@/components/technicians/technician-dashboard"
+import { ReportsAnalytics } from "@/components/reports/reports-analytics"
+import { AITools } from "@/components/ai-tools/ai-tools"
+import { SuppliersModule } from "@/components/suppliers/suppliers-module"
+import { InspectionsModule } from "@/components/inspections/inspections-module"
+import { EstimatesModule } from "@/components/estimates/estimates-module"
+import DatabaseTest from "@/components/admin/database-test"
 
 function WorkshopSystemContent() {
-  const { user, isLoading } = useSupabaseAuth()
-  const [activeSection, setActiveSection] = useState("dashboard")
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 bg-orange-500 rounded-xl flex items-center justify-center mx-auto">
-            <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-          </div>
-          <p className="text-lg font-medium">Loading MASS Workshop System...</p>
-        </div>
-      </div>
-    )
-  }
+  const { user, logout } = useSupabaseAuth()
+  const [activeModule, setActiveModule] = useState("dashboard")
 
   if (!user) {
     return <SupabaseLoginForm />
   }
 
-  const renderActiveSection = () => {
-    switch (activeSection) {
+  const renderModule = () => {
+    switch (activeModule) {
       case "dashboard":
         return <Dashboard />
       case "customers":
@@ -54,17 +47,12 @@ function WorkshopSystemContent() {
         return <InspectionsModule />
       case "estimates":
         return <EstimatesModule />
-      case "inventory":
-        return (
-          <div className="p-6">
-            <h1 className="text-2xl font-bold">Inventory Management</h1>
-            <p>Coming soon...</p>
-          </div>
-        )
       case "reports":
         return <ReportsAnalytics />
       case "ai-tools":
         return <AITools />
+      case "database-test":
+        return user.role === "admin" ? <DatabaseTest /> : <Dashboard />
       default:
         return <Dashboard />
     }
@@ -72,8 +60,22 @@ function WorkshopSystemContent() {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-      <main className="flex-1 overflow-auto">{renderActiveSection()}</main>
+      <Sidebar activeModule={activeModule} onModuleChange={setActiveModule} userRole={user.role} />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">MASS Car Workshop</h1>
+              <p className="text-sm text-gray-600">Vehicle Workshop Management System</p>
+            </div>
+            <UserMenu user={user} onLogout={logout} />
+          </div>
+        </header>
+        <main className="flex-1 overflow-auto p-6">
+          <ConnectionStatus />
+          {renderModule()}
+        </main>
+      </div>
     </div>
   )
 }

@@ -1,9 +1,25 @@
 import { createClient } from "@supabase/supabase-js"
 
 const supabaseUrl = "https://bnqcimnejaemtcpanqnq.supabase.co"
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseKey =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  process.env.SUPABASE_KEY ||
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJucWNpbW5lamFlbXRjcGFucW5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2OTM0NTIsImV4cCI6MjA2NjI2OTQ1Mn0.sbLMOhRs2DC55G9Sajd7Hplrv3GB8l_DuL07up33t00"
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Create a function to get the Supabase client safely
+export const getSupabaseClient = () => {
+  if (!supabaseKey) {
+    console.warn("Supabase key not available, using fallback configuration")
+    return createClient(
+      supabaseUrl,
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJucWNpbW5lamFlbXRjcGFucW5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2OTM0NTIsImV4cCI6MjA2NjI2OTQ1Mn0.sbLMOhRs2DC55G9Sajd7Hplrv3GB8l_DuL07up33t00",
+    )
+  }
+  return createClient(supabaseUrl, supabaseKey)
+}
+
+// Export the client for backward compatibility
+export const supabase = getSupabaseClient()
 
 // Database types
 export interface User {

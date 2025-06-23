@@ -8,314 +8,292 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, EyeOff, Car, AlertCircle, CheckCircle } from "lucide-react"
+import { Eye, EyeOff, Car, AlertCircle, Shield, Users, Wrench, User } from "lucide-react"
 import { useSupabaseAuth } from "./supabase-auth-provider"
 
+const demoUsers = [
+  {
+    role: "Admin",
+    email: "admin@masscar.com",
+    password: "123456",
+    icon: Shield,
+    color: "bg-red-500 hover:bg-red-600",
+    description: "Full system access - All modules, user management, reports",
+    permissions: ["All Modules", "User Management", "System Settings", "Advanced Reports"],
+  },
+  {
+    role: "Staff",
+    email: "staff@masscar.com",
+    password: "123456",
+    icon: Users,
+    color: "bg-blue-500 hover:bg-blue-600",
+    description: "Operational access - Customer management, appointments, estimates",
+    permissions: ["Customer Management", "Appointments", "Estimates", "Basic Reports"],
+  },
+  {
+    role: "Technician",
+    email: "tech@masscar.com",
+    password: "123456",
+    icon: Wrench,
+    color: "bg-green-500 hover:bg-green-600",
+    description: "Technical focus - Inspections, diagnostics, work orders",
+    permissions: ["Vehicle Inspections", "Diagnostics", "Work Orders", "Parts Lookup"],
+  },
+  {
+    role: "Customer",
+    email: "customer@masscar.com",
+    password: "123456",
+    icon: User,
+    color: "bg-purple-500 hover:bg-purple-600",
+    description: "Self-service portal - View own vehicles, appointments, estimates",
+    permissions: ["Own Vehicles", "Own Appointments", "View Estimates", "Service History"],
+  },
+]
+
 export function SupabaseLoginForm() {
-  const { login, register, isLoading } = useSupabaseAuth()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [selectedDemo, setSelectedDemo] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  // Login form state
-  const [loginEmail, setLoginEmail] = useState("")
-  const [loginPassword, setLoginPassword] = useState("")
-  const [showLoginPassword, setShowLoginPassword] = useState(false)
-
-  // Register form state
-  const [registerEmail, setRegisterEmail] = useState("")
-  const [registerPassword, setRegisterPassword] = useState("")
-  const [firstName, setFirstName] = useState("")
-  const [lastName, setLastName] = useState("")
-  const [phone, setPhone] = useState("")
-  const [role, setRole] = useState<"admin" | "staff" | "technician" | "customer">("customer")
-  const [showRegisterPassword, setShowRegisterPassword] = useState(false)
-
-  // UI state
-  const [error, setError] = useState("")
-  const [success, setSuccess] = useState("")
-  const [activeTab, setActiveTab] = useState("login")
+  const { login } = useSupabaseAuth()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError("")
-    setSuccess("")
+    if (!email || !password) return
 
-    if (!loginEmail || !loginPassword) {
-      setError("Please fill in all fields")
-      return
-    }
+    setIsLoading(true)
+    setError(null)
 
-    const result = await login(loginEmail, loginPassword)
-
+    const result = await login(email, password)
     if (!result.success) {
       setError(result.error || "Login failed")
     }
+
+    setIsLoading(false)
   }
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setSuccess("")
+  const handleDemoLogin = async (demoUser: (typeof demoUsers)[0]) => {
+    setSelectedDemo(demoUser.role)
+    setEmail(demoUser.email)
+    setPassword(demoUser.password)
+    setIsLoading(true)
+    setError(null)
 
-    if (!registerEmail || !registerPassword || !firstName || !lastName) {
-      setError("Please fill in all required fields")
-      return
-    }
-
-    if (registerPassword.length < 6) {
-      setError("Password must be at least 6 characters long")
-      return
-    }
-
-    const result = await register(registerEmail, registerPassword, {
-      first_name: firstName,
-      last_name: lastName,
-      phone: phone || undefined,
-      role,
-      is_active: true,
-    })
-
-    if (result.success) {
-      setSuccess("Registration successful! Please check your email to verify your account.")
-      // Reset form
-      setRegisterEmail("")
-      setRegisterPassword("")
-      setFirstName("")
-      setLastName("")
-      setPhone("")
-      setRole("customer")
-    } else {
-      setError(result.error || "Registration failed")
-    }
-  }
-
-  const demoLogin = async (email: string) => {
-    setLoginEmail(email)
-    setLoginPassword("123456")
-    setError("")
-    setSuccess("")
-
-    const result = await login(email, "123456")
-
+    const result = await login(demoUser.email, demoUser.password)
     if (!result.success) {
       setError(result.error || "Demo login failed")
     }
+
+    setIsLoading(false)
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">
-      <Card className="w-full max-w-md shadow-xl">
-        <CardHeader className="text-center space-y-4">
-          <div className="flex justify-center">
-            <div className="w-16 h-16 bg-orange-500 rounded-xl flex items-center justify-center">
-              <Car className="w-8 h-8 text-white" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-4">
+      <div className="w-full max-w-4xl">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center space-x-3 mb-4">
+            <div className="w-16 h-16 bg-orange-500 rounded-2xl flex items-center justify-center">
+              <Car className="w-9 h-9 text-white" />
+            </div>
+            <div className="text-left">
+              <h1 className="text-4xl font-bold text-white">MASS Car Workshop</h1>
+              <p className="text-lg text-slate-300">Vehicle Workshop Management System</p>
+              <p className="text-sm text-slate-400">Hargeisa, Somaliland • AutoLeap Alternative</p>
             </div>
           </div>
-          <div>
-            <CardTitle className="text-2xl font-bold">MASS Car Workshop</CardTitle>
-            <CardDescription>Vehicle Workshop Management System</CardDescription>
-          </div>
-        </CardHeader>
+        </div>
 
-        <CardContent>
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Sign In</TabsTrigger>
-              <TabsTrigger value="register">Register</TabsTrigger>
-            </TabsList>
+        <Tabs defaultValue="demo" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="demo">Demo Login (Quick Test)</TabsTrigger>
+            <TabsTrigger value="manual">Manual Login</TabsTrigger>
+          </TabsList>
 
-            <TabsContent value="login" className="space-y-4">
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="login-email">Email</Label>
-                  <Input
-                    id="login-email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
-                    disabled={isLoading}
-                  />
+          {/* Demo Login Tab */}
+          <TabsContent value="demo">
+            <Card className="border-slate-700 bg-slate-800/50 backdrop-blur">
+              <CardHeader>
+                <CardTitle className="text-2xl text-center text-white">Test Different User Roles</CardTitle>
+                <CardDescription className="text-center text-slate-300">
+                  Click any role below to instantly login and explore the system
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {error && (
+                  <Alert variant="destructive" className="mb-6">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {demoUsers.map((user) => {
+                    const Icon = user.icon
+                    const isSelected = selectedDemo === user.role
+
+                    return (
+                      <Card
+                        key={user.role}
+                        className={`cursor-pointer transition-all border-slate-600 bg-slate-700/50 hover:bg-slate-700 ${
+                          isSelected ? "ring-2 ring-orange-500" : ""
+                        }`}
+                        onClick={() => handleDemoLogin(user)}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-start space-x-3">
+                            <div className={`p-2 rounded-lg ${user.color}`}>
+                              <Icon className="w-5 h-5 text-white" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center space-x-2 mb-2">
+                                <h3 className="font-semibold text-white">{user.role}</h3>
+                                <Badge variant="outline" className="text-xs">
+                                  {user.email}
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-slate-300 mb-3">{user.description}</p>
+                              <div className="space-y-1">
+                                <p className="text-xs font-medium text-slate-400">Access Includes:</p>
+                                <div className="flex flex-wrap gap-1">
+                                  {user.permissions.slice(0, 2).map((permission) => (
+                                    <Badge key={permission} variant="secondary" className="text-xs">
+                                      {permission}
+                                    </Badge>
+                                  ))}
+                                  {user.permissions.length > 2 && (
+                                    <Badge variant="secondary" className="text-xs">
+                                      +{user.permissions.length - 2} more
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="login-password">Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="login-password"
-                      type={showLoginPassword ? "text" : "password"}
-                      placeholder="Enter your password"
-                      value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
-                      disabled={isLoading}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                      onClick={() => setShowLoginPassword(!showLoginPassword)}
-                      disabled={isLoading}
-                    >
-                      {showLoginPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </Button>
+                {isLoading && (
+                  <div className="text-center mt-6">
+                    <div className="inline-flex items-center space-x-2 text-slate-300">
+                      <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                      <span>Logging in as {selectedDemo}...</span>
+                    </div>
                   </div>
-                </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Signing in..." : "Sign In"}
-                </Button>
-              </form>
+          {/* Manual Login Tab */}
+          <TabsContent value="manual">
+            <Card className="border-slate-700 bg-slate-800/50 backdrop-blur max-w-md mx-auto">
+              <CardHeader>
+                <CardTitle className="text-2xl text-center text-white">Manual Login</CardTitle>
+                <CardDescription className="text-center text-slate-300">
+                  Enter credentials manually for testing
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {error && (
+                  <Alert variant="destructive" className="mb-4">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
 
-              <div className="space-y-2">
-                <p className="text-sm text-center text-muted-foreground">Demo Accounts:</p>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => demoLogin("admin@masscar.com")}
-                    disabled={isLoading}
-                  >
-                    Admin
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => demoLogin("staff@masscar.com")}
-                    disabled={isLoading}
-                  >
-                    Staff
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => demoLogin("tech@masscar.com")}
-                    disabled={isLoading}
-                  >
-                    Technician
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => demoLogin("customer@masscar.com")}
-                    disabled={isLoading}
-                  >
-                    Customer
-                  </Button>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="register" className="space-y-4">
-              <form onSubmit={handleRegister} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="first-name">First Name *</Label>
+                    <Label htmlFor="email" className="text-slate-200">
+                      Email
+                    </Label>
                     <Input
-                      id="first-name"
-                      placeholder="First name"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      disabled={isLoading}
+                      id="email"
+                      type="email"
+                      placeholder="Enter email address"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
+                      required
                     />
                   </div>
+
                   <div className="space-y-2">
-                    <Label htmlFor="last-name">Last Name *</Label>
-                    <Input
-                      id="last-name"
-                      placeholder="Last name"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      disabled={isLoading}
-                    />
+                    <Label htmlFor="password" className="text-slate-200">
+                      Password
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 pr-10"
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 text-slate-400 hover:text-white"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </Button>
+                    </div>
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Signing in..." : "Sign In"}
+                  </Button>
+                </form>
+
+                {/* Quick Fill Buttons */}
+                <div className="mt-4 pt-4 border-t border-slate-600">
+                  <p className="text-xs text-slate-400 text-center mb-2">Quick Fill:</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {demoUsers.slice(0, 4).map((user) => (
+                      <Button
+                        key={user.role}
+                        variant="outline"
+                        size="sm"
+                        className="text-xs border-slate-600 text-slate-300 hover:text-white"
+                        onClick={() => {
+                          setEmail(user.email)
+                          setPassword(user.password)
+                        }}
+                      >
+                        {user.role}
+                      </Button>
+                    ))}
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
 
-                <div className="space-y-2">
-                  <Label htmlFor="register-email">Email *</Label>
-                  <Input
-                    id="register-email"
-                    type="email"
-                    placeholder="Enter your email"
-                    value={registerEmail}
-                    onChange={(e) => setRegisterEmail(e.target.value)}
-                    disabled={isLoading}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    placeholder="+252-XX-XXX-XXXX"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    disabled={isLoading}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="role">Role</Label>
-                  <Select value={role} onValueChange={(value: any) => setRole(value)} disabled={isLoading}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select your role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="customer">Customer</SelectItem>
-                      <SelectItem value="technician">Technician</SelectItem>
-                      <SelectItem value="staff">Staff</SelectItem>
-                      <SelectItem value="admin">Administrator</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="register-password">Password *</Label>
-                  <div className="relative">
-                    <Input
-                      id="register-password"
-                      type={showRegisterPassword ? "text" : "password"}
-                      placeholder="Create a password (min. 6 characters)"
-                      value={registerPassword}
-                      onChange={(e) => setRegisterPassword(e.target.value)}
-                      disabled={isLoading}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                      onClick={() => setShowRegisterPassword(!showRegisterPassword)}
-                      disabled={isLoading}
-                    >
-                      {showRegisterPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </Button>
-                  </div>
-                </div>
-
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Creating account..." : "Create Account"}
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
-
-          {error && (
-            <Alert variant="destructive" className="mt-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          {success && (
-            <Alert className="mt-4 border-green-200 bg-green-50">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <AlertDescription className="text-green-800">{success}</AlertDescription>
-            </Alert>
-          )}
-        </CardContent>
-      </Card>
+        {/* Footer */}
+        <div className="text-center mt-8 text-sm text-slate-400">
+          <p>🚀 Complete AutoLeap Alternative • Built for Somaliland Workshops</p>
+          <p className="mt-1">
+            All demo accounts use password: <code className="bg-slate-800 px-2 py-1 rounded">123456</code>
+          </p>
+        </div>
+      </div>
     </div>
   )
 }
