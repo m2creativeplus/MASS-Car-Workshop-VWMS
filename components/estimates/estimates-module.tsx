@@ -1,44 +1,36 @@
 "use client"
 
 import { useState } from "react"
-import EstimatesDashboard from "./estimates-dashboard"
-import CreateEstimate from "./create-estimate"
-import EstimateViewer from "./estimate-viewer"
+import { EstimatesDashboard } from "./estimates-dashboard"
+import { CreateEstimate } from "./create-estimate"
+import { EstimateViewer } from "./estimate-viewer"
 
-/**
- * End-to-end Digital Estimating wrapper.
- * Switches between dashboard, create wizard, and viewer.
- */
 export function EstimatesModule() {
   const [view, setView] = useState<"dashboard" | "create" | "view">("dashboard")
-  const [estimateId, setEstimateId] = useState<string | null>(null)
+  const [selectedEstimateId, setSelectedEstimateId] = useState<string | null>(null)
 
-  const gotoDashboard = () => setView("dashboard")
+  const handleCreateEstimate = () => {
+    setView("create")
+  }
+
+  const handleViewEstimate = (estimateId: string) => {
+    setSelectedEstimateId(estimateId)
+    setView("view")
+  }
+
+  const handleBackToDashboard = () => {
+    setView("dashboard")
+    setSelectedEstimateId(null)
+  }
 
   return (
-    <>
-      {view === "dashboard" && (
-        <EstimatesDashboard
-          onCreate={() => setView("create")}
-          onOpen={(id) => {
-            setEstimateId(id)
-            setView("view")
-          }}
-        />
+    <div className="container mx-auto py-6">
+      {view === "dashboard" && <EstimatesDashboard onCreate={handleCreateEstimate} onOpen={handleViewEstimate} />}
+      {view === "create" && <CreateEstimate onBack={handleBackToDashboard} />}
+      {view === "view" && selectedEstimateId && (
+        <EstimateViewer estimateId={selectedEstimateId} onBack={handleBackToDashboard} />
       )}
-
-      {view === "create" && (
-        <CreateEstimate
-          onCancel={gotoDashboard}
-          onSaved={(id) => {
-            setEstimateId(id)
-            setView("view")
-          }}
-        />
-      )}
-
-      {view === "view" && estimateId && <EstimateViewer id={estimateId} onBack={gotoDashboard} />}
-    </>
+    </div>
   )
 }
 

@@ -7,6 +7,7 @@ import { useSupabaseAuth } from "@/components/auth/supabase-auth-provider"
 import { Sidebar } from "@/components/layout/sidebar"
 import { UserMenu } from "@/components/layout/user-menu"
 import { ConnectionStatus } from "@/components/connection-status"
+import dynamic from "next/dynamic"
 
 // Import all modules
 import { Dashboard } from "@/components/dashboard/dashboard"
@@ -16,10 +17,12 @@ import { Appointments } from "@/components/appointments/appointments"
 import { TechnicianDashboard } from "@/components/technicians/technician-dashboard"
 import { ReportsAnalytics } from "@/components/reports/reports-analytics"
 import { AITools } from "@/components/ai-tools/ai-tools"
-import { SuppliersModule } from "@/components/suppliers/suppliers-module"
-import { InspectionsModule } from "@/components/inspections/inspections-module"
-import { EstimatesModule } from "@/components/estimates/estimates-module"
-import DatabaseTest from "@/components/admin/database-test"
+
+// Dynamically import modules that might cause SSR issues
+const SuppliersModule = dynamic(() => import("@/components/suppliers/suppliers-module"), { ssr: false })
+const InspectionsModule = dynamic(() => import("@/components/inspections/inspections-module"), { ssr: false })
+const EstimatesModule = dynamic(() => import("@/components/estimates/estimates-module"), { ssr: false })
+const DatabaseTest = dynamic(() => import("@/components/admin/database-test"), { ssr: false })
 
 function WorkshopSystemContent() {
   const { user, logout } = useSupabaseAuth()
