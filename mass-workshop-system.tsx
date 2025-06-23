@@ -1,23 +1,42 @@
 "use client"
 
 import { useState } from "react"
+import { SupabaseAuthProvider, useSupabaseAuth } from "./components/auth/supabase-auth-provider"
+import { SupabaseLoginForm } from "./components/auth/supabase-login-form"
 import { Sidebar } from "./components/layout/sidebar"
 import { Dashboard } from "./components/dashboard/dashboard"
 import { Customers } from "./components/customers/customers"
 import { Vehicles } from "./components/vehicles/vehicles"
 import { Appointments } from "./components/appointments/appointments"
-import { AITools } from "./components/ai-tools/ai-tools"
 import { TechnicianDashboard } from "./components/technicians/technician-dashboard"
+import { SuppliersModule } from "./components/suppliers/suppliers-module"
+import { InspectionsModule } from "./components/inspections/inspections-module"
+import { EstimatesModule } from "./components/estimates/estimates-module"
 import { ReportsAnalytics } from "./components/reports/reports-analytics"
-import { AuthProvider, useAuth } from "./components/auth/auth-provider"
-import { LoginForm } from "./components/auth/login-form"
+import { AITools } from "./components/ai-tools/ai-tools"
 
-function MassWorkshopContent() {
-  const { user } = useAuth()
+function WorkshopSystemContent() {
+  const { user, isLoading } = useSupabaseAuth()
   const [activeSection, setActiveSection] = useState("dashboard")
 
-  // Move all the existing renderContent logic here
-  const renderContent = () => {
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 bg-orange-500 rounded-xl flex items-center justify-center mx-auto">
+            <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+          </div>
+          <p className="text-lg font-medium">Loading MASS Workshop System...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return <SupabaseLoginForm />
+  }
+
+  const renderActiveSection = () => {
     switch (activeSection) {
       case "dashboard":
         return <Dashboard />
@@ -27,62 +46,42 @@ function MassWorkshopContent() {
         return <Vehicles />
       case "appointments":
         return <Appointments />
-      case "ai-tools":
-        return <AITools />
       case "technicians":
         return <TechnicianDashboard />
+      case "suppliers":
+        return <SuppliersModule />
+      case "inspections":
+        return <InspectionsModule />
+      case "estimates":
+        return <EstimatesModule />
       case "inventory":
         return (
-          <div className="p-8">
-            <h1 className="text-2xl font-bold">Inventory Module</h1>
+          <div className="p-6">
+            <h1 className="text-2xl font-bold">Inventory Management</h1>
             <p>Coming soon...</p>
           </div>
         )
       case "reports":
         return <ReportsAnalytics />
+      case "ai-tools":
+        return <AITools />
       default:
         return <Dashboard />
     }
   }
 
-  if (!user) {
-    return null // This will be handled by the parent component
-  }
-
   return (
     <div className="flex h-screen bg-gray-50">
       <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-      <main className="flex-1 overflow-auto">
-        <div className="p-8">{renderContent()}</div>
-      </main>
+      <main className="flex-1 overflow-auto">{renderActiveSection()}</main>
     </div>
   )
 }
 
 export default function MassWorkshopSystem() {
   return (
-    <AuthProvider>
-      <MassWorkshopApp />
-    </AuthProvider>
+    <SupabaseAuthProvider>
+      <WorkshopSystemContent />
+    </SupabaseAuthProvider>
   )
-}
-
-function MassWorkshopApp() {
-  const { user, login, isLoading } = useAuth()
-  const [loginError, setLoginError] = useState<string | null>(null)
-
-  const handleLogin = async (email: string, password: string) => {
-    setLoginError(null)
-    const success = await login(email, password)
-    if (!success) {
-      setLoginError("Invalid email or password. Please try again.")
-    }
-    return success
-  }
-
-  if (!user) {
-    return <LoginForm onLogin={handleLogin} isLoading={isLoading} error={loginError || undefined} />
-  }
-
-  return <MassWorkshopContent />
 }
