@@ -9,53 +9,18 @@ interface User {
   firstName: string
   lastName: string
   phone?: string
+  loginTime?: string
 }
 
 interface AuthContextType {
   user: User | null
   login: (email: string, password: string) => Promise<boolean>
-  logout: () => void
+  logout: () => Promise<void>
   isLoading: boolean
   hasPermission: (module: string, action: string) => boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
-
-// Demo users data
-const demoUsers: Record<string, User> = {
-  "admin@masscar.com": {
-    id: 1,
-    email: "admin@masscar.com",
-    role: "admin",
-    firstName: "System",
-    lastName: "Administrator",
-    phone: "+252-61-234-5678",
-  },
-  "staff@masscar.com": {
-    id: 2,
-    email: "staff@masscar.com",
-    role: "staff",
-    firstName: "Workshop",
-    lastName: "Staff",
-    phone: "+252-61-234-5679",
-  },
-  "tech@masscar.com": {
-    id: 3,
-    email: "tech@masscar.com",
-    role: "technician",
-    firstName: "Senior",
-    lastName: "Technician",
-    phone: "+252-61-234-5680",
-  },
-  "customer@masscar.com": {
-    id: 4,
-    email: "customer@masscar.com",
-    role: "customer",
-    firstName: "Demo",
-    lastName: "Customer",
-    phone: "+252-61-234-5681",
-  },
-}
 
 // Role permissions mapping
 const rolePermissions: Record<string, Record<string, Record<string, boolean>>> = {
@@ -115,7 +80,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Check for existing session
     const savedUser = localStorage.getItem("mass_user")
     if (savedUser) {
-      setUser(JSON.parse(savedUser))
+      try {
+        const userData = JSON.parse(savedUser)
+        setUser(userData)
+      } catch (error) {
+        console.error("Error parsing saved user data:", error)
+        localStorage.removeItem("mass_user")
+      }
     }
     setIsLoading(false)
   }, [])
@@ -123,25 +94,54 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true)
 
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      })
 
-    // Check demo credentials
-    if (password === "123456" && demoUsers[email]) {
-      const userData = demoUsers[email]
-      setUser(userData)
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.error("Login failed:", errorData.error)
+        setIsLoading(false)
+        return false
+      }
+
+      const { user: userData } = await response.json()
+
+      // Store user data in local storage
       localStorage.setItem("mass_user", JSON.stringify(userData))
+
+      // Update application state
+      setUser(userData)
       setIsLoading(false)
       return true
+    } catch (error) {
+      console.error("Login error:", error)
+      setIsLoading(false)
+      return false
     }
-
-    setIsLoading(false)
-    return false
   }
 
-  const logout = () => {
-    setUser(null)
-    localStorage.removeItem("mass_user")
+  const logout = async (): Promise<void> => {
+    try {
+      // Call logout API
+      await fetch("/api/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+    } catch (error) {
+      console.error("Logout API error:", error)
+    } finally {
+      // Clear local state regardless of API call success
+      setUser(null)
+      localStorage.removeItem("mass_user")
+    }
   }
 
   const hasPermission = (module: string, action: string): boolean => {

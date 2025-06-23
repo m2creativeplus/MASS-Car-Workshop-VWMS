@@ -1,4 +1,6 @@
 "use client"
+
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -10,13 +12,20 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { User, Settings, LogOut, Shield } from "lucide-react"
 import { useAuth } from "../auth/auth-provider"
+import { User, Settings, LogOut, Shield } from "lucide-react"
 
 export function UserMenu() {
   const { user, logout } = useAuth()
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   if (!user) return null
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    await logout()
+    setIsLoggingOut(false)
+  }
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
@@ -48,7 +57,7 @@ export function UserMenu() {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent className="w-80" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-2">
             <div className="flex items-center space-x-2">
@@ -56,32 +65,36 @@ export function UserMenu() {
                 {user.firstName} {user.lastName}
               </p>
               <Badge className={`text-xs ${getRoleBadgeColor(user.role)}`}>
+                <Shield className="w-3 h-3 mr-1" />
                 {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
               </Badge>
             </div>
             <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
             {user.phone && <p className="text-xs leading-none text-muted-foreground">{user.phone}</p>}
+            {user.loginTime && (
+              <p className="text-xs leading-none text-muted-foreground">
+                Logged in: {new Date(user.loginTime).toLocaleString()}
+              </p>
+            )}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem className="cursor-pointer">
           <User className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem className="cursor-pointer">
           <Settings className="mr-2 h-4 w-4" />
           <span>Settings</span>
         </DropdownMenuItem>
-        {user.role === "admin" && (
-          <DropdownMenuItem>
-            <Shield className="mr-2 h-4 w-4" />
-            <span>Admin Panel</span>
-          </DropdownMenuItem>
-        )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={logout} className="text-red-600">
+        <DropdownMenuItem
+          className="cursor-pointer text-red-600 focus:text-red-600"
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+        >
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
+          <span>{isLoggingOut ? "Signing out..." : "Sign out"}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
