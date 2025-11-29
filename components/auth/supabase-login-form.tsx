@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Eye, EyeOff, Car, AlertCircle, Shield, Users, Wrench, User } from "lucide-react"
+import { Eye, EyeOff, Car, AlertCircle, Shield, Users, Wrench, User } from 'lucide-react'
 import { useSupabaseAuth } from "./supabase-auth-provider"
 
 const demoUsers = [
@@ -64,17 +64,27 @@ export function SupabaseLoginForm() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email || !password) return
+    if (!email || !password) {
+      setError("Please enter both email and password")
+      return
+    }
 
     setIsLoading(true)
     setError(null)
 
-    const result = await login(email, password)
-    if (!result.success) {
-      setError(result.error || "Login failed")
+    try {
+      const result = await login(email, password)
+      if (!result.success) {
+        setError(result.error || "Login failed")
+        console.error("[LoginForm] Login failed:", result.error)
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred"
+      setError(errorMessage)
+      console.error("[LoginForm] Unexpected error:", err)
+    } finally {
+      setIsLoading(false)
     }
-
-    setIsLoading(false)
   }
 
   const handleDemoLogin = async (demoUser: (typeof demoUsers)[0]) => {
@@ -84,12 +94,19 @@ export function SupabaseLoginForm() {
     setIsLoading(true)
     setError(null)
 
-    const result = await login(demoUser.email, demoUser.password)
-    if (!result.success) {
-      setError(result.error || "Demo login failed")
+    try {
+      const result = await login(demoUser.email, demoUser.password)
+      if (!result.success) {
+        setError(result.error || "Demo login failed")
+        console.error("[LoginForm] Demo login failed:", result.error)
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred"
+      setError(errorMessage)
+      console.error("[LoginForm] Demo login error:", err)
+    } finally {
+      setIsLoading(false)
     }
-
-    setIsLoading(false)
   }
 
   return (
@@ -128,7 +145,15 @@ export function SupabaseLoginForm() {
                 {error && (
                   <Alert variant="destructive" className="mb-6">
                     <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>{error}</AlertDescription>
+                    <AlertDescription>
+                      {error}
+                      {error.includes("Connection failed") && (
+                        <p className="text-sm mt-2">
+                          Make sure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set in your
+                          environment.
+                        </p>
+                      )}
+                    </AlertDescription>
                   </Alert>
                 )}
 

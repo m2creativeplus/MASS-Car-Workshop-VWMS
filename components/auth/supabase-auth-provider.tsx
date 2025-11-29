@@ -26,6 +26,7 @@ interface AuthContextType {
   ) => Promise<{ success: boolean; error?: string }>
   isLoading: boolean
   hasPermission: (module: string, action: string) => boolean
+  authError: string | null
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -84,19 +85,25 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [supabaseUser, setSupabaseUser] = useState<SupabaseUser | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [authError, setAuthError] = useState<string | null>(null)
 
   useEffect(() => {
     // Get initial session
     const getInitialSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
 
-      if (session?.user) {
-        await loadUserProfile(session.user)
+        if (session?.user) {
+          await loadUserProfile(session.user)
+        }
+      } catch (error) {
+        console.error("[Auth] Failed to get initial session:", error)
+        setAuthError("Failed to establish session")
+      } finally {
+        setIsLoading(false)
       }
-
-      setIsLoading(false)
     }
 
     getInitialSession()
@@ -105,13 +112,18 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session?.user) {
-        await loadUserProfile(session.user)
-      } else {
-        setUser(null)
-        setSupabaseUser(null)
+      try {
+        if (session?.user) {
+          await loadUserProfile(session.user)
+        } else {
+          setUser(null)
+          setSupabaseUser(null)
+        }
+      } catch (error) {
+        console.error("[Auth] Auth state change error:", error)
+      } finally {
+        setIsLoading(false)
       }
-      setIsLoading(false)
     })
 
     return () => subscription.unsubscribe()
@@ -125,8 +137,38 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
         .eq("user_id", supabaseUser.id)
         .single()
 
+      if (error?.code === "PGRST116") {
+        console.warn("[Auth] User profile not found, creating default profile")
+        const defaultProfile: UserProfile = {
+          id: "",
+          user_id: supabaseUser.id,
+          first_name: supabaseUser.user_metadata?.first_name || "",
+          last_name: supabaseUser.user_metadata?.last_name || "",
+          role: supabaseUser.user_metadata?.role || "customer",
+          is_active: true,
+          phone: supabaseUser.user_metadata?.phone,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }
+
+        const authUser: AuthUser = {
+          id: supabaseUser.id,
+          email: supabaseUser.email!,
+          role: defaultProfile.role,
+          firstName: defaultProfile.first_name,
+          lastName: defaultProfile.last_name,
+          phone: defaultProfile.phone,
+          isActive: true,
+        }
+
+        setUser(authUser)
+        setSupabaseUser(supabaseUser)
+        return
+      }
+
       if (error) {
-        console.error("Error loading user profile:", error)
+        console.error("[Auth] Error loading user profile:", error)
+        setAuthError("Failed to load user profile")
         return
       }
 
@@ -145,13 +187,19 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
         setSupabaseUser(supabaseUser)
       }
     } catch (error) {
-      console.error("Error in loadUserProfile:", error)
+      console.error("[Auth] Error in loadUserProfile:", error)
+      setAuthError("Failed to load profile")
     }
   }
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
       setIsLoading(true)
+      setAuthError(null)
+
+      if (!email || !password) {
+        return { success: false, error: "Email and password are required" }
+      }
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -159,7 +207,14 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
       })
 
       if (error) {
-        return { success: false, error: error.message }
+        console.error("[Auth] Login error:", error)
+        let errorMessage = error.message
+        if (error.message.includes("Invalid login credentials")) {
+          errorMessage = "Invalid email or password"
+        } else if (error.message.includes("Failed to fetch")) {
+          errorMessage = "Connection failed - please check your internet and try again"
+        }
+        return { success: false, error: errorMessage }
       }
 
       if (data.user) {
@@ -168,7 +223,9 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 
       return { success: true }
     } catch (error) {
-      return { success: false, error: "An unexpected error occurred" }
+      const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred"
+      console.error("[Auth] Unexpected login error:", error)
+      return { success: false, error: errorMessage }
     } finally {
       setIsLoading(false)
     }
@@ -181,6 +238,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
   ): Promise<{ success: boolean; error?: string }> => {
     try {
       setIsLoading(true)
+      setAuthError(null)
 
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -192,16 +250,20 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
             role: userData.role || "customer",
             phone: userData.phone,
           },
+          emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || window.location.origin,
         },
       })
 
       if (error) {
+        console.error("[Auth] Registration error:", error)
         return { success: false, error: error.message }
       }
 
       return { success: true }
     } catch (error) {
-      return { success: false, error: "An unexpected error occurred" }
+      const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred"
+      console.error("[Auth] Unexpected registration error:", error)
+      return { success: false, error: errorMessage }
     } finally {
       setIsLoading(false)
     }
@@ -212,8 +274,10 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
       await supabase.auth.signOut()
       setUser(null)
       setSupabaseUser(null)
+      setAuthError(null)
     } catch (error) {
-      console.error("Error during logout:", error)
+      console.error("[Auth] Error during logout:", error)
+      setAuthError("Logout failed")
     }
   }
 
@@ -239,6 +303,7 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
         register,
         isLoading,
         hasPermission,
+        authError,
       }}
     >
       {children}

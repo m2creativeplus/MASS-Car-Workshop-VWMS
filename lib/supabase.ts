@@ -1,25 +1,32 @@
 import { createClient } from "@supabase/supabase-js"
 
-const supabaseUrl = "https://bnqcimnejaemtcpanqnq.supabase.co"
-const supabaseKey =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  process.env.SUPABASE_KEY ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJucWNpbW5lamFlbXRjcGFucW5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2OTM0NTIsImV4cCI6MjA2NjI2OTQ1Mn0.sbLMOhRs2DC55G9Sajd7Hplrv3GB8l_DuL07up33t00"
+const supabaseUrl =
+  process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || "https://bnqcimnejaemtcpanqnq.supabase.co"
 
-// Create a function to get the Supabase client safely
-export const getSupabaseClient = () => {
-  if (!supabaseKey) {
-    console.warn("Supabase key not available, using fallback configuration")
-    return createClient(
-      supabaseUrl,
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJucWNpbW5lamFlbXRjcGFucW5xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2OTM0NTIsImV4cCI6MjA2NjI2OTQ1Mn0.sbLMOhRs2DC55G9Sajd7Hplrv3GB8l_DuL07up33t00",
-    )
-  }
-  return createClient(supabaseUrl, supabaseKey)
+const supabaseKey =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_KEY
+
+// Validate that required configuration is available
+if (!supabaseKey) {
+  throw new Error("[Supabase] Missing Supabase anon key. Please add SUPABASE_ANON_KEY to your environment variables.")
 }
 
-// Export the client for backward compatibility
-export const supabase = getSupabaseClient()
+console.log("[v0] Supabase URL:", supabaseUrl)
+console.log("[v0] Supabase key configured:", !!supabaseKey)
+
+// Create Supabase client - will use public anon key for client-side operations
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+  },
+  global: {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  },
+})
 
 // Database types
 export interface User {
