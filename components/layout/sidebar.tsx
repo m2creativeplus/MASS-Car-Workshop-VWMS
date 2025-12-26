@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -18,12 +18,17 @@ import {
   Database,
   ChevronLeft,
   ChevronRight,
+  Settings,
+  LogOut,
+  Menu,
 } from "lucide-react"
 import { useSupabaseAuth } from "@/components/auth/supabase-auth-provider"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface SidebarProps {
   activeModule: string
   onModuleChange: (module: string) => void
+  userRole?: string
 }
 
 const menuItems = [
@@ -33,78 +38,142 @@ const menuItems = [
   { id: "appointments", label: "Appointments", icon: Calendar, roles: ["admin", "staff", "technician", "customer"] },
   { id: "technicians", label: "Technicians", icon: UserCheck, roles: ["admin", "staff"] },
   { id: "suppliers", label: "Suppliers", icon: Building2, roles: ["admin", "staff"] },
-  { id: "inspections", label: "Inspections", icon: ClipboardCheck, roles: ["admin", "staff", "technician"] },
-  { id: "estimates", label: "Estimates", icon: FileText, roles: ["admin", "staff", "technician"] },
-  { id: "reports", label: "Reports", icon: BarChart3, roles: ["admin", "staff"] },
-  { id: "ai-tools", label: "AI Tools", icon: Bot, roles: ["admin", "staff", "technician"] },
-  { id: "database-test", label: "Database Test", icon: Database, roles: ["admin"] },
+  { id: "inspections", label: "DVI Inspections", icon: ClipboardCheck, roles: ["admin", "staff", "technician"] },
+  { id: "estimates", label: "Estimates & Invoices", icon: FileText, roles: ["admin", "staff", "technician"] },
+  { id: "reports", label: "Analytics", icon: BarChart3, roles: ["admin", "staff"] },
+  { id: "ai-tools", label: "AI Assistant", icon: Bot, roles: ["admin", "staff", "technician"] },
 ]
 
-export function Sidebar({ activeModule, onModuleChange }: SidebarProps) {
+export function Sidebar({ activeModule, onModuleChange, userRole }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const { user, hasPermission } = useSupabaseAuth()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const filteredMenuItems = menuItems.filter((item) => {
-    if (!user) return false
-    return item.roles.includes(user.role) && hasPermission(item.id, "read")
+    // If userRole prop is passed, use it, otherwise fall back to user object or allow all if neither
+    const role = userRole || user?.role || "admin" 
+    
+    // Check role inclusion
+    if (item.roles && !item.roles.includes(role)) return false
+    
+    // Check permission if user object exists
+    if (user && !hasPermission(item.id, "read")) return false
+    
+    return true
   })
 
   return (
     <div
       className={cn(
-        "flex flex-col h-full bg-white border-r border-gray-200 transition-all duration-300",
-        isCollapsed ? "w-16" : "w-64",
+        "flex flex-col h-full sidebar-premium border-r border-sidebar-border transition-all duration-300 shadow-2xl z-50",
+        isCollapsed ? "w-[80px]" : "w-[280px]",
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
-        {!isCollapsed && (
-          <div className="flex items-center space-x-2">
-            <Car className="h-6 w-6 text-blue-600" />
-            <span className="font-bold text-gray-900">MASS VWMS</span>
+      <div className="flex items-center p-6 mb-2">
+        <div className={cn("flex items-center gap-3 transition-opacity duration-200", isCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 flex-1")}>
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
+            <Car className="h-6 w-6 text-white" />
           </div>
-        )}
-        <Button variant="ghost" size="sm" onClick={() => setIsCollapsed(!isCollapsed)} className="h-8 w-8 p-0">
-          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          <div className="flex flex-col">
+            <span className="font-bold text-lg text-white tracking-tight">MASS</span>
+            <span className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">Automotive</span>
+          </div>
+        </div>
+        
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={() => setIsCollapsed(!isCollapsed)} 
+          className="text-slate-400 hover:text-white hover:bg-white/10 rounded-full h-8 w-8 ml-auto"
+        >
+          {isCollapsed ? <Menu className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </Button>
       </div>
 
       {/* Navigation */}
-      <ScrollArea className="flex-1 px-3 py-4">
-        <nav className="space-y-2">
-          {filteredMenuItems.map((item) => {
+      <ScrollArea className="flex-1 px-4">
+        <nav className="space-y-1.5">
+          {filteredMenuItems.map((item, index) => {
             const Icon = item.icon
             const isActive = activeModule === item.id
 
             return (
-              <Button
+              <button
                 key={item.id}
-                variant={isActive ? "default" : "ghost"}
-                className={cn(
-                  "w-full justify-start",
-                  isCollapsed && "px-2",
-                  isActive && "bg-blue-600 text-white hover:bg-blue-700",
-                )}
                 onClick={() => onModuleChange(item.id)}
+                className={cn(
+                  "sidebar-item w-full group relative",
+                  isActive && "sidebar-item-active",
+                  isCollapsed && "justify-center px-0 py-4"
+                )}
+                style={{ animationDelay: `${index * 50}ms` }}
               >
-                <Icon className={cn("h-4 w-4", !isCollapsed && "mr-2")} />
-                {!isCollapsed && <span>{item.label}</span>}
-              </Button>
+                <div className={cn(
+                  "flex items-center justify-center transition-colors duration-200",
+                  isActive ? "text-orange-500" : "text-slate-400 group-hover:text-white"
+                )}>
+                  <Icon className="h-5 w-5" />
+                </div>
+                
+                {!isCollapsed && (
+                  <span className={cn(
+                    "font-medium text-sm ml-3 transition-colors duration-200",
+                    isActive ? "text-white" : "text-slate-400 group-hover:text-white"
+                  )}>
+                    {item.label}
+                  </span>
+                )}
+
+                {/* Hover Glow Effect */}
+                {!isActive && (
+                  <div className="absolute inset-0 rounded-lg bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" />
+                )}
+                
+                {/* Active Indicator for Collapsed Mode */}
+                {isCollapsed && isActive && (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-orange-500 rounded-r-full" />
+                )}
+              </button>
             )
           })}
         </nav>
       </ScrollArea>
 
-      {/* Footer */}
-      {!isCollapsed && (
-        <div className="p-4 border-t">
-          <div className="text-xs text-gray-500 text-center">
-            MASS Car Workshop VWMS
-            <br />
-            v1.0.0
+      {/* User Profile Footer */}
+      <div className="p-4 mt-auto">
+        <div className={cn(
+          "rounded-xl bg-white/5 border border-white/10 p-3 transition-all duration-300 hover:bg-white/10 hover:border-white/20 cursor-pointer overflow-hidden",
+          isCollapsed ? "items-center justify-center flex" : ""
+        )}>
+          <div className="flex items-center gap-3">
+             <Avatar className="h-9 w-9 border-2 border-orange-500/20">
+              <AvatarFallback className="bg-orange-500 text-white font-bold">
+                {user?.role?.charAt(0).toUpperCase() || "A"}
+              </AvatarFallback>
+            </Avatar>
+            
+            {!isCollapsed && (
+              <div className="flex flex-col overflow-hidden">
+                <span className="text-sm font-medium text-white truncate">
+                  {user?.firstName ? `${user.firstName} ${user.lastName?.[0]}.` : "Current User"}
+                </span>
+                <span className="text-xs text-slate-400 capitalize">
+                  {user?.role || "Administrator"}
+                </span>
+              </div>
+            )}
+            
+            {!isCollapsed && (
+              <LogOut className="h-4 w-4 text-slate-400 ml-auto hover:text-red-400 transition-colors" />
+            )}
           </div>
         </div>
-      )}
+      </div>
     </div>
   )
 }

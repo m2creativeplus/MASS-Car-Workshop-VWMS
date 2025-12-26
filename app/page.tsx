@@ -1,6 +1,4 @@
-import dynamic from "next/dynamic"
-
-const MassWorkshopSystem = dynamic(() => import("../mass-workshop-system"), { ssr: false })
+import MassWorkshopSystem from "../mass-workshop-system"
 
 export default function Page() {
   return <MassWorkshopSystem />

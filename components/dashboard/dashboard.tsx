@@ -1,349 +1,226 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { PremiumKPICard } from "@/components/ui/premium-kpi-card"
 import {
   Users,
   Car,
   Package,
-  UserPlus,
   Wrench,
-  ChevronLeft,
-  ChevronRight,
-  X,
-  Minimize2,
-  Plus,
-  ExternalLink,
+  TrendingUp,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+  MoreHorizontal,
+  Plus
 } from "lucide-react"
 import { useState } from "react"
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+
+const revenueData = [
+  { name: 'Mon', revenue: 4000 },
+  { name: 'Tue', revenue: 3000 },
+  { name: 'Wed', revenue: 5500 },
+  { name: 'Thu', revenue: 4500 },
+  { name: 'Fri', revenue: 6800 },
+  { name: 'Sat', revenue: 7200 },
+  { name: 'Sun', revenue: 3800 },
+]
 
 export function Dashboard() {
-  const [showSetupWizard, setShowSetupWizard] = useState(true)
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 5, 1)) // June 2025
-  const [calendarView, setCalendarView] = useState<"Month" | "Week" | "Day">("Month")
-
-  const stats = [
-    { title: "EMPLOYEES", value: "1", icon: Users, color: "text-teal-600", bgColor: "bg-teal-100" },
-    { title: "CUSTOMERS", value: "1", icon: Users, color: "text-orange-600", bgColor: "bg-orange-100" },
-    { title: "SUPPLIERS", value: "1", icon: UserPlus, color: "text-pink-600", bgColor: "bg-pink-100" },
-    { title: "PRODUCTS", value: "1", icon: Package, color: "text-purple-600", bgColor: "bg-purple-100" },
-    { title: "VEHICLE SELL", value: "0", icon: Car, color: "text-blue-600", bgColor: "bg-blue-100" },
-    { title: "SERVICES", value: "2", icon: Wrench, color: "text-indigo-600", bgColor: "bg-indigo-100" },
-  ]
-
-  const recentCustomer = {
-    name: "Washingtone Ochieng",
-    email: "Samuel@gmail.com",
-    avatar: "WO",
-  }
-
-  // Generate calendar days for June 2025
-  const generateCalendarDays = () => {
-    const year = currentDate.getFullYear()
-    const month = currentDate.getMonth()
-    const firstDay = new Date(year, month, 1)
-    const lastDay = new Date(year, month + 1, 0)
-    const startDate = new Date(firstDay)
-    startDate.setDate(startDate.getDate() - firstDay.getDay())
-
-    const days = []
-    const currentDateObj = new Date(startDate)
-
-    for (let i = 0; i < 42; i++) {
-      days.push(new Date(currentDateObj))
-      currentDateObj.setDate(currentDateObj.getDate() + 1)
-    }
-
-    return days
-  }
-
-  const calendarDays = generateCalendarDays()
-  const monthNames = [
-    "JANUARY",
-    "FEBRUARY",
-    "MARCH",
-    "APRIL",
-    "MAY",
-    "JUNE",
-    "JULY",
-    "AUGUST",
-    "SEPTEMBER",
-    "OCTOBER",
-    "NOVEMBER",
-    "DECEMBER",
-  ]
-  const dayNames = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
-
-  const navigateMonth = (direction: "prev" | "next") => {
-    const newDate = new Date(currentDate)
-    if (direction === "prev") {
-      newDate.setMonth(newDate.getMonth() - 1)
-    } else {
-      newDate.setMonth(newDate.getMonth() + 1)
-    }
-    setCurrentDate(newDate)
-  }
+  const [timeRange, setTimeRange] = useState("week")
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
+    <div className="space-y-8 animate-fade-in-up">
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-700">Dashboard : Admin</h1>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Dashboard Overview</h1>
+          <p className="text-muted-foreground mt-1">Welcome back, Admin. Here's what's happening at the workshop today.</p>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="ghost" size="sm">
-            <Plus className="w-4 h-4" />
+        <div className="flex gap-3">
+          <Button variant="outline" className="glass-card">
+            <Clock className="mr-2 h-4 w-4" />
+            History
           </Button>
-          <Button variant="ghost" size="sm">
-            <ExternalLink className="w-4 h-4" />
+          <Button className="bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20">
+            <Plus className="mr-2 h-4 w-4" />
+            New Job Card
           </Button>
-          <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">A</span>
-          </div>
         </div>
       </div>
 
-      {/* Setup Wizard */}
-      {showSetupWizard && (
-        <Card className="bg-gray-100">
-          <CardHeader className="pb-2">
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-lg text-gray-700">Setup Wizard</CardTitle>
-              <div className="flex space-x-2">
-                <Button variant="ghost" size="sm" onClick={() => setShowSetupWizard(false)}>
-                  <Minimize2 className="w-4 h-4" />
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => setShowSetupWizard(false)}>
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-        </Card>
-      )}
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {stats.map((stat, index) => {
-          const Icon = stat.icon
-          return (
-            <Card key={index} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className={`w-12 h-12 rounded-lg ${stat.bgColor} flex items-center justify-center mb-3`}>
-                      <Icon className={`w-6 h-6 ${stat.color}`} />
-                    </div>
-                    <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
-                    <p className="text-sm font-medium text-gray-600 mt-1">{stat.title}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )
-        })}
+      {/* KPI Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <PremiumKPICard 
+          title="Total Revenue" 
+          value="$12,450" 
+          icon={TrendingUp} 
+          trend={{ value: 12, label: "vs last week", positive: true }}
+          color="success"
+          index={0}
+        />
+        <PremiumKPICard 
+          title="Active Jobs" 
+          value="18" 
+          icon={Wrench} 
+          trend={{ value: 4, label: "new today", positive: true }}
+          color="primary"
+          index={1}
+        />
+        <PremiumKPICard 
+          title="Vehicles In" 
+          value="24" 
+          icon={Car} 
+          color="info"
+          index={2}
+        />
+        <PremiumKPICard 
+          title="Pending Parts" 
+          value="5" 
+          icon={Package} 
+          trend={{ value: 2, label: "delayed", positive: false }}
+          color="warning"
+          index={3}
+        />
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Services Chart */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg">Services</CardTitle>
-            <ExternalLink className="w-4 h-4 text-gray-400" />
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-center">
-              <div className="relative w-32 h-32">
-                <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 36 36">
-                  <path
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="#e5e7eb"
-                    strokeWidth="3"
-                  />
-                  <path
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="#10b981"
-                    strokeWidth="3"
-                    strokeDasharray="50, 100"
-                  />
-                  <path
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="#f97316"
-                    strokeWidth="3"
-                    strokeDasharray="50, 100"
-                    strokeDashoffset="-50"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl font-bold text-gray-900">2</span>
-                  <span className="text-sm text-gray-600">Total</span>
-                  <span className="text-sm text-gray-600">Services</span>
-                </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* Revenue Chart */}
+        <Card className="lg:col-span-2 glass-card border-none shadow-sm">
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle>Revenue Analytics</CardTitle>
+                <CardDescription>Income breakdown over time</CardDescription>
+              </div>
+              <div className="flex bg-muted rounded-lg p-1">
+                {["daily", "week", "month"].map((range) => (
+                  <button
+                    key={range}
+                    onClick={() => setTimeRange(range)}
+                    className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
+                      timeRange === range 
+                        ? "bg-white dark:bg-slate-700 text-foreground shadow-sm" 
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {range.charAt(0).toUpperCase() + range.slice(1)}
+                  </button>
+                ))}
               </div>
             </div>
-            <div className="flex justify-between mt-6">
-              <div className="text-center">
-                <div className="flex items-center justify-center mb-1">
-                  <div className="w-3 h-3 bg-orange-500 rounded-sm mr-2"></div>
-                </div>
-                <div className="text-xl font-bold">1</div>
-                <div className="text-sm text-gray-600">Free Services</div>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center mb-1">
-                  <div className="w-3 h-3 bg-green-500 rounded-sm mr-2"></div>
-                </div>
-                <div className="text-xl font-bold">1</div>
-                <div className="text-sm text-gray-600">Paid Services</div>
-              </div>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                  <XAxis 
+                    dataKey="name" 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12} 
+                    tickLine={false} 
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fontSize={12} 
+                    tickLine={false} 
+                    axisLine={false}
+                    tickFormatter={(value) => `$${value}`}
+                  />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'hsl(var(--popover))', 
+                      borderRadius: '8px', 
+                      border: '1px solid hsl(var(--border))',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                    }}
+                    itemStyle={{ color: 'hsl(var(--foreground))' }}
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="revenue" 
+                    stroke="hsl(var(--primary))" 
+                    strokeWidth={3}
+                    fillOpacity={1} 
+                    fill="url(#colorRevenue)" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </CardContent>
         </Card>
 
-        {/* Recently Joined Customer */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg">Recently Joined Customer</CardTitle>
-            <ExternalLink className="w-4 h-4 text-gray-400" />
+        {/* Live Activity Feed */}
+        <Card className="glass-card border-none shadow-sm h-full">
+          <CardHeader>
+            <CardTitle>Live Activity</CardTitle>
+            <CardDescription>Real-time workshop updates</CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold">{recentCustomer.avatar}</span>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-900">{recentCustomer.name}</h3>
-                <p className="text-sm text-gray-600">{recentCustomer.email}</p>
-              </div>
+          <CardContent className="h-[350px] overflow-auto pr-2 custom-scrollbar">
+            <div className="space-y-6">
+              {[
+                { time: "10 mins ago", text: "Job #4052 completed by Mike", icon: CheckCircle2, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+                { time: "25 mins ago", text: "New booking: Toyota Land Cruiser", icon: Car, color: "text-blue-500", bg: "bg-blue-500/10" },
+                { time: "1 hour ago", text: "Parts order #992 delayed", icon: AlertCircle, color: "text-amber-500", bg: "bg-amber-500/10" },
+                { time: "2 hours ago", text: "Inspection report sent to Sarah", icon: FileText, color: "text-purple-500", bg: "bg-purple-500/10" },
+                { time: "3 hours ago", text: "Tech John started Job #4055", icon: Wrench, color: "text-orange-500", bg: "bg-orange-500/10" },
+              ].map((activity, i) => (
+                <div key={i} className="flex gap-4 group">
+                  <div className={`mt-1 h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 ${activity.bg} ${activity.color}`}>
+                    <activity.icon className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <p className="text-sm font-medium leading-none text-foreground">{activity.text}</p>
+                    <p className="text-xs text-muted-foreground">{activity.time}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Calendar and Service Details */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Calendar */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-lg">Calendar</CardTitle>
-              <div className="flex items-center space-x-2">
-                <Badge variant="outline" className="text-orange-500">
-                  ● Open
-                </Badge>
-                <Badge variant="outline" className="text-green-500">
-                  ● Completed
-                </Badge>
+      {/* Technician Status Board */}
+      <h2 className="text-xl font-bold text-foreground tracking-tight mt-8">Technician Status</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[
+          { name: "John Doe", status: "Working", job: "Brake Service - BMW X5", avatar: "JD", color: "emerald" },
+          { name: "Mike Ross", status: "Available", job: "Waiting for assignment", avatar: "MR", color: "blue" },
+          { name: "Sarah Smith", status: "Break", job: "Returning at 2:00 PM", avatar: "SS", color: "amber" },
+        ].map((tech, i) => (
+          <Card key={i} className="glass-card hover:bg-muted/50 transition-colors">
+            <CardContent className="p-4 flex items-center gap-4">
+              <div className="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-slate-600 dark:text-slate-300">
+                {tech.avatar}
               </div>
-            </div>
-            <div className="flex items-center justify-between mt-4">
-              <Button variant="ghost" size="sm" onClick={() => navigateMonth("prev")}>
-                <ChevronLeft className="w-4 h-4" />
-              </Button>
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-500">Today</span>
-                <span className="text-lg font-semibold text-orange-500">
-                  {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-                </span>
-                <div className="flex space-x-1">
-                  {["Month", "Week", "Day"].map((view) => (
-                    <Button
-                      key={view}
-                      variant={calendarView === view ? "default" : "ghost"}
-                      size="sm"
-                      onClick={() => setCalendarView(view as "Month" | "Week" | "Day")}
-                      className="text-xs"
-                    >
-                      {view}
-                    </Button>
-                  ))}
+              <div className="flex-1">
+                <div className="flex justify-between items-center mb-1">
+                  <h4 className="font-bold text-sm">{tech.name}</h4>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium border ${
+                    tech.color === 'emerald' ? 'bg-emerald-100/50 text-emerald-700 border-emerald-200' :
+                    tech.color === 'blue' ? 'bg-blue-100/50 text-blue-700 border-blue-200' :
+                    'bg-amber-100/50 text-amber-700 border-amber-200'
+                  }`}>
+                    {tech.status}
+                  </span>
                 </div>
-              </div>
-              <Button variant="ghost" size="sm" onClick={() => navigateMonth("next")}>
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-7 gap-1 mb-2">
-              {dayNames.map((day) => (
-                <div key={day} className="text-center text-xs font-medium text-gray-500 p-2">
-                  {day}
-                </div>
-              ))}
-            </div>
-            <div className="grid grid-cols-7 gap-1">
-              {calendarDays.map((day, index) => {
-                const isCurrentMonth = day.getMonth() === currentDate.getMonth()
-                const isToday = day.toDateString() === new Date().toDateString()
-                const hasEvent = day.getDate() === 21 && isCurrentMonth // Sample event on 21st
-
-                return (
-                  <div
-                    key={index}
-                    className={`
-                      text-center p-2 text-sm cursor-pointer hover:bg-gray-100 rounded
-                      ${!isCurrentMonth ? "text-gray-300" : "text-gray-700"}
-                      ${isToday ? "bg-blue-100 text-blue-600 font-semibold" : ""}
-                      ${hasEvent ? "bg-orange-100" : ""}
-                    `}
-                  >
-                    {day.getDate()}
-                  </div>
-                )
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Service Details */}
-        <div className="space-y-6">
-          {/* Upcoming Service Details */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg">Upcoming Service Details</CardTitle>
-              <ExternalLink className="w-4 h-4 text-gray-400" />
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Services
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Paid Service Details */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg">Paid Service Details</CardTitle>
-              <ExternalLink className="w-4 h-4 text-gray-400" />
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center space-x-4">
-                <div className="bg-green-500 text-white px-3 py-2 rounded-lg text-center">
-                  <div className="text-xs">Apr</div>
-                  <div className="text-sm font-bold">03</div>
-                </div>
-                <div>
-                  <div className="font-semibold">J000001</div>
-                  <div className="text-sm text-gray-600">2024-04-03</div>
-                  <div className="flex items-center mt-1">
-                    <div className="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center mr-2">
-                      <span className="text-white text-xs font-bold">N</span>
-                    </div>
-                    <span className="text-sm">Nandan kumar</span>
-                  </div>
-                </div>
+                <p className="text-xs text-muted-foreground truncate">{tech.job}</p>
               </div>
             </CardContent>
           </Card>
-        </div>
+        ))}
       </div>
     </div>
   )
