@@ -1,221 +1,163 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+"use client"
+
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Zap, BarChart3, FileText, Eye, Settings, MessageSquare, Wrench, Brain, Plus } from "lucide-react"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { 
+  Bot, 
+  Send, 
+  Sparkles, 
+  Zap, 
+  Wrench,
+  Search,
+  MessageSquare
+} from "lucide-react"
+import { useState } from "react"
+import { cn } from "@/lib/utils"
+
+interface Message {
+  role: "user" | "assistant"
+  content: string
+  timestamp: Date
+}
 
 export function AITools() {
-  const aiTools = [
+  const [messages, setMessages] = useState<Message[]>([
     {
-      id: 1,
-      name: "Chatbase Customer Bot",
-      description: "AI chatbot for customer inquiries and appointment booking",
-      category: "Customer Service",
-      status: "Ready to Setup",
-      icon: MessageSquare,
-      color: "bg-blue-500",
-      features: ["24/7 Customer Support", "Appointment Booking", "FAQ Handling"],
-    },
-    {
-      id: 2,
-      name: "Zapier Automation",
-      description: "Automated appointment reminders and follow-ups",
-      category: "Workflow",
-      status: "Configure",
-      icon: Zap,
-      color: "bg-orange-500",
-      features: ["SMS Reminders", "Email Follow-ups", "Calendar Sync"],
-    },
-    {
-      id: 3,
-      name: "Google Looker Studio",
-      description: "Professional KPI dashboards and reports",
-      category: "Analytics",
-      status: "Available",
-      icon: BarChart3,
-      color: "bg-green-500",
-      features: ["Real-time Dashboards", "Custom Reports", "Performance Analytics"],
-    },
-    {
-      id: 4,
-      name: "Documint Reports",
-      description: "Automated invoice and service report generation",
-      category: "Documents",
-      status: "Ready",
-      icon: FileText,
-      color: "bg-purple-500",
-      features: ["Auto Invoice Generation", "Service Reports", "Document Templates"],
-    },
-    {
-      id: 5,
-      name: "Obviously AI",
-      description: "Predictive maintenance and inventory forecasting",
-      category: "Predictive",
-      status: "Setup Required",
-      icon: Brain,
-      color: "bg-teal-500",
-      features: ["Failure Prediction", "Inventory Forecasting", "Maintenance Scheduling"],
-    },
-    {
-      id: 6,
-      name: "Parseur OCR",
-      description: "Scan and digitize repair orders and invoices",
-      category: "Document Processing",
-      status: "Ready",
-      icon: Eye,
-      color: "bg-indigo-500",
-      features: ["Document Scanning", "Data Extraction", "Digital Archive"],
-    },
-  ]
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Ready":
-        return "bg-green-100 text-green-800"
-      case "Available":
-        return "bg-blue-100 text-blue-800"
-      case "Configure":
-        return "bg-orange-100 text-orange-800"
-      case "Setup Required":
-        return "bg-red-100 text-red-800"
-      case "Ready to Setup":
-        return "bg-yellow-100 text-yellow-800"
-      default:
-        return "bg-gray-100 text-gray-800"
+      role: "assistant",
+      content: "Hello! I'm your MASS Workshop AI Assistant. I can help you with vehicle diagnostics, parts identification, or estimating repair times. How can I assist you today?",
+      timestamp: new Date()
     }
+  ])
+  const [input, setInput] = useState("")
+
+  const handleSend = () => {
+    if (!input.trim()) return
+
+    const userMsg: Message = {
+      role: "user",
+      content: input,
+      timestamp: new Date()
+    }
+
+    setMessages(prev => [...prev, userMsg])
+    setInput("")
+
+    // Simulate AI response
+    setTimeout(() => {
+      const aiMsg: Message = {
+        role: "assistant",
+        content: "I'm analyzing your request. Since I'm in demo mode, I can confirm that for a 2020 Toyota Land Cruiser brake pad replacement, the standard labor time is 1.5 hours and recommended parts are OEM pads (Part #04465-60280).",
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, aiMsg])
+    }, 1000)
   }
 
-  const integrationSteps = [
-    {
-      step: 1,
-      title: "Set up Chatbase for customer service",
-      description: "Create AI chatbot for appointment booking and FAQ",
-      completed: false,
-    },
-    {
-      step: 2,
-      title: "Configure Zapier automation",
-      description: "Automate appointment reminders and follow-ups",
-      completed: false,
-    },
-    {
-      step: 3,
-      title: "Connect Google Looker Studio",
-      description: "Build professional KPI dashboards",
-      completed: false,
-    },
-    {
-      step: 4,
-      title: "Implement predictive analytics",
-      description: "Enable AI-powered maintenance predictions",
-      completed: false,
-    },
-  ]
-
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">LOVABLE AI Tools</h1>
-          <p className="text-gray-600">Enhance your workshop with AI-powered automation and insights</p>
-        </div>
-        <Button className="bg-orange-600 hover:bg-orange-700">
-          <Plus className="w-4 h-4 mr-2" />
-          Add New Tool
-        </Button>
-      </div>
-
-      {/* Quick Setup Banner */}
-      <Card className="bg-gradient-to-r from-orange-500 to-red-600 text-white">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-xl font-bold">🚀 Quick Setup: Zapier Automation</h3>
-              <p className="text-orange-100 mb-4">
-                Connect your Zapier webhook to automate appointment reminders, customer follow-ups, and service
-                notifications.
-              </p>
-              <Input
-                placeholder="Enter your Zapier webhook URL..."
-                className="bg-white/20 border-white/30 text-white placeholder-white/70 mb-4"
-              />
+    <div className="h-[calc(100vh-120px)] grid grid-cols-1 lg:grid-cols-4 gap-6 animate-fade-in-up">
+      {/* Sidebar Tools */}
+      <div className="space-y-4">
+        <Card className="glass-card hover:bg-muted/50 cursor-pointer transition-colors border-l-4 border-l-purple-500">
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600">
+              <Zap className="h-5 w-5" />
             </div>
-            <Button className="bg-white text-orange-600 hover:bg-gray-100 ml-4">Test Connection</Button>
-          </div>
-        </CardContent>
-      </Card>
+            <div>
+              <h3 className="font-bold text-sm">Rapid Diagnostics</h3>
+              <p className="text-xs text-muted-foreground">Identify issues from symptoms</p>
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* AI Tools Grid */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        {aiTools.map((tool) => {
-          const Icon = tool.icon
-          return (
-            <Card key={tool.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className={`p-2 rounded-lg ${tool.color}`}>
-                      <Icon className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg">{tool.name}</CardTitle>
-                      <p className="text-sm text-gray-600">{tool.category}</p>
-                    </div>
-                  </div>
-                  <Badge className={getStatusColor(tool.status)}>{tool.status}</Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 mb-4">{tool.description}</p>
-                <div className="space-y-2 mb-4">
-                  {tool.features.map((feature, index) => (
-                    <div key={index} className="flex items-center text-sm text-gray-600">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                      {feature}
-                    </div>
-                  ))}
-                </div>
-                <Button className="w-full" variant="outline">
-                  <Settings className="w-4 h-4 mr-2" />
-                  Configure
-                </Button>
-              </CardContent>
-            </Card>
-          )
-        })}
+        <Card className="glass-card hover:bg-muted/50 cursor-pointer transition-colors border-l-4 border-l-blue-500">
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600">
+              <Search className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-sm">Parts Finder</h3>
+              <p className="text-xs text-muted-foreground">Locate compatible parts</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="glass-card hover:bg-muted/50 cursor-pointer transition-colors border-l-4 border-l-orange-500">
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600">
+              <Wrench className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-sm">Repair Procedures</h3>
+              <p className="text-xs text-muted-foreground">Step-by-step guides</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Integration Roadmap */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Wrench className="w-5 h-5 mr-2" />
-            Integration Roadmap
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {integrationSteps.map((item) => (
-              <div key={item.step} className="flex items-center space-x-4 p-4 border rounded-lg">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
-                    item.completed ? "bg-green-500" : "bg-orange-500"
-                  }`}
-                >
-                  {item.step}
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900">{item.title}</h4>
-                  <p className="text-sm text-gray-600">{item.description}</p>
-                </div>
-                <Button variant="outline" size="sm">
-                  {item.completed ? "Completed" : "Start Setup"}
-                </Button>
-              </div>
-            ))}
+      {/* Chat Interface */}
+      <Card className="lg:col-span-3 glass-card flex flex-col h-full border-none shadow-lg">
+        <CardHeader className="border-b">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+              <Bot className="h-6 w-6" />
+            </div>
+            <div>
+              <CardTitle>MASS AI Assistant</CardTitle>
+              <CardDescription>Powered by advanced automotive LLMs</CardDescription>
+            </div>
           </div>
-        </CardContent>
+        </CardHeader>
+        
+        <div className="flex-1 overflow-hidden relative">
+          <ScrollArea className="h-full p-4">
+            <div className="space-y-4 pb-4">
+              {messages.map((msg, i) => (
+                <div
+                  key={i}
+                  className={cn(
+                    "flex w-full max-w-[80%] gap-3 p-4 rounded-2xl text-sm shadow-sm animate-fade-in-up",
+                    msg.role === "user" 
+                      ? "ml-auto bg-primary text-primary-foreground" 
+                      : "bg-muted/50 border"
+                  )}
+                >
+                  {msg.role === "assistant" && <Bot className="h-5 w-5 mt-0.5 shrink-0" />}
+                  <div className="space-y-1">
+                    <p>{msg.content}</p>
+                    <p className={cn(
+                      "text-[10px] opacity-70",
+                      msg.role === "user" ? "text-primary-foreground" : "text-muted-foreground"
+                    )}>
+                      {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
+
+        <div className="p-4 border-t bg-background/50 backdrop-blur-sm">
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault()
+              handleSend()
+            }}
+            className="flex gap-2"
+          >
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask about diagnostics, error codes, or compatibility..."
+              className="flex-1"
+            />
+            <Button type="submit" size="icon" className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:brightness-110 transiton-all">
+              <Send className="h-4 w-4" />
+            </Button>
+          </form>
+        </div>
       </Card>
     </div>
   )

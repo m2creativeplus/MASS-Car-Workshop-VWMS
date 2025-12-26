@@ -9,19 +9,19 @@ import { UserMenu } from "@/components/layout/user-menu"
 import { ConnectionStatus } from "@/components/connection-status"
 import dynamic from "next/dynamic"
 
-// Import all modules
+// Import Standard Modules
 import { Dashboard } from "@/components/dashboard/dashboard"
 import { Customers } from "@/components/customers/customers"
 import { Vehicles } from "@/components/vehicles/vehicles"
 import { Appointments } from "@/components/appointments/appointments"
 import { TechnicianDashboard } from "@/components/technicians/technician-dashboard"
+import { CreateEstimate } from "@/components/estimates/create-estimate" // Using CreateEstimate as main view for now
 import { ReportsAnalytics } from "@/components/reports/reports-analytics"
 import { AITools } from "@/components/ai-tools/ai-tools"
+import { EnhancedInspectionChecklist } from "@/components/inspections/enhanced-inspection-checklist" // New Enhanced DVI
 
-// Dynamically import modules that might cause SSR issues
+// Dynamically import optional/admin modules
 const SuppliersModule = dynamic(() => import("@/components/suppliers/suppliers-module"), { ssr: false })
-const InspectionsModule = dynamic(() => import("@/components/inspections/inspections-module"), { ssr: false })
-const EstimatesModule = dynamic(() => import("@/components/estimates/estimates-module"), { ssr: false })
 const DatabaseTest = dynamic(() => import("@/components/admin/database-test"), { ssr: false })
 
 function WorkshopSystemContent() {
@@ -47,9 +47,9 @@ function WorkshopSystemContent() {
       case "suppliers":
         return <SuppliersModule />
       case "inspections":
-        return <InspectionsModule />
+        return <EnhancedInspectionChecklist />
       case "estimates":
-        return <EstimatesModule />
+        return <CreateEstimate />
       case "reports":
         return <ReportsAnalytics />
       case "ai-tools":
@@ -79,12 +79,12 @@ function WorkshopSystemContent() {
   }
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden font-sans antialiased text-foreground">
+    <div className="flex h-screen bg-background overflow-hidden font-sans antialiased text-foreground selection:bg-orange-500/30 selection:text-orange-900 dark:selection:text-orange-100">
       <Sidebar activeModule={activeModule} onModuleChange={setActiveModule} userRole={user.role} />
       
-      <div className="flex-1 flex flex-col relative overflow-hidden bg-slate-50 dark:bg-slate-900/50">
+      <div className="flex-1 flex flex-col relative overflow-hidden bg-slate-50 dark:bg-slate-950/50 transition-colors duration-300">
         {/* Glass Header */}
-        <header className="absolute top-0 left-0 right-0 h-16 glass-card z-10 mx-6 mt-4 rounded-xl flex items-center justify-between px-6 shadow-sm">
+        <header className="absolute top-0 left-0 right-0 h-16 glass-card z-10 mx-6 mt-4 rounded-xl flex items-center justify-between px-6 shadow-sm border border-white/20 dark:border-white/5">
           <div className="flex items-center gap-2">
             <h1 className="text-lg font-bold text-foreground tracking-tight">
               {getModuleTitle(activeModule)}
@@ -98,7 +98,7 @@ function WorkshopSystemContent() {
 
         {/* Main Content Area */}
         <main className="flex-1 overflow-auto p-6 pt-24 custom-scrollbar">
-          <div className="max-w-7xl mx-auto space-y-6">
+          <div className="max-w-7xl mx-auto space-y-6 pb-20">
             {renderModule()}
           </div>
         </main>

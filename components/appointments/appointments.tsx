@@ -1,208 +1,360 @@
 "use client"
 
-import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Clock, User, Car, Plus, RefreshCw, CheckCircle, X } from "lucide-react"
+import { Calendar } from "@/components/ui/calendar"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { 
+  Plus, 
+  Calendar as CalendarIcon,
+  Clock,
+  User,
+  Car,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  Filter,
+  ChevronLeft,
+  ChevronRight
+} from "lucide-react"
+import { useState } from "react"
+import { cn } from "@/lib/utils"
+
+interface Appointment {
+  id: string
+  customer: string
+  vehicle: string
+  service: string
+  technician: string
+  date: string
+  time: string
+  duration: number
+  status: "scheduled" | "in-progress" | "completed" | "cancelled"
+  priority: "normal" | "urgent"
+  estimatedCost: number
+}
+
+const mockAppointments: Appointment[] = [
+  {
+    id: "1",
+    customer: "Mohamed Ahmed",
+    vehicle: "Toyota Land Cruiser (ABC-1234)",
+    service: "Full Service + Oil Change",
+    technician: "John Doe",
+    date: "2025-12-26",
+    time: "09:00",
+    duration: 120,
+    status: "scheduled",
+    priority: "normal",
+    estimatedCost: 450
+  },
+  {
+    id: "2",
+    customer: "Sarah Hassan",
+    vehicle: "Honda Civic (XYZ-5678)",
+    service: "Brake System Repair",
+    technician: "Mike Ross",
+    date: "2025-12-26",
+    time: "11:00",
+    duration: 180,
+    status: "in-progress",
+    priority: "urgent",
+    estimatedCost: 780
+  },
+  {
+    id: "3",
+    customer: "Ahmed Ali",
+    vehicle: "Ford F-150 (DEF-9012)",
+    service: "Tire Replacement (4x)",
+    technician: "Sarah Smith",
+    date: "2025-12-26",
+    time: "14:00",
+    duration: 90,
+    status: "scheduled",
+    priority: "normal",
+    estimatedCost: 600
+  },
+  {
+    id: "4",
+    customer: "Fatima Omar",
+    vehicle: "Nissan Patrol (GHI-3456)",
+    service: "Engine Diagnostic",
+    technician: "John Doe",
+    date: "2025-12-27",
+    time: "10:00",
+    duration: 60,
+    status: "scheduled",
+    priority: "urgent",
+    estimatedCost: 250
+  },
+]
 
 export function Appointments() {
-  // 🆕 initialize selectedDate with today's date in ISO-format (yyyy-mm-dd)
-  const today = new Date()
-  const defaultDate = today.toISOString().split("T")[0] // "2025-06-22"
-  const [selectedDate, setSelectedDate] = useState<string>(defaultDate)
+  const [appointments, setAppointments] = useState<Appointment[]>(mockAppointments)
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
+  const [viewMode, setViewMode] = useState<"day" | "week" | "month">("day")
+  const [filterStatus, setFilterStatus] = useState<string>("all")
 
-  const appointments = [
-    {
-      id: 1,
-      time: "09:00",
-      customer: "Ahmed Hassan",
-      vehicle: "Toyota Corolla",
-      service: "Oil Change",
-      status: "Confirmed",
-      technician: "Ali Mohamed",
-      duration: "1 hour",
-    },
-    {
-      id: 2,
-      time: "10:30",
-      customer: "Fatima Ali",
-      vehicle: "Honda Civic",
-      service: "Brake Inspection",
-      status: "Confirmed",
-      technician: "Hassan Omar",
-      duration: "2 hours",
-    },
-    {
-      id: 3,
-      time: "13:00",
-      customer: "Mohamed Yusuf",
-      vehicle: "Nissan Altima",
-      service: "General Maintenance",
-      status: "Pending",
-      technician: "Amina Yusuf",
-      duration: "3 hours",
-    },
-    {
-      id: 4,
-      time: "15:30",
-      customer: "Sahra Ahmed",
-      vehicle: "Hyundai Elantra",
-      service: "Engine Diagnostic",
-      status: "Confirmed",
-      technician: "Omar Ahmed",
-      duration: "2 hours",
-    },
-  ]
-
-  const getStatusColor = (status: string) => {
+  const getStatusConfig = (status: Appointment["status"]) => {
     switch (status) {
-      case "Confirmed":
-        return "bg-green-100 text-green-800"
-      case "Pending":
-        return "bg-yellow-100 text-yellow-800"
-      case "Cancelled":
-        return "bg-red-100 text-red-800"
-      default:
-        return "bg-gray-100 text-gray-800"
+      case "scheduled":
+        return { 
+          color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400", 
+          icon: CalendarIcon,
+          label: "Scheduled" 
+        }
+      case "in-progress":
+        return { 
+          color: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400", 
+          icon: Clock,
+          label: "In Progress" 
+        }
+      case "completed":
+        return { 
+          color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400", 
+          icon: CheckCircle2,
+          label: "Completed" 
+        }
+      case "cancelled":
+        return { 
+          color: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400", 
+          icon: XCircle,
+          label: "Cancelled" 
+        }
     }
   }
 
+  const filteredAppointments = appointments.filter(apt => {
+    if (filterStatus !== "all" && apt.status !== filterStatus) return false
+    if (viewMode === "day") {
+      return apt.date === selectedDate.toISOString().split('T')[0]
+    }
+    return true
+  })
+
+  const todayAppointments = appointments.filter(apt => apt.date === new Date().toISOString().split('T')[0])
+  const upcomingCount = appointments.filter(apt => apt.status === "scheduled").length
+  const inProgressCount = appointments.filter(apt => apt.status === "in-progress").length
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in-up">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Appointments</h1>
-          <p className="text-gray-600">Manage customer appointments and scheduling</p>
+          <h1 className="text-3xl font-bold tracking-tight">Service Schedule</h1>
+          <p className="text-muted-foreground mt-1">Manage appointments and service bookings</p>
         </div>
-        <Button className="bg-orange-600 hover:bg-orange-700">
-          <Plus className="w-4 h-4 mr-2" />
+        <Button className="bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20">
+          <Plus className="mr-2 h-4 w-4" />
           New Appointment
         </Button>
       </div>
 
-      {/* Date Selection and Quick Stats */}
-      <div className="grid lg:grid-cols-4 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Select Date</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center space-x-2">
-              <Calendar className="w-4 h-4 text-gray-500" />
-              <input
-                type="date"
-                value={selectedDate} // controlled value
-                onChange={(e) => setSelectedDate(e.target.value)} // 🔄 update state
-                className="border rounded px-2 py-1 text-sm"
-              />
-            </div>
-            <div className="mt-4 space-y-2">
-              <Button variant="outline" size="sm" className="w-full">
-                Today
-              </Button>
-              <Button variant="outline" size="sm" className="w-full">
-                Tomorrow
-              </Button>
+      {/* Quick Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card className="glass-card">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Today</p>
+                <h3 className="text-2xl font-bold mt-1">{todayAppointments.length}</h3>
+              </div>
+              <CalendarIcon className="h-8 w-8 text-blue-500" />
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-orange-600">7</div>
-            <p className="text-sm text-gray-600">Today's Appointments</p>
+        <Card className="glass-card">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Scheduled</p>
+                <h3 className="text-2xl font-bold mt-1">{upcomingCount}</h3>
+              </div>
+              <Clock className="h-8 w-8 text-purple-500" />
+            </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-green-600">5</div>
-            <p className="text-sm text-gray-600">Confirmed</p>
+        <Card className="glass-card">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">In Progress</p>
+                <h3 className="text-2xl font-bold mt-1">{inProgressCount}</h3>
+              </div>
+              <AlertCircle className="h-8 w-8 text-amber-500" />
+            </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-yellow-600">2</div>
-            <p className="text-sm text-gray-600">Pending</p>
+        <Card className="glass-card">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Est. Revenue</p>
+                <h3 className="text-2xl font-bold mt-1">
+                  ${filteredAppointments.reduce((sum, apt) => sum + apt.estimatedCost, 0).toLocaleString()}
+                </h3>
+              </div>
+              <CheckCircle2 className="h-8 w-8 text-emerald-500" />
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Appointments List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Today's Schedule - {selectedDate}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {appointments.map((appointment) => (
-              <div
-                key={appointment.id}
-                className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="w-16 h-16 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <Clock className="w-6 h-6 text-orange-600" />
-                  </div>
-                  <div>
-                    <div className="text-lg font-semibold text-gray-900">{appointment.time}</div>
-                    <Badge className={getStatusColor(appointment.status)}>{appointment.status}</Badge>
-                  </div>
-                  <div>
-                    <div className="flex items-center text-sm text-gray-600 mb-1">
-                      <User className="w-4 h-4 mr-1" />
-                      {appointment.customer}
-                    </div>
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Car className="w-4 h-4 mr-1" />
-                      {appointment.vehicle}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium text-gray-900">{appointment.service}</div>
-                    <div className="text-sm text-gray-600">Technician: {appointment.technician}</div>
-                    <div className="text-xs text-gray-500">Duration: {appointment.duration}</div>
-                  </div>
-                </div>
-
-                <div className="flex space-x-2">
-                  <Button variant="outline" size="sm">
-                    <RefreshCw className="w-4 h-4 mr-1" />
-                    Reschedule
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Calendar */}
+        <Card className="glass-card">
+          <CardHeader>
+            <CardTitle className="text-lg">Select Date</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={(date) => date && setSelectedDate(date)}
+              className="rounded-md border"
+            />
+            
+            <div className="mt-4 space-y-2">
+              <div className="flex gap-2">
+                {["day", "week", "month"].map((mode) => (
+                  <Button
+                    key={mode}
+                    size="sm"
+                    variant={viewMode === mode ? "default" : "outline"}
+                    onClick={() => setViewMode(mode as any)}
+                    className="flex-1 capitalize"
+                  >
+                    {mode}
                   </Button>
-                  <Button variant="outline" size="sm" className="text-green-600 hover:text-green-700">
-                    <CheckCircle className="w-4 h-4 mr-1" />
-                    Complete
-                  </Button>
-                  <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
-                    <X className="w-4 h-4 mr-1" />
-                    Cancel
-                  </Button>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="scheduled">Scheduled</SelectItem>
+                  <SelectItem value="in-progress">In Progress</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* Available Time Slots */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Available Time Slots</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-6 gap-2">
-            {["08:00", "08:30", "11:00", "11:30", "14:00", "14:30", "16:00", "16:30", "17:00", "17:30"].map((time) => (
-              <Button key={time} variant="outline" size="sm" className="text-green-600 border-green-200">
-                {time}
-              </Button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+        {/* Appointments List */}
+        <div className="lg:col-span-2 space-y-4">
+          <Card className="glass-card">
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <CardTitle>
+                  {viewMode === "day" && `Appointments for ${selectedDate.toLocaleDateString()}`}
+                  {viewMode === "week" && "This Week's Appointments"}
+                  {viewMode === "month" && "This Month's Appointments"}
+                </CardTitle>
+                <Badge variant="outline">{filteredAppointments.length} total</Badge>
+              </div>
+            </CardHeader>
+          </Card>
+
+          {filteredAppointments.length === 0 ? (
+            <Card className="glass-card">
+              <CardContent className="p-12 text-center">
+                <CalendarIcon className="h-12 w-12 mx-auto mb-3 text-muted-foreground opacity-20" />
+                <p className="text-muted-foreground">No appointments for this date.</p>
+              </CardContent>
+            </Card>
+          ) : (
+            filteredAppointments.map((appointment, index) => {
+              const statusConfig = getStatusConfig(appointment.status)
+              const StatusIcon = statusConfig.icon
+              
+              return (
+                <Card 
+                  key={appointment.id}
+                  className={cn(
+                    "glass-card hover:shadow-md transition-all duration-200 animate-slide-in-left",
+                    appointment.priority === "urgent" && "border-l-4 border-l-red-500"
+                  )}
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex gap-4 flex-1">
+                        {/* Time Block */}
+                        <div className="flex flex-col items-center justify-center bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-lg p-3 min-w-[80px]">
+                          <span className="text-2xl font-bold">{appointment.time}</span>
+                          <span className="text-xs opacity-90">{appointment.duration} min</span>
+                        </div>
+
+                        {/* Details */}
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-bold text-lg">{appointment.service}</h4>
+                            {appointment.priority === "urgent" && (
+                              <Badge variant="destructive" className="text-xs">URGENT</Badge>
+                            )}
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <User className="h-4 w-4" />
+                              {appointment.customer}
+                            </div>
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Car className="h-4 w-4" />
+                              {appointment.vehicle}
+                            </div>
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <User className="h-4 w-4" />
+                              Tech: {appointment.technician}
+                            </div>
+                            <div className="flex items-center gap-2 font-semibold text-emerald-600 dark:text-emerald-400">
+                              ${appointment.estimatedCost}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 pt-2">
+                            <Badge className={statusConfig.color}>
+                              <StatusIcon className="h-3 w-3 mr-1" />
+                              {statusConfig.label}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex flex-col gap-2">
+                        {appointment.status === "scheduled" && (
+                          <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600">
+                            Start
+                          </Button>
+                        )}
+                        {appointment.status === "in-progress" && (
+                          <Button size="sm" className="bg-blue-500 hover:bg-blue-600">
+                            Complete
+                          </Button>
+                        )}
+                        <Button size="sm" variant="outline">
+                          Details
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )
+            })
+          )}
+        </div>
+      </div>
     </div>
   )
 }

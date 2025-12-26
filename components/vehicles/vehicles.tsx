@@ -1,205 +1,273 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Car, Search, Plus, MapPin, Gauge, History, Edit } from "lucide-react"
+import { 
+  Plus, 
+  Search, 
+  Car as CarIcon,
+  Calendar,
+  Wrench,
+  FileText,
+  AlertCircle,
+  CheckCircle2,
+  Clock
+} from "lucide-react"
+import { useState } from "react"
+
+interface Vehicle {
+  id: string
+  make: string
+  model: string
+  year: number
+  licensePlate: string
+  vin: string
+  color: string
+  mileage: number
+  owner: string
+  lastService: string
+  nextService: string
+  status: "active" | "in-service" | "completed"
+  serviceHistory: number
+}
+
+const mockVehicles: Vehicle[] = [
+  {
+    id: "1",
+    make: "Toyota",
+    model: "Land Cruiser",
+    year: 2020,
+    licensePlate: "ABC-1234",
+    vin: "JTMRFREV5HD085123",
+    color: "White",
+    mileage: 45000,
+    owner: "Mohamed Ahmed",
+    lastService: "2025-12-01",
+    nextService: "2026-03-01",
+    status: "active",
+    serviceHistory: 12
+  },
+  {
+    id: "2",
+    make: "Honda",
+    model: "Civic",
+    year: 2019,
+    licensePlate: "XYZ-5678",
+    vin: "2HGFC2F59KH542789",
+    color: "Silver",
+    mileage: 62000,
+    owner: "Sarah Hassan",
+    lastService: "2025-12-15",
+    nextService: "2026-03-15",
+    status: "in-service",
+    serviceHistory: 8
+  },
+  {
+    id: "3",
+    make: "Ford",
+    model: "F-150",
+    year: 2021,
+    licensePlate: "DEF-9012",
+    vin: "1FTFW1E85MKE12345",
+    color: "Blue",
+    mileage: 38000,
+    owner: "Ahmed Ali",
+    lastService: "2025-11-20",
+    nextService: "2026-02-20",
+    status: "completed",
+    serviceHistory: 5
+  },
+]
 
 export function Vehicles() {
+  const [vehicles, setVehicles] = useState<Vehicle[]>(mockVehicles)
   const [searchTerm, setSearchTerm] = useState("")
 
-  const vehicles = [
-    {
-      id: 1,
-      make: "Toyota",
-      model: "Corolla",
-      year: 2020,
-      license: "SL-001-ABC",
-      owner: "Ahmed Hassan",
-      mileage: "45,000 km",
-      status: "In Service",
-      lastService: "2024-01-15",
-      nextService: "2024-04-15",
-      vin: "1HGBH41JXMN109186",
-    },
-    {
-      id: 2,
-      make: "Honda",
-      model: "Civic",
-      year: 2019,
-      license: "SL-002-DEF",
-      owner: "Fatima Ali",
-      mileage: "38,000 km",
-      status: "Completed",
-      lastService: "2024-01-20",
-      nextService: "2024-05-20",
-      vin: "2HGBH41JXMN109187",
-    },
-    {
-      id: 3,
-      make: "Nissan",
-      model: "Altima",
-      year: 2021,
-      license: "SL-003-GHI",
-      owner: "Mohamed Yusuf",
-      mileage: "22,000 km",
-      status: "Waiting",
-      lastService: "2024-01-10",
-      nextService: "2024-04-10",
-      vin: "3HGBH41JXMN109188",
-    },
-    {
-      id: 4,
-      make: "Hyundai",
-      model: "Elantra",
-      year: 2018,
-      license: "SL-004-JKL",
-      owner: "Sahra Ahmed",
-      mileage: "67,000 km",
-      status: "In Service",
-      lastService: "2024-01-25",
-      nextService: "2024-04-25",
-      vin: "4HGBH41JXMN109189",
-    },
-  ]
-
-  const filteredVehicles = vehicles.filter(
-    (vehicle) =>
-      vehicle.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vehicle.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vehicle.license.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vehicle.owner.toLowerCase().includes(searchTerm.toLowerCase()),
+  const filteredVehicles = vehicles.filter(vehicle =>
+    `${vehicle.make} ${vehicle.model}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    vehicle.licensePlate.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    vehicle.owner.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const getStatusColor = (status: string) => {
+  const getStatusConfig = (status: Vehicle["status"]) => {
     switch (status) {
-      case "In Service":
-        return "bg-yellow-100 text-yellow-800"
-      case "Completed":
-        return "bg-green-100 text-green-800"
-      case "Waiting":
-        return "bg-blue-100 text-blue-800"
-      default:
-        return "bg-gray-100 text-gray-800"
+      case "active":
+        return { color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400", label: "Active" }
+      case "in-service":
+        return { color: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400", label: "In Service" }
+      case "completed":
+        return { color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400", label: "Completed" }
     }
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in-up">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Vehicles</h1>
-          <p className="text-gray-600">Track vehicle information and service history</p>
+          <h1 className="text-3xl font-bold tracking-tight">Vehicle Registry</h1>
+          <p className="text-muted-foreground mt-1">Manage all vehicles and service history</p>
         </div>
-        <Button className="bg-green-600 hover:bg-green-700">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Vehicle
+        <Button className="bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20">
+          <Plus className="mr-2 h-4 w-4" />
+          Register New Vehicle
         </Button>
       </div>
 
-      {/* Search and Filters */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex space-x-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search vehicles by make, model, license plate, or owner..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card className="glass-card">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Total Vehicles</p>
+                <h3 className="text-2xl font-bold mt-1">{vehicles.length}</h3>
+              </div>
+              <CarIcon className="h-8 w-8 text-blue-500" />
             </div>
-            <Button variant="outline">Filter by Status</Button>
-            <Button variant="outline">Export List</Button>
+          </CardContent>
+        </Card>
+
+        <Card className="glass-card">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">In Service</p>
+                <h3 className="text-2xl font-bold mt-1">
+                  {vehicles.filter(v => v.status === "in-service").length}
+                </h3>
+              </div>
+              <Wrench className="h-8 w-8 text-amber-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="glass-card">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Service Due</p>
+                <h3 className="text-2xl font-bold mt-1">3</h3>
+              </div>
+              <AlertCircle className="h-8 w-8 text-red-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="glass-card">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Completed</p>
+                <h3 className="text-2xl font-bold mt-1">
+                  {vehicles.filter(v => v.status === "completed").length}
+                </h3>
+              </div>
+              <CheckCircle2 className="h-8 w-8 text-emerald-500" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Search */}
+      <Card className="glass-card">
+        <CardContent className="p-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by make, model, plate, or owner..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
           </div>
         </CardContent>
       </Card>
 
-      {/* Vehicle Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">156</div>
-            <p className="text-sm text-gray-600">Total Vehicles</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-yellow-600">18</div>
-            <p className="text-sm text-gray-600">In Service</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-green-600">12</div>
-            <p className="text-sm text-gray-600">Completed Today</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-2xl font-bold text-purple-600">8</div>
-            <p className="text-sm text-gray-600">Due for Service</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Vehicle List */}
-      <div className="space-y-4">
-        {filteredVehicles.map((vehicle) => (
-          <Card key={vehicle.id} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <Car className="w-6 h-6 text-green-600" />
+      {/* Vehicle Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {filteredVehicles.map((vehicle, index) => {
+          const statusConfig = getStatusConfig(vehicle.status)
+          
+          return (
+            <Card 
+              key={vehicle.id} 
+              className="glass-card hover:shadow-lg transition-all duration-200 animate-slide-in-left"
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-3">
+                    <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+                      <CarIcon className="h-8 w-8 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle>{vehicle.year} {vehicle.make} {vehicle.model}</CardTitle>
+                      <p className="text-sm text-muted-foreground">{vehicle.licensePlate}</p>
+                    </div>
+                  </div>
+                  <Badge className={statusConfig.color}>{statusConfig.label}</Badge>
+                </div>
+              </CardHeader>
+              
+              <CardContent className="space-y-4">
+                {/* Vehicle Details */}
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-muted-foreground">Owner</p>
+                    <p className="font-medium">{vehicle.owner}</p>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      {vehicle.year} {vehicle.make} {vehicle.model}
-                    </h3>
-                    <div className="flex items-center space-x-4 text-sm text-gray-600">
-                      <div className="flex items-center">
-                        <MapPin className="w-4 h-4 mr-1" />
-                        License: {vehicle.license}
-                      </div>
-                      <div>Owner: {vehicle.owner}</div>
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">VIN: {vehicle.vin}</div>
+                    <p className="text-muted-foreground">Color</p>
+                    <p className="font-medium">{vehicle.color}</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Mileage</p>
+                    <p className="font-medium">{vehicle.mileage.toLocaleString()} km</p>
+                  </div>
+                  <div>
+                    <p className="text-muted-foreground">Service History</p>
+                    <p className="font-medium">{vehicle.serviceHistory} records</p>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-6">
-                  <div className="text-center">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Gauge className="w-4 h-4 mr-1" />
-                      {vehicle.mileage}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">Next service: {vehicle.nextService}</div>
+                {/* Service Timeline */}
+                <div className="pt-3 border-t space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      Last Service
+                    </span>
+                    <span className="font-medium">{new Date(vehicle.lastService).toLocaleDateString()}</span>
                   </div>
-
-                  <div className="flex flex-col items-center space-y-2">
-                    <Badge className={getStatusColor(vehicle.status)}>{vehicle.status}</Badge>
-                  </div>
-
-                  <div className="flex space-x-2">
-                    <Button variant="outline" size="sm">
-                      <History className="w-4 h-4 mr-1" />
-                      Service History
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <Edit className="w-4 h-4 mr-1" />
-                      Edit
-                    </Button>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground flex items-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      Next Service
+                    </span>
+                    <span className="font-medium text-orange-600 dark:text-orange-400">
+                      {new Date(vehicle.nextService).toLocaleDateString()}
+                    </span>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+
+                {/* Actions */}
+                <div className="flex gap-2 pt-2">
+                  <Button variant="outline" size="sm" className="flex-1">
+                    <FileText className="mr-2 h-4 w-4" />
+                    Service History
+                  </Button>
+                  <Button size="sm" className="flex-1 bg-orange-500 hover:bg-orange-600 text-white">
+                    <Wrench className="mr-2 h-4 w-4" />
+                    Schedule Service
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )
+        })}
       </div>
     </div>
   )
