@@ -9,6 +9,8 @@ import {
   Users,
   Car,
   Calendar,
+  ClipboardList,
+  Package,
   UserCheck,
   Building2,
   ClipboardCheck,
@@ -33,9 +35,11 @@ interface SidebarProps {
 
 const menuItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["admin", "staff", "technician", "customer"] },
+  { id: "work-orders", label: "Work Orders", icon: ClipboardList, roles: ["admin", "staff", "technician"] },
   { id: "customers", label: "Customers", icon: Users, roles: ["admin", "staff"] },
   { id: "vehicles", label: "Vehicles", icon: Car, roles: ["admin", "staff", "technician", "customer"] },
   { id: "appointments", label: "Appointments", icon: Calendar, roles: ["admin", "staff", "technician", "customer"] },
+  { id: "inventory", label: "Inventory", icon: Package, roles: ["admin", "staff"] },
   { id: "technicians", label: "Technicians", icon: UserCheck, roles: ["admin", "staff"] },
   { id: "suppliers", label: "Suppliers", icon: Building2, roles: ["admin", "staff"] },
   { id: "inspections", label: "DVI Inspections", icon: ClipboardCheck, roles: ["admin", "staff", "technician"] },

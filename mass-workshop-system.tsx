@@ -14,6 +14,8 @@ import { Dashboard } from "@/components/dashboard/dashboard"
 import { Customers } from "@/components/customers/customers"
 import { Vehicles } from "@/components/vehicles/vehicles"
 import { Appointments } from "@/components/appointments/appointments"
+import { WorkOrdersKanban } from "@/components/work-orders/work-orders-kanban"
+import { InventoryManagement } from "@/components/inventory/inventory-management"
 import { TechnicianDashboard } from "@/components/technicians/technician-dashboard"
 import { CreateEstimate } from "@/components/estimates/create-estimate" // Using CreateEstimate as main view for now
 import { ReportsAnalytics } from "@/components/reports/reports-analytics"
@@ -36,12 +38,16 @@ function WorkshopSystemContent() {
     switch (activeModule) {
       case "dashboard":
         return <Dashboard />
+      case "work-orders":
+        return <WorkOrdersKanban />
       case "customers":
         return <Customers />
       case "vehicles":
         return <Vehicles />
       case "appointments":
         return <Appointments />
+      case "inventory":
+        return <InventoryManagement />
       case "technicians":
         return <TechnicianDashboard />
       case "suppliers":
@@ -64,9 +70,11 @@ function WorkshopSystemContent() {
   const getModuleTitle = (id: string) => {
     const titles: Record<string, string> = {
       dashboard: "Dashboard Overview",
+      "work-orders": "Work Orders",
       customers: "Customer Management",
       vehicles: "Vehicle Registry",
       appointments: "Service Schedule",
+      inventory: "Inventory Management",
       technicians: "Technician Portal",
       suppliers: "Supplier Directory",
       inspections: "Digital Vehicle Inspections",
