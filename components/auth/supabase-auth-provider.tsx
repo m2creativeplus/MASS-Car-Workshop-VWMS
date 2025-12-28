@@ -201,27 +201,95 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: "Email and password are required" }
       }
 
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      // ========== DEMO MODE ==========
+      // Check if this is a demo login (for development/testing without real Supabase)
+      const demoUsers: Record<string, AuthUser> = {
+        "admin@masscar.com": {
+          id: "demo-admin-001",
+          email: "admin@masscar.com",
+          role: "admin",
+          firstName: "Admin",
+          lastName: "User",
+          isActive: true,
+        },
+        "staff@masscar.com": {
+          id: "demo-staff-001",
+          email: "staff@masscar.com",
+          role: "staff",
+          firstName: "Staff",
+          lastName: "Member",
+          isActive: true,
+        },
+        "tech@masscar.com": {
+          id: "demo-tech-001",
+          email: "tech@masscar.com",
+          role: "technician",
+          firstName: "Tech",
+          lastName: "Worker",
+          isActive: true,
+        },
+        "customer@masscar.com": {
+          id: "demo-customer-001",
+          email: "customer@masscar.com",
+          role: "customer",
+          firstName: "Customer",
+          lastName: "User",
+          isActive: true,
+        },
+      }
 
-      if (error) {
-        console.error("[Auth] Login error:", error)
-        let errorMessage = error.message
-        if (error.message.includes("Invalid login credentials")) {
-          errorMessage = "Invalid email or password"
-        } else if (error.message.includes("Failed to fetch")) {
-          errorMessage = "Connection failed - please check your internet and try again"
+      // If it's a demo email with password "123456", use demo mode
+      if (demoUsers[email] && password === "123456") {
+        console.log("[Auth] Demo mode login:", email)
+        setUser(demoUsers[email])
+        return { success: true }
+      }
+
+      // ========== REAL SUPABASE AUTH ==========
+      // Try real Supabase auth for non-demo users
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        })
+
+        if (error) {
+          console.error("[Auth] Supabase login error:", error)
+          // If Supabase fails for demo emails, still allow demo login
+          if (demoUsers[email] && error.message.includes("Failed to fetch")) {
+            console.log("[Auth] Supabase connection failed, using demo mode")
+            setUser(demoUsers[email])
+            return { success: true }
+          }
+          let errorMessage = error.message
+          if (error.message.includes("Invalid login credentials")) {
+            errorMessage = "Invalid email or password"
+          } else if (error.message.includes("Failed to fetch")) {
+            errorMessage = "Connection failed - using demo mode for testing"
+            // Fallback to demo mode for any demo email
+            if (demoUsers[email]) {
+              setUser(demoUsers[email])
+              return { success: true }
+            }
+          }
+          return { success: false, error: errorMessage }
         }
-        return { success: false, error: errorMessage }
-      }
 
-      if (data.user) {
-        await loadUserProfile(data.user)
-      }
+        if (data.user) {
+          await loadUserProfile(data.user)
+        }
 
-      return { success: true }
+        return { success: true }
+      } catch (fetchError) {
+        // Network error - use demo mode if demo email
+        console.error("[Auth] Network error:", fetchError)
+        if (demoUsers[email]) {
+          console.log("[Auth] Using demo fallback due to network error")
+          setUser(demoUsers[email])
+          return { success: true }
+        }
+        return { success: false, error: "Connection failed - please check your internet" }
+      }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred"
       console.error("[Auth] Unexpected login error:", error)
@@ -271,13 +339,23 @@ export function SupabaseAuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async (): Promise<void> => {
     try {
-      await supabase.auth.signOut()
+      // Clear local state first (works for demo mode)
       setUser(null)
       setSupabaseUser(null)
       setAuthError(null)
+      
+      // Try to sign out from Supabase (ignore errors for demo mode)
+      try {
+        await supabase.auth.signOut()
+      } catch (e) {
+        // Ignore Supabase errors - demo mode doesn't need real signout
+        console.log("[Auth] Demo mode logout - Supabase signout skipped")
+      }
     } catch (error) {
       console.error("[Auth] Error during logout:", error)
-      setAuthError("Logout failed")
+      // Still clear local state even on error
+      setUser(null)
+      setSupabaseUser(null)
     }
   }
 
