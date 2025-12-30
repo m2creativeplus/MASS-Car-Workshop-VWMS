@@ -65,8 +65,9 @@ const features = [
 ]
 
 export function SupabaseLoginForm() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  // Pre-filled for testing - remove in production
+  const [email, setEmail] = useState("admin@masscar.com")
+  const [password, setPassword] = useState("123456")
   const [showPassword, setShowPassword] = useState(false)
   const [selectedDemo, setSelectedDemo] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
