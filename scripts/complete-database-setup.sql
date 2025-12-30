@@ -240,8 +240,24 @@ CREATE POLICY "Staff can manage suppliers" ON public.suppliers
 CREATE POLICY "All can view parts" ON public.parts_catalog
     FOR SELECT USING (true);
 
-CREATE POLICY "Staff can manage parts" ON public.parts_catalog
-    FOR INSERT, UPDATE, DELETE USING (
+CREATE POLICY "Staff can insert parts" ON public.parts_catalog
+    FOR INSERT WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM public.user_profiles 
+            WHERE user_id = auth.uid() AND role IN ('admin', 'staff')
+        )
+    );
+
+CREATE POLICY "Staff can update parts" ON public.parts_catalog
+    FOR UPDATE USING (
+        EXISTS (
+            SELECT 1 FROM public.user_profiles 
+            WHERE user_id = auth.uid() AND role IN ('admin', 'staff')
+        )
+    );
+
+CREATE POLICY "Staff can delete parts" ON public.parts_catalog
+    FOR DELETE USING (
         EXISTS (
             SELECT 1 FROM public.user_profiles 
             WHERE user_id = auth.uid() AND role IN ('admin', 'staff')
@@ -252,8 +268,24 @@ CREATE POLICY "Staff can manage parts" ON public.parts_catalog
 CREATE POLICY "All can view labor guide" ON public.labor_guide
     FOR SELECT USING (true);
 
-CREATE POLICY "Admins can manage labor guide" ON public.labor_guide
-    FOR INSERT, UPDATE, DELETE USING (
+CREATE POLICY "Admins can insert labor guide" ON public.labor_guide
+    FOR INSERT WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM public.user_profiles 
+            WHERE user_id = auth.uid() AND role = 'admin'
+        )
+    );
+
+CREATE POLICY "Admins can update labor guide" ON public.labor_guide
+    FOR UPDATE USING (
+        EXISTS (
+            SELECT 1 FROM public.user_profiles 
+            WHERE user_id = auth.uid() AND role = 'admin'
+        )
+    );
+
+CREATE POLICY "Admins can delete labor guide" ON public.labor_guide
+    FOR DELETE USING (
         EXISTS (
             SELECT 1 FROM public.user_profiles 
             WHERE user_id = auth.uid() AND role = 'admin'
@@ -264,8 +296,24 @@ CREATE POLICY "Admins can manage labor guide" ON public.labor_guide
 CREATE POLICY "All can view inspection templates" ON public.inspection_templates
     FOR SELECT USING (true);
 
-CREATE POLICY "Admins can manage inspection templates" ON public.inspection_templates
-    FOR INSERT, UPDATE, DELETE USING (
+CREATE POLICY \"Admins can insert inspection templates\" ON public.inspection_templates
+    FOR INSERT WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM public.user_profiles 
+            WHERE user_id = auth.uid() AND role = 'admin'
+        )
+    );
+
+CREATE POLICY \"Admins can update inspection templates\" ON public.inspection_templates
+    FOR UPDATE USING (
+        EXISTS (
+            SELECT 1 FROM public.user_profiles 
+            WHERE user_id = auth.uid() AND role = 'admin'
+        )
+    );
+
+CREATE POLICY \"Admins can delete inspection templates\" ON public.inspection_templates
+    FOR DELETE USING (
         EXISTS (
             SELECT 1 FROM public.user_profiles 
             WHERE user_id = auth.uid() AND role = 'admin'
