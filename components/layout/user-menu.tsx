@@ -12,11 +12,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { useAuth } from "../auth/auth-provider"
+import { useSupabaseAuth } from "../auth/supabase-auth-provider"
 import { User, Settings, LogOut, Shield } from "lucide-react"
 
 export function UserMenu() {
-  const { user, logout } = useAuth()
+  const { user, logout } = useSupabaseAuth()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   if (!user) return null
@@ -71,11 +71,6 @@ export function UserMenu() {
             </div>
             <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
             {user.phone && <p className="text-xs leading-none text-muted-foreground">{user.phone}</p>}
-            {user.loginTime && (
-              <p className="text-xs leading-none text-muted-foreground">
-                Logged in: {new Date(user.loginTime).toLocaleString()}
-              </p>
-            )}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
