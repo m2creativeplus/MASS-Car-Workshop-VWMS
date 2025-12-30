@@ -296,7 +296,7 @@ CREATE POLICY "Admins can delete labor guide" ON public.labor_guide
 CREATE POLICY "All can view inspection templates" ON public.inspection_templates
     FOR SELECT USING (true);
 
-CREATE POLICY \"Admins can insert inspection templates\" ON public.inspection_templates
+CREATE POLICY "Admins can insert inspection templates" ON public.inspection_templates
     FOR INSERT WITH CHECK (
         EXISTS (
             SELECT 1 FROM public.user_profiles 
@@ -304,7 +304,7 @@ CREATE POLICY \"Admins can insert inspection templates\" ON public.inspection_te
         )
     );
 
-CREATE POLICY \"Admins can update inspection templates\" ON public.inspection_templates
+CREATE POLICY "Admins can update inspection templates" ON public.inspection_templates
     FOR UPDATE USING (
         EXISTS (
             SELECT 1 FROM public.user_profiles 
@@ -312,7 +312,7 @@ CREATE POLICY \"Admins can update inspection templates\" ON public.inspection_te
         )
     );
 
-CREATE POLICY \"Admins can delete inspection templates\" ON public.inspection_templates
+CREATE POLICY "Admins can delete inspection templates" ON public.inspection_templates
     FOR DELETE USING (
         EXISTS (
             SELECT 1 FROM public.user_profiles 
