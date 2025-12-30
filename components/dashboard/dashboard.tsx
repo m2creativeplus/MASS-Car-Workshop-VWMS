@@ -13,7 +13,8 @@ import {
   CheckCircle2,
   AlertCircle,
   MoreHorizontal,
-  Plus
+  Plus,
+  FileText
 } from "lucide-react"
 import { useState } from "react"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
