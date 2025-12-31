@@ -22,12 +22,12 @@ export default function NotFound() {
         >
           {/* Glow effect */}
           <div className="absolute inset-0 h-28 w-28 rounded-full bg-amber-500/20 blur-xl" />
-          
+
           {/* Icon container */}
           <div className="relative h-28 w-28 rounded-full bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center border-4 border-zinc-700 shadow-2xl">
             <SearchX className="h-14 w-14 text-amber-500" />
           </div>
-          
+
           {/* Decorative wrench */}
           <motion.div
             className="absolute -bottom-2 -right-2 h-10 w-10 rounded-full bg-orange-500 flex items-center justify-center shadow-lg"
@@ -59,7 +59,7 @@ export default function NotFound() {
         >
           Garage Closed
         </motion.h1>
-        
+
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -110,7 +110,7 @@ export default function NotFound() {
         {/* Gradient orbs */}
         <div className="absolute top-1/4 left-1/3 h-64 w-64 rounded-full bg-orange-500/5 blur-3xl" />
         <div className="absolute bottom-1/4 right-1/3 h-64 w-64 rounded-full bg-amber-500/5 blur-3xl" />
-        
+
         {/* Grid lines (optional decorative) */}
         <svg className="absolute inset-0 h-full w-full opacity-[0.02]">
           <defs>

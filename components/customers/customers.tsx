@@ -1,24 +1,18 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { 
   Plus, 
-  Search, 
-  Filter, 
-  MoreVertical,
+  Eye,
+  Pencil,
+  Trash2,
   Phone,
   Mail,
-  Car as CarIcon,
-  Calendar,
-  DollarSign,
-  Edit,
-  Trash2
+  Users
 } from "lucide-react"
-import { useState } from "react"
 
 interface Customer {
   id: string
@@ -68,196 +62,176 @@ const mockCustomers: Customer[] = [
     lastVisit: "2025-11-30",
     status: "inactive"
   },
+  {
+    id: "4",
+    firstName: "Fatima",
+    lastName: "Omar",
+    email: "fatima.omar@email.com",
+    phone: "+252 65 567 8901",
+    vehicles: 1,
+    totalSpent: 1200,
+    lastVisit: "2025-12-28",
+    status: "active"
+  },
 ]
 
 export function Customers() {
-  const [customers, setCustomers] = useState<Customer[]>(mockCustomers)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [showAddModal, setShowAddModal] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
 
-  const filteredCustomers = customers.filter(customer =>
-    `${customer.firstName} ${customer.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.phone.includes(searchTerm)
+  const filteredCustomers = mockCustomers.filter(customer =>
+    `${customer.firstName} ${customer.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    customer.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    customer.phone.includes(searchQuery)
   )
 
   return (
-    <div className="space-y-6 animate-fade-in-up">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Customer Management</h1>
-          <p className="text-muted-foreground mt-1">Manage your customer database and relationships</p>
+    <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-950 p-6">
+      
+      {/* Header Controls (Sakosys Style) */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <h2 className="text-xl font-bold text-slate-800 dark:text-white uppercase tracking-tight">
+          Customer List
+        </h2>
+        
+        <div className="flex gap-2 w-full md:w-auto">
+          <Button className="bg-[#00A65A] hover:bg-[#008d4c] text-white">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Customer
+          </Button>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20">
-          <Plus className="mr-2 h-4 w-4" />
-          Add New Customer
-        </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="glass-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Customers</p>
-                <h3 className="text-2xl font-bold mt-1">{customers.length}</h3>
-              </div>
-              <div className="h-12 w-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                <CarIcon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Active</p>
-                <h3 className="text-2xl font-bold mt-1">
-                  {customers.filter(c => c.status === "active").length}
-                </h3>
-              </div>
-              <div className="h-12 w-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                <CarIcon className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Vehicles</p>
-                <h3 className="text-2xl font-bold mt-1">
-                  {customers.reduce((sum, c) => sum + c.vehicles, 0)}
-                </h3>
-              </div>
-              <div className="h-12 w-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                <CarIcon className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Revenue</p>
-                <h3 className="text-2xl font-bold mt-1">
-                  ${customers.reduce((sum, c) => sum + c.totalSpent, 0).toLocaleString()}
-                </h3>
-              </div>
-              <div className="h-12 w-12 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
-                <DollarSign className="h-6 w-6 text-orange-600 dark:text-orange-400" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Filter Bar */}
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-t-lg border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-slate-600">Show</span>
+          <select className="border border-slate-300 rounded px-2 py-1 text-sm bg-transparent">
+            <option>10</option>
+            <option>25</option>
+            <option>50</option>
+          </select>
+          <span className="text-sm text-slate-600">entries</span>
+        </div>
+        
+        <div className="relative w-64">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">Search:</span>
+          <Input 
+            className="pl-16 h-8" 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
       </div>
 
-      {/* Search and Filter */}
-      <Card className="glass-card">
-        <CardContent className="p-4">
-          <div className="flex gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by name, email, or phone..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Button variant="outline">
-              <Filter className="mr-2 h-4 w-4" />
-              Filters
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Customer List */}
-      <div className="grid gap-4">
-        {filteredCustomers.map((customer, index) => (
-          <Card 
-            key={customer.id} 
-            className="glass-card hover:shadow-md transition-all duration-200 animate-slide-in-left"
-            style={{ animationDelay: `${index * 50}ms` }}
-          >
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4 flex-1">
-                  {/* Avatar */}
-                  <div className="h-14 w-14 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+      {/* Data Table (Sakosys AdminLTE Style) */}
+      <div className="bg-white dark:bg-slate-900 rounded-b-lg border border-t-0 border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+        <table className="w-full text-sm text-left">
+          <thead className="text-xs text-slate-700 uppercase bg-slate-50 dark:bg-slate-800 dark:text-slate-400 border-b border-slate-200">
+            <tr>
+              <th className="px-6 py-4 font-bold">Avatar</th>
+              <th className="px-6 py-4 font-bold">Name</th>
+              <th className="px-6 py-4 font-bold">Contact</th>
+              <th className="px-6 py-4 font-bold">Vehicles</th>
+              <th className="px-6 py-4 font-bold">Total Spent</th>
+              <th className="px-6 py-4 font-bold">Last Visit</th>
+              <th className="px-6 py-4 font-bold">Status</th>
+              <th className="px-6 py-4 font-bold text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+            {filteredCustomers.map((customer) => (
+              <tr key={customer.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                {/* Avatar */}
+                <td className="px-6 py-3">
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white font-bold text-sm shadow">
                     {customer.firstName[0]}{customer.lastName[0]}
                   </div>
-
-                  {/* Info */}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-bold text-lg">
-                        {customer.firstName} {customer.lastName}
-                      </h3>
-                      <Badge variant={customer.status === "active" ? "default" : "secondary"} className="text-xs">
-                        {customer.status}
-                      </Badge>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mt-2">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Mail className="h-4 w-4" />
-                        {customer.email}
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Phone className="h-4 w-4" />
-                        {customer.phone}
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <CarIcon className="h-4 w-4" />
-                        {customer.vehicles} vehicle{customer.vehicles !== 1 ? 's' : ''}
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Calendar className="h-4 w-4" />
-                        Last visit: {new Date(customer.lastVisit).toLocaleDateString()}
-                      </div>
-                    </div>
+                </td>
+                
+                {/* Name */}
+                <td className="px-6 py-3 font-medium text-slate-900 dark:text-white">
+                  {customer.firstName} {customer.lastName}
+                  {customer.address && (
+                    <div className="text-xs text-slate-500 font-normal">{customer.address}</div>
+                  )}
+                </td>
+                
+                {/* Contact */}
+                <td className="px-6 py-3">
+                  <div className="flex items-center gap-1 text-xs text-slate-600 mb-1">
+                    <Mail className="h-3 w-3" />
+                    {customer.email}
                   </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-3">
-                  <div className="text-right mr-4">
-                    <p className="text-sm text-muted-foreground">Total Spent</p>
-                    <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
-                      ${customer.totalSpent.toLocaleString()}
-                    </p>
+                  <div className="flex items-center gap-1 text-xs text-slate-600">
+                    <Phone className="h-3 w-3" />
+                    {customer.phone}
                   </div>
-                  
-                  <Button variant="outline" size="sm">
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                </td>
+                
+                {/* Vehicles */}
+                <td className="px-6 py-3">
+                  <span className="inline-flex items-center gap-1 text-sm font-semibold">
+                    <Users className="h-4 w-4 text-blue-500" />
+                    {customer.vehicles}
+                  </span>
+                </td>
+                
+                {/* Total Spent */}
+                <td className="px-6 py-3 font-bold text-emerald-600">
+                  ${customer.totalSpent.toLocaleString()}
+                </td>
+                
+                {/* Last Visit */}
+                <td className="px-6 py-3 text-slate-600">
+                  {new Date(customer.lastVisit).toLocaleDateString()}
+                </td>
+                
+                {/* Status */}
+                <td className="px-6 py-3">
+                  <Badge className={customer.status === 'active' 
+                    ? "bg-green-500 hover:bg-green-600" 
+                    : "bg-slate-400 hover:bg-slate-500"
+                  }>
+                    {customer.status}
+                  </Badge>
+                </td>
+                
+                {/* Actions (4 color buttons) */}
+                <td className="px-6 py-3">
+                  <div className="flex justify-center gap-2">
+                    {/* Yellow: View */}
+                    <Button size="icon" className="h-8 w-8 bg-[#f39c12] hover:bg-[#d58512] text-white rounded shadow-sm">
+                      <Eye className="h-4 w-4" />
+                    </Button>
+
+                    {/* Light Blue: Edit */}
+                    <Button size="icon" className="h-8 w-8 bg-[#3c8dbc] hover:bg-[#367fa9] text-white rounded shadow-sm">
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+
+                    {/* Red: Delete */}
+                    <Button size="icon" className="h-8 w-8 bg-[#dd4b39] hover:bg-[#d73925] text-white rounded shadow-sm">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        
+        {/* Pagination Footer */}
+        <div className="bg-slate-50 dark:bg-slate-800 px-4 py-3 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center sm:px-6">
+           <div className="text-xs text-slate-500">
+             Showing 1 to {filteredCustomers.length} of {mockCustomers.length} entries
+           </div>
+           <div className="flex gap-1">
+             <Button variant="outline" size="sm" className="h-7 text-xs" disabled>Previous</Button>
+             <Button size="sm" className="h-7 text-xs bg-blue-500 text-white hover:bg-blue-600">1</Button>
+             <Button variant="outline" size="sm" className="h-7 text-xs">Next</Button>
+           </div>
+        </div>
       </div>
-
-      {filteredCustomers.length === 0 && (
-        <Card className="glass-card">
-          <CardContent className="p-12 text-center">
-            <p className="text-muted-foreground">No customers found matching your search.</p>
-          </CardContent>
-        </Card>
-      )}
     </div>
   )
 }

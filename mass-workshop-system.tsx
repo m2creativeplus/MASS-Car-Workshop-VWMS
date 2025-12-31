@@ -25,6 +25,11 @@ import { EnhancedInspectionChecklist } from "@/components/inspections/enhanced-i
 // Dynamically import optional/admin modules
 const SuppliersModule = dynamic(() => import("@/components/suppliers/suppliers-module"), { ssr: false })
 const DatabaseTest = dynamic(() => import("@/components/admin/database-test"), { ssr: false })
+const SettingsModule = dynamic(() => import("@/components/settings/settings-module"), { ssr: false })
+const DeliveryModule = dynamic(() => import("@/components/delivery/delivery-module"), { ssr: false })
+const RemindersModule = dynamic(() => import("@/components/reminders/reminders-module"), { ssr: false })
+const PartSellsModule = dynamic(() => import("@/components/pos/part-sells-module"), { ssr: false })
+const AutoDiagnosticsModule = dynamic(() => import("@/components/ai-diagnostics/auto-diagnostics-module"), { ssr: false })
 
 function WorkshopSystemContent() {
   const { user, logout } = useSupabaseAuth()
@@ -60,6 +65,16 @@ function WorkshopSystemContent() {
         return <ReportsAnalytics />
       case "ai-tools":
         return <AITools />
+      case "pos":
+        return <PartSellsModule />
+      case "delivery":
+        return <DeliveryModule />
+      case "reminders":
+        return <RemindersModule />
+      case "diagnostics":
+        return <AutoDiagnosticsModule />
+      case "settings":
+        return user.role === "admin" ? <SettingsModule /> : <Dashboard />
       case "database-test":
         return user.role === "admin" ? <DatabaseTest /> : <Dashboard />
       default:
@@ -75,12 +90,17 @@ function WorkshopSystemContent() {
       vehicles: "Vehicle Registry",
       appointments: "Service Schedule",
       inventory: "Inventory Management",
+      pos: "Part Sells / POS",
+      delivery: "Delivery Car",
+      reminders: "Service Reminders",
+      diagnostics: "AI Auto-Diagnostics",
       technicians: "Technician Portal",
       suppliers: "Supplier Directory",
       inspections: "Digital Vehicle Inspections",
       estimates: "Estimates & Invoices",
       reports: "Analytics & Reports",
       "ai-tools": "AI Assistant",
+      settings: "System Settings",
       "database-test": "System Diagnostics"
     }
     return titles[id] || "Dashboard"

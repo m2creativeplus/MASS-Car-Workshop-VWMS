@@ -1,33 +1,29 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { 
-  User,
-  Wrench,
-  Clock,
-  TrendingUp,
-  Star,
-  AlertCircle,
-  CheckCircle2,
-  Activity
-} from "lucide-react"
 import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import { 
+  Plus, 
+  Eye,
+  Pencil,
+  Trash2,
+  Wrench,
+  Star,
+  Phone
+} from "lucide-react"
 
 interface Technician {
   id: string
   name: string
   role: string
+  phone: string
   status: "available" | "working" | "break" | "offline"
-  currentJob?: string
   completedToday: number
   efficiency: number
   rating: number
   specialties: string[]
-  certifications: string[]
 }
 
 const mockTechnicians: Technician[] = [
@@ -35,245 +31,230 @@ const mockTechnicians: Technician[] = [
     id: "1",
     name: "John Doe",
     role: "Senior Mechanic",
+    phone: "+252 63 111 2222",
     status: "working",
-    currentJob: "Brake Service - BMW X5 (#4052)",
     completedToday: 3,
     efficiency: 95,
     rating: 4.8,
-    specialties: ["Engine Repair", "Brake Systems", "Diagnostics"],
-    certifications: ["ASE Master", "BMW Certified"]
+    specialties: ["Engine Repair", "Brake Systems"]
   },
   {
     id: "2",
     name: "Mike Ross",
     role: "Mechanic",
+    phone: "+252 63 333 4444",
     status: "available",
     completedToday: 2,
     efficiency: 88,
     rating: 4.6,
-    specialties: ["Oil Service", "Tire Replacement", "General Maintenance"],
-    certifications: ["ASE Certified"]
+    specialties: ["Oil Service", "General Maintenance"]
   },
   {
     id: "3",
     name: "Sarah Smith",
     role: "Technician",
+    phone: "+252 63 555 6666",
     status: "break",
     completedToday: 4,
     efficiency: 92,
     rating: 4.9,
-    specialties: ["Electrical Systems", "AC Repair", "Diagnostics"],
-    certifications: ["ASE Master", "Electrical Specialist"]
+    specialties: ["Electrical Systems", "Diagnostics"]
+  },
+  {
+    id: "4",
+    name: "Ahmed Hassan",
+    role: "Junior Mechanic",
+    phone: "+252 63 777 8888",
+    status: "working",
+    completedToday: 1,
+    efficiency: 75,
+    rating: 4.2,
+    specialties: ["Tire Service", "Oil Change"]
   },
 ]
 
 export function TechnicianDashboard() {
-  const [technicians, setTechnicians] = useState<Technician[]>(mockTechnicians)
+  const [searchQuery, setSearchQuery] = useState("")
 
-  const getStatusConfig = (status: Technician["status"]) => {
+  const filteredTechnicians = mockTechnicians.filter(tech =>
+    tech.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    tech.role.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const getStatusBadge = (status: Technician["status"]) => {
     switch (status) {
       case "available":
-        return { 
-          color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-          dot: "bg-emerald-500",
-          label: "Available"
-        }
+        return <Badge className="bg-green-500 hover:bg-green-600">Available</Badge>
       case "working":
-        return { 
-          color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-          dot: "bg-blue-500",
-          label: "Working"
-        }
+        return <Badge className="bg-blue-500 hover:bg-blue-600">Working</Badge>
       case "break":
-        return { 
-          color: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-          dot: "bg-amber-500",
-          label: "On Break"
-        }
+        return <Badge className="bg-amber-500 hover:bg-amber-600">On Break</Badge>
       case "offline":
-        return { 
-          color: "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400",
-          dot: "bg-gray-500",
-          label: "Offline"
-        }
+        return <Badge className="bg-slate-400 hover:bg-slate-500">Offline</Badge>
     }
   }
 
-  const totalCompleted = technicians.reduce((sum, t) => sum + t.completedToday, 0)
-  const avgEfficiency = Math.round(technicians.reduce((sum, t) => sum + t.efficiency, 0) / technicians.length)
-  const activeCount = technicians.filter(t => t.status === "working").length
-
   return (
-    <div className="space-y-6 animate-fade-in-up">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Technician Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Monitor team performance and assignments</p>
+    <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-950 p-6">
+      
+      {/* Header Controls (Sakosys Style) */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <h2 className="text-xl font-bold text-slate-800 dark:text-white uppercase tracking-tight">
+          Mechanics List
+        </h2>
+        
+        <div className="flex gap-2 w-full md:w-auto">
+          <Button className="bg-[#00A65A] hover:bg-[#008d4c] text-white">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Mechanic
+          </Button>
         </div>
       </div>
 
-      {/* Team Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="glass-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Team Members</p>
-                <h3 className="text-2xl font-bold mt-1">{technicians.length}</h3>
-              </div>
-              <User className="h-8 w-8 text-blue-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Currently Working</p>
-                <h3 className="text-2xl font-bold mt-1">{activeCount}</h3>
-              </div>
-              <Wrench className="h-8 w-8 text-orange-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Completed Today</p>
-                <h3 className="text-2xl font-bold mt-1">{totalCompleted}</h3>
-              </div>
-              <CheckCircle2 className="h-8 w-8 text-emerald-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Avg Efficiency</p>
-                <h3 className="text-2xl font-bold mt-1">{avgEfficiency}%</h3>
-              </div>
-              <TrendingUp className="h-8 w-8 text-purple-500" />
-            </div>
-          </CardContent>
-        </Card>
+      {/* Filter Bar */}
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-t-lg border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-slate-600">Show</span>
+          <select className="border border-slate-300 rounded px-2 py-1 text-sm bg-transparent">
+            <option>10</option>
+            <option>25</option>
+            <option>50</option>
+          </select>
+          <span className="text-sm text-slate-600">entries</span>
+        </div>
+        
+        <div className="relative w-64">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">Search:</span>
+          <Input 
+            className="pl-16 h-8" 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
       </div>
 
-      {/* Technician Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {technicians.map((tech, index) => {
-          const statusConfig = getStatusConfig(tech.status)
-          
-          return (
-            <Card 
-              key={tech.id}
-              className="glass-card hover:shadow-lg transition-all duration-200 animate-slide-in-left"
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="relative">
-                      <Avatar className="h-16 w-16 border-4 border-background">
-                        <AvatarFallback className="bg-gradient-to-br from-orange-500 to-red-600 text-white text-xl font-bold">
-                          {tech.name.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className={`absolute -bottom-1 -right-1 h-5 w-5 rounded-full border-2 border-background ${statusConfig.dot}`} />
-                    </div>
-                    
-                    <div>
-                      <CardTitle className="text-xl">{tech.name}</CardTitle>
-                      <p className="text-sm text-muted-foreground">{tech.role}</p>
-                      <div className="flex items-center gap-1 mt-1">
-                        <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                        <span className="text-sm font-semibold">{tech.rating}</span>
-                      </div>
-                    </div>
+      {/* Data Table (Sakosys AdminLTE Style) */}
+      <div className="bg-white dark:bg-slate-900 rounded-b-lg border border-t-0 border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+        <table className="w-full text-sm text-left">
+          <thead className="text-xs text-slate-700 uppercase bg-slate-50 dark:bg-slate-800 dark:text-slate-400 border-b border-slate-200">
+            <tr>
+              <th className="px-6 py-4 font-bold">Avatar</th>
+              <th className="px-6 py-4 font-bold">Name</th>
+              <th className="px-6 py-4 font-bold">Role</th>
+              <th className="px-6 py-4 font-bold">Phone</th>
+              <th className="px-6 py-4 font-bold">Jobs Today</th>
+              <th className="px-6 py-4 font-bold">Efficiency</th>
+              <th className="px-6 py-4 font-bold">Rating</th>
+              <th className="px-6 py-4 font-bold">Status</th>
+              <th className="px-6 py-4 font-bold text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+            {filteredTechnicians.map((tech) => (
+              <tr key={tech.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                {/* Avatar */}
+                <td className="px-6 py-3">
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white font-bold text-sm shadow">
+                    {tech.name.split(' ').map(n => n[0]).join('')}
                   </div>
-                  
-                  <Badge className={statusConfig.color}>{statusConfig.label}</Badge>
-                </div>
-              </CardHeader>
-              
-              <CardContent className="space-y-4">
-                {/* Current Job */}
-                {tech.currentJob && (
-                  <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Activity className="h-4 w-4 text-blue-600 dark:text-blue-400 animate-pulse" />
-                      <span className="font-medium text-blue-700 dark:text-blue-300">
-                        Currently working on:
-                      </span>
-                    </div>
-                    <p className="text-sm mt-1 font-semibold">{tech.currentJob}</p>
-                  </div>
-                )}
-
-                {/* Performance Metrics */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Completed Today</span>
-                      <span className="font-bold">{tech.completedToday}</span>
-                    </div>
-                    <Progress value={(tech.completedToday / 5) * 100} className="h-2" />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Efficiency</span>
-                      <span className="font-bold">{tech.efficiency}%</span>
-                    </div>
-                    <Progress value={tech.efficiency} className="h-2" />
-                  </div>
-                </div>
-
-                {/* Specialties */}
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground mb-2">SPECIALTIES</p>
-                  <div className="flex flex-wrap gap-2">
-                    {tech.specialties.map((specialty, i) => (
-                      <Badge key={i} variant="outline" className="text-xs">
-                        {specialty}
-                      </Badge>
+                </td>
+                
+                {/* Name */}
+                <td className="px-6 py-3 font-medium text-slate-900 dark:text-white">
+                  {tech.name}
+                  <div className="text-xs text-slate-500 flex flex-wrap gap-1 mt-1">
+                    {tech.specialties.map((s, i) => (
+                      <span key={i} className="bg-slate-100 dark:bg-slate-700 px-1 rounded">{s}</span>
                     ))}
                   </div>
-                </div>
-
-                {/* Certifications */}
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground mb-2">CERTIFICATIONS</p>
-                  <div className="flex flex-wrap gap-2">
-                    {tech.certifications.map((cert, i) => (
-                      <Badge key={i} className="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
-                        <CheckCircle2 className="h-3 w-3 mr-1" />
-                        {cert}
-                      </Badge>
-                    ))}
+                </td>
+                
+                {/* Role */}
+                <td className="px-6 py-3 text-slate-600">
+                  {tech.role}
+                </td>
+                
+                {/* Phone */}
+                <td className="px-6 py-3">
+                  <div className="flex items-center gap-1 text-xs text-slate-600">
+                    <Phone className="h-3 w-3" />
+                    {tech.phone}
                   </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-2 pt-2">
-                  {tech.status === "available" && (
-                    <Button className="flex-1 bg-orange-500 hover:bg-orange-600">
-                      Assign Job
+                </td>
+                
+                {/* Jobs Today */}
+                <td className="px-6 py-3 font-semibold text-center">
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold">
+                    {tech.completedToday}
+                  </span>
+                </td>
+                
+                {/* Efficiency */}
+                <td className="px-6 py-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-16 h-2 bg-slate-200 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-emerald-500 rounded-full" 
+                        style={{ width: `${tech.efficiency}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-xs font-medium">{tech.efficiency}%</span>
+                  </div>
+                </td>
+                
+                {/* Rating */}
+                <td className="px-6 py-3">
+                  <div className="flex items-center gap-1">
+                    <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                    <span className="font-semibold">{tech.rating}</span>
+                  </div>
+                </td>
+                
+                {/* Status */}
+                <td className="px-6 py-3">
+                  {getStatusBadge(tech.status)}
+                </td>
+                
+                {/* Actions (4 color buttons) */}
+                <td className="px-6 py-3">
+                  <div className="flex justify-center gap-2">
+                    {/* Blue: Assign */}
+                    <Button size="icon" className="h-8 w-8 bg-[#00c0ef] hover:bg-[#00acd6] text-white rounded shadow-sm">
+                      <Wrench className="h-4 w-4" />
                     </Button>
-                  )}
-                  <Button variant="outline" className="flex-1">
-                    View Details
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )
-        })}
+                    
+                    {/* Yellow: View */}
+                    <Button size="icon" className="h-8 w-8 bg-[#f39c12] hover:bg-[#d58512] text-white rounded shadow-sm">
+                      <Eye className="h-4 w-4" />
+                    </Button>
+
+                    {/* Light Blue: Edit */}
+                    <Button size="icon" className="h-8 w-8 bg-[#3c8dbc] hover:bg-[#367fa9] text-white rounded shadow-sm">
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+
+                    {/* Red: Delete */}
+                    <Button size="icon" className="h-8 w-8 bg-[#dd4b39] hover:bg-[#d73925] text-white rounded shadow-sm">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        
+        {/* Pagination Footer */}
+        <div className="bg-slate-50 dark:bg-slate-800 px-4 py-3 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center sm:px-6">
+           <div className="text-xs text-slate-500">
+             Showing 1 to {filteredTechnicians.length} of {mockTechnicians.length} entries
+           </div>
+           <div className="flex gap-1">
+             <Button variant="outline" size="sm" className="h-7 text-xs" disabled>Previous</Button>
+             <Button size="sm" className="h-7 text-xs bg-blue-500 text-white hover:bg-blue-600">1</Button>
+             <Button variant="outline" size="sm" className="h-7 text-xs">Next</Button>
+           </div>
+        </div>
       </div>
     </div>
   )

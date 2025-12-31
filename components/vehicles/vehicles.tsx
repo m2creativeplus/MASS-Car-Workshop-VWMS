@@ -1,21 +1,20 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { 
   Plus, 
-  Search, 
+  Eye,
+  Pencil,
+  Trash2,
   Car as CarIcon,
-  Calendar,
   Wrench,
-  FileText,
-  AlertCircle,
-  CheckCircle2,
-  Clock
+  RefreshCw,
+  Loader2
 } from "lucide-react"
-import { useState } from "react"
+import { database, Vehicle as DbVehicle } from "@/lib/database"
 
 interface Vehicle {
   id: string
@@ -27,247 +26,224 @@ interface Vehicle {
   color: string
   mileage: number
   owner: string
-  lastService: string
-  nextService: string
   status: "active" | "in-service" | "completed"
-  serviceHistory: number
 }
 
-const mockVehicles: Vehicle[] = [
-  {
-    id: "1",
-    make: "Toyota",
-    model: "Land Cruiser",
-    year: 2020,
-    licensePlate: "ABC-1234",
-    vin: "JTMRFREV5HD085123",
-    color: "White",
-    mileage: 45000,
-    owner: "Mohamed Ahmed",
-    lastService: "2025-12-01",
-    nextService: "2026-03-01",
-    status: "active",
-    serviceHistory: 12
-  },
-  {
-    id: "2",
-    make: "Honda",
-    model: "Civic",
-    year: 2019,
-    licensePlate: "XYZ-5678",
-    vin: "2HGFC2F59KH542789",
-    color: "Silver",
-    mileage: 62000,
-    owner: "Sarah Hassan",
-    lastService: "2025-12-15",
-    nextService: "2026-03-15",
-    status: "in-service",
-    serviceHistory: 8
-  },
-  {
-    id: "3",
-    make: "Ford",
-    model: "F-150",
-    year: 2021,
-    licensePlate: "DEF-9012",
-    vin: "1FTFW1E85MKE12345",
-    color: "Blue",
-    mileage: 38000,
-    owner: "Ahmed Ali",
-    lastService: "2025-11-20",
-    nextService: "2026-02-20",
-    status: "completed",
-    serviceHistory: 5
-  },
+// Transform database vehicle to UI vehicle
+function transformVehicle(dbVehicle: DbVehicle): Vehicle {
+  const statusMap: Record<string, Vehicle['status']> = {
+    'Active': 'active',
+    'Maintenance': 'in-service',
+    'Tax Due': 'completed'
+  }
+  return {
+    id: dbVehicle.id,
+    make: dbVehicle.make,
+    model: dbVehicle.model,
+    year: dbVehicle.year,
+    licensePlate: dbVehicle.license_plate,
+    vin: dbVehicle.vin,
+    color: dbVehicle.color,
+    mileage: dbVehicle.mileage,
+    owner: 'Fleet Owner',
+    status: statusMap[dbVehicle.status || ''] || 'active'
+  }
+}
+
+// Demo data
+const demoVehicles: Vehicle[] = [
+  { id: "1", make: "Toyota", model: "Land Cruiser 79", year: 2019, licensePlate: "SL-82307-T", vin: "JTM8R5EV5JD789012", color: "White", mileage: 48000, owner: "Mohamed Ahmed", status: "active" },
+  { id: "2", make: "Toyota", model: "Hilux", year: 2020, licensePlate: "SL-70115-G", vin: "JTM5R6EV1LD567890", color: "Gray", mileage: 28000, owner: "Sarah Hassan", status: "in-service" },
+  { id: "3", make: "Nissan", model: "Patrol", year: 2018, licensePlate: "SL-61203-D", vin: "JN1TBNT30Z0000001", color: "Black", mileage: 85000, owner: "Ahmed Ali", status: "active" },
+  { id: "4", make: "Mitsubishi", model: "Pajero", year: 2021, licensePlate: "SL-55401-P", vin: "JMYLYV97J1J000001", color: "Silver", mileage: 15000, owner: "Fatima Omar", status: "completed" },
 ]
 
 export function Vehicles() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>(mockVehicles)
-  const [searchTerm, setSearchTerm] = useState("")
+  const [vehicles, setVehicles] = useState<Vehicle[]>(demoVehicles)
+  const [loading, setLoading] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+
+  const fetchVehicles = async () => {
+    setLoading(true)
+    try {
+      const { data, error } = await database.vehicles.getAll()
+      if (data && data.length > 0) {
+        setVehicles(data.map(transformVehicle))
+      }
+    } catch (err) {
+      console.error('Failed to fetch vehicles:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchVehicles()
+  }, [])
 
   const filteredVehicles = vehicles.filter(vehicle =>
-    `${vehicle.make} ${vehicle.model}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vehicle.licensePlate.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vehicle.owner.toLowerCase().includes(searchTerm.toLowerCase())
+    `${vehicle.make} ${vehicle.model}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    vehicle.licensePlate.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    vehicle.owner.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const getStatusConfig = (status: Vehicle["status"]) => {
+  const getStatusBadge = (status: Vehicle["status"]) => {
     switch (status) {
       case "active":
-        return { color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400", label: "Active" }
+        return <Badge className="bg-green-500 hover:bg-green-600">Active</Badge>
       case "in-service":
-        return { color: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400", label: "In Service" }
+        return <Badge className="bg-amber-500 hover:bg-amber-600">In Service</Badge>
       case "completed":
-        return { color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400", label: "Completed" }
+        return <Badge className="bg-blue-500 hover:bg-blue-600">Completed</Badge>
     }
   }
 
   return (
-    <div className="space-y-6 animate-fade-in-up">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Vehicle Registry</h1>
-          <p className="text-muted-foreground mt-1">Manage all vehicles and service history</p>
+    <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-950 p-6">
+      
+      {/* Header Controls (Sakosys Style) */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <h2 className="text-xl font-bold text-slate-800 dark:text-white uppercase tracking-tight">
+          Car Stock / Vehicle List
+        </h2>
+        
+        <div className="flex gap-2 w-full md:w-auto">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={fetchVehicles}
+            disabled={loading}
+          >
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+          </Button>
+          <Button className="bg-[#00A65A] hover:bg-[#008d4c] text-white">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Vehicle
+          </Button>
         </div>
-        <Button className="bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20">
-          <Plus className="mr-2 h-4 w-4" />
-          Register New Vehicle
-        </Button>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="glass-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Total Vehicles</p>
-                <h3 className="text-2xl font-bold mt-1">{vehicles.length}</h3>
-              </div>
-              <CarIcon className="h-8 w-8 text-blue-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">In Service</p>
-                <h3 className="text-2xl font-bold mt-1">
-                  {vehicles.filter(v => v.status === "in-service").length}
-                </h3>
-              </div>
-              <Wrench className="h-8 w-8 text-amber-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Service Due</p>
-                <h3 className="text-2xl font-bold mt-1">3</h3>
-              </div>
-              <AlertCircle className="h-8 w-8 text-red-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Completed</p>
-                <h3 className="text-2xl font-bold mt-1">
-                  {vehicles.filter(v => v.status === "completed").length}
-                </h3>
-              </div>
-              <CheckCircle2 className="h-8 w-8 text-emerald-500" />
-            </div>
-          </CardContent>
-        </Card>
+      {/* Filter Bar */}
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-t-lg border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-slate-600">Show</span>
+          <select className="border border-slate-300 rounded px-2 py-1 text-sm bg-transparent">
+            <option>10</option>
+            <option>25</option>
+            <option>50</option>
+          </select>
+          <span className="text-sm text-slate-600">entries</span>
+        </div>
+        
+        <div className="relative w-64">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">Search:</span>
+          <Input 
+            className="pl-16 h-8" 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
       </div>
 
-      {/* Search */}
-      <Card className="glass-card">
-        <CardContent className="p-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by make, model, plate, or owner..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </CardContent>
-      </Card>
+      {/* Data Table (Sakosys AdminLTE Style) */}
+      <div className="bg-white dark:bg-slate-900 rounded-b-lg border border-t-0 border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+        <table className="w-full text-sm text-left">
+          <thead className="text-xs text-slate-700 uppercase bg-slate-50 dark:bg-slate-800 dark:text-slate-400 border-b border-slate-200">
+            <tr>
+              <th className="px-6 py-4 font-bold">Image</th>
+              <th className="px-6 py-4 font-bold">Vehicle</th>
+              <th className="px-6 py-4 font-bold">Plate / VIN</th>
+              <th className="px-6 py-4 font-bold">Owner</th>
+              <th className="px-6 py-4 font-bold">Mileage</th>
+              <th className="px-6 py-4 font-bold">Color</th>
+              <th className="px-6 py-4 font-bold">Status</th>
+              <th className="px-6 py-4 font-bold text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+            {filteredVehicles.map((vehicle) => (
+              <tr key={vehicle.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                {/* Image/Icon */}
+                <td className="px-6 py-3">
+                  <div className="h-10 w-10 rounded bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+                    <CarIcon className="h-5 w-5 text-white" />
+                  </div>
+                </td>
+                
+                {/* Vehicle */}
+                <td className="px-6 py-3 font-medium text-slate-900 dark:text-white">
+                  {vehicle.year} {vehicle.make} {vehicle.model}
+                </td>
+                
+                {/* Plate / VIN */}
+                <td className="px-6 py-3">
+                  <div className="font-semibold text-orange-600">{vehicle.licensePlate}</div>
+                  <div className="text-xs text-slate-500 font-mono">{vehicle.vin}</div>
+                </td>
+                
+                {/* Owner */}
+                <td className="px-6 py-3 text-slate-600">
+                  {vehicle.owner}
+                </td>
+                
+                {/* Mileage */}
+                <td className="px-6 py-3 font-semibold">
+                  {vehicle.mileage.toLocaleString()} km
+                </td>
+                
+                {/* Color */}
+                <td className="px-6 py-3">
+                  <span className="inline-flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full border border-slate-300" style={{ backgroundColor: vehicle.color.toLowerCase() }}></span>
+                    {vehicle.color}
+                  </span>
+                </td>
+                
+                {/* Status */}
+                <td className="px-6 py-3">
+                  {getStatusBadge(vehicle.status)}
+                </td>
+                
+                {/* Actions (4 color buttons) */}
+                <td className="px-6 py-3">
+                  <div className="flex justify-center gap-2">
+                    {/* Blue: Repair */}
+                    <Button size="icon" className="h-8 w-8 bg-[#00c0ef] hover:bg-[#00acd6] text-white rounded shadow-sm">
+                      <Wrench className="h-4 w-4" />
+                    </Button>
+                    
+                    {/* Yellow: View */}
+                    <Button size="icon" className="h-8 w-8 bg-[#f39c12] hover:bg-[#d58512] text-white rounded shadow-sm">
+                      <Eye className="h-4 w-4" />
+                    </Button>
 
-      {/* Vehicle Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {filteredVehicles.map((vehicle, index) => {
-          const statusConfig = getStatusConfig(vehicle.status)
-          
-          return (
-            <Card 
-              key={vehicle.id} 
-              className="glass-card hover:shadow-lg transition-all duration-200 animate-slide-in-left"
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
-              <CardHeader className="pb-3">
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-3">
-                    <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
-                      <CarIcon className="h-8 w-8 text-white" />
-                    </div>
-                    <div>
-                      <CardTitle>{vehicle.year} {vehicle.make} {vehicle.model}</CardTitle>
-                      <p className="text-sm text-muted-foreground">{vehicle.licensePlate}</p>
-                    </div>
-                  </div>
-                  <Badge className={statusConfig.color}>{statusConfig.label}</Badge>
-                </div>
-              </CardHeader>
-              
-              <CardContent className="space-y-4">
-                {/* Vehicle Details */}
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <p className="text-muted-foreground">Owner</p>
-                    <p className="font-medium">{vehicle.owner}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Color</p>
-                    <p className="font-medium">{vehicle.color}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Mileage</p>
-                    <p className="font-medium">{vehicle.mileage.toLocaleString()} km</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Service History</p>
-                    <p className="font-medium">{vehicle.serviceHistory} records</p>
-                  </div>
-                </div>
+                    {/* Light Blue: Edit */}
+                    <Button size="icon" className="h-8 w-8 bg-[#3c8dbc] hover:bg-[#367fa9] text-white rounded shadow-sm">
+                      <Pencil className="h-4 w-4" />
+                    </Button>
 
-                {/* Service Timeline */}
-                <div className="pt-3 border-t space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
-                      Last Service
-                    </span>
-                    <span className="font-medium">{new Date(vehicle.lastService).toLocaleDateString()}</span>
+                    {/* Red: Delete */}
+                    <Button size="icon" className="h-8 w-8 bg-[#dd4b39] hover:bg-[#d73925] text-white rounded shadow-sm">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
-                      Next Service
-                    </span>
-                    <span className="font-medium text-orange-600 dark:text-orange-400">
-                      {new Date(vehicle.nextService).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-2 pt-2">
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <FileText className="mr-2 h-4 w-4" />
-                    Service History
-                  </Button>
-                  <Button size="sm" className="flex-1 bg-orange-500 hover:bg-orange-600 text-white">
-                    <Wrench className="mr-2 h-4 w-4" />
-                    Schedule Service
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )
-        })}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        
+        {/* Pagination Footer */}
+        <div className="bg-slate-50 dark:bg-slate-800 px-4 py-3 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center sm:px-6">
+           <div className="text-xs text-slate-500">
+             Showing 1 to {filteredVehicles.length} of {vehicles.length} entries
+           </div>
+           <div className="flex gap-1">
+             <Button variant="outline" size="sm" className="h-7 text-xs" disabled>Previous</Button>
+             <Button size="sm" className="h-7 text-xs bg-blue-500 text-white hover:bg-blue-600">1</Button>
+             <Button variant="outline" size="sm" className="h-7 text-xs">Next</Button>
+           </div>
+        </div>
       </div>
     </div>
   )

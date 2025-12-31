@@ -2,160 +2,191 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { PremiumKPICard } from "@/components/ui/premium-kpi-card"
-import {
-  Users,
-  Car,
-  Package,
-  Wrench,
-  TrendingUp,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  MoreHorizontal,
-  Plus,
-  FileText
+import { 
+  Users, 
+  Car, 
+  Wrench, 
+  Settings,
+  ShoppingCart,
+  ArrowRight,
+  MoreHorizontal
 } from "lucide-react"
 import { useState } from "react"
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { 
+  AreaChart, 
+  Area, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell
+} from 'recharts'
 
-const revenueData = [
-  { name: 'Mon', revenue: 4000 },
-  { name: 'Tue', revenue: 3000 },
-  { name: 'Wed', revenue: 5500 },
-  { name: 'Thu', revenue: 4500 },
-  { name: 'Fri', revenue: 6800 },
-  { name: 'Sat', revenue: 7200 },
-  { name: 'Sun', revenue: 3800 },
+const repairData = [
+  { name: 'Jan', repairs: 1 },
+  { name: 'Feb', repairs: 0 },
+  { name: 'Mar', repairs: 1 },
+  { name: 'Apr', repairs: 3 },
+  { name: 'May', repairs: 1 },
+  { name: 'Jun', repairs: 1 },
+  { name: 'Jul', repairs: 0 },
+  { name: 'Aug', repairs: 0 },
+  { name: 'Sep', repairs: 1 },
+  { name: 'Oct', repairs: 0 },
+  { name: 'Nov', repairs: 0 },
+  { name: 'Dec', repairs: 0 },
 ]
 
+const donutData1 = [
+  { name: 'Sold', value: 45 },
+  { name: 'Stock', value: 55 },
+]
+
+const donutData2 = [
+  { name: 'Sold', value: 30 },
+  { name: 'Stock', value: 70 },
+]
+
+const COLORS = ['#F59E0B', '#e5e7eb'] // Amber and Gray
+const COLORS_TEAL = ['#14b8a6', '#e5e7eb'] // Teal and Gray
+
 export function Dashboard() {
-  const [timeRange, setTimeRange] = useState("week")
+  const [timeRange, setTimeRange] = useState("year")
 
   return (
-    <div className="space-y-8 animate-fade-in-up">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Dashboard Overview</h1>
-          <p className="text-muted-foreground mt-1">Welcome back, Admin. Here's what's happening at the workshop today.</p>
-        </div>
-        <div className="flex gap-3">
-          <Button variant="outline" className="glass-card">
-            <Clock className="mr-2 h-4 w-4" />
-            History
-          </Button>
-          <Button className="bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20">
-            <Plus className="mr-2 h-4 w-4" />
-            New Job Card
-          </Button>
+    <div className="space-y-6 animate-fade-in-up p-2">
+      
+      {/* 1. Header is handled by the main layout, so we focus on the content */}
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold text-emerald-600 tracking-tight uppercase">
+          SAKO WORKSHOP DASHBOARD
+        </h2>
+        <div className="flex gap-2">
+          <span className="text-xs text-muted-foreground flex items-center">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
+            System Live
+          </span>
         </div>
       </div>
 
-      {/* KPI Grid */}
+      {/* 2. Info Cards Row (Replicating Sakosys Colors) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <PremiumKPICard 
-          title="Total Revenue" 
-          value="$12,450" 
-          icon={TrendingUp} 
-          trend={{ value: 12, label: "vs last week", positive: true }}
-          color="success"
-          index={0}
-        />
-        <PremiumKPICard 
-          title="Active Jobs" 
-          value="18" 
-          icon={Wrench} 
-          trend={{ value: 4, label: "new today", positive: true }}
-          color="primary"
-          index={1}
-        />
-        <PremiumKPICard 
-          title="Vehicles In" 
-          value="24" 
-          icon={Car} 
-          color="info"
-          index={2}
-        />
-        <PremiumKPICard 
-          title="Pending Parts" 
-          value="5" 
-          icon={Package} 
-          trend={{ value: 2, label: "delayed", positive: false }}
-          color="warning"
-          index={3}
-        />
+        
+        {/* Card 1: Parts (Cyan/Blue) */}
+        <Card className="bg-[#00c0ef] text-white border-none shadow-md overflow-hidden relative">
+          <CardContent className="p-4 relative z-10">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="text-4xl font-bold">465</h3>
+                <p className="text-sm font-medium opacity-90 mt-1">PARTS IN STOCK</p>
+              </div>
+              <Wrench className="h-16 w-16 opacity-20 absolute right-4 top-2 text-black" />
+            </div>
+          </CardContent>
+          <div className="bg-black/10 p-2 text-center text-xs font-medium cursor-pointer flex justify-center items-center hover:bg-black/20 transition-colors">
+            More info <ArrowRight className="h-3 w-3 ml-1" />
+          </div>
+        </Card>
+
+        {/* Card 2: Customers (Orange) */}
+        <Card className="bg-[#F39C12] text-white border-none shadow-md overflow-hidden relative">
+          <CardContent className="p-4 relative z-10">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="text-4xl font-bold">35</h3>
+                <p className="text-sm font-medium opacity-90 mt-1">CUSTOMERS</p>
+              </div>
+              <Users className="h-16 w-16 opacity-20 absolute right-4 top-2 text-black" />
+            </div>
+          </CardContent>
+          <div className="bg-black/10 p-2 text-center text-xs font-medium cursor-pointer flex justify-center items-center hover:bg-black/20 transition-colors">
+            More info <ArrowRight className="h-3 w-3 ml-1" />
+          </div>
+        </Card>
+
+        {/* Card 3: Cars (Green) */}
+        <Card className="bg-[#00A65A] text-white border-none shadow-md overflow-hidden relative">
+          <CardContent className="p-4 relative z-10">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="text-4xl font-bold">10</h3>
+                <p className="text-sm font-medium opacity-90 mt-1">CARS IN STOCK</p>
+              </div>
+              <Car className="h-16 w-16 opacity-20 absolute right-4 top-2 text-black" />
+            </div>
+          </CardContent>
+          <div className="bg-black/10 p-2 text-center text-xs font-medium cursor-pointer flex justify-center items-center hover:bg-black/20 transition-colors">
+            More info <ArrowRight className="h-3 w-3 ml-1" />
+          </div>
+        </Card>
+
+        {/* Card 4: Mechanics (Red) */}
+        <Card className="bg-[#DD4B39] text-white border-none shadow-md overflow-hidden relative">
+          <CardContent className="p-4 relative z-10">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="text-4xl font-bold">12</h3>
+                <p className="text-sm font-medium opacity-90 mt-1">MECHANICS</p>
+              </div>
+              <Settings className="h-16 w-16 opacity-20 absolute right-4 top-2 text-black" />
+            </div>
+          </CardContent>
+          <div className="bg-black/10 p-2 text-center text-xs font-medium cursor-pointer flex justify-center items-center hover:bg-black/20 transition-colors">
+            More info <ArrowRight className="h-3 w-3 ml-1" />
+          </div>
+        </Card>
+
       </div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* 3. Main Chart Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         
-        {/* Revenue Chart */}
-        <Card className="lg:col-span-2 glass-card border-none shadow-sm">
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <div>
-                <CardTitle>Revenue Analytics</CardTitle>
-                <CardDescription>Income breakdown over time</CardDescription>
-              </div>
-              <div className="flex bg-muted rounded-lg p-1">
-                {["daily", "week", "month"].map((range) => (
-                  <button
-                    key={range}
-                    onClick={() => setTimeRange(range)}
-                    className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${
-                      timeRange === range 
-                        ? "bg-white dark:bg-slate-700 text-foreground shadow-sm" 
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {range.charAt(0).toUpperCase() + range.slice(1)}
-                  </button>
-                ))}
-              </div>
+        {/* Left Column: Repair Report Area Chart */}
+        <Card className="lg:col-span-2 shadow-sm border-t-2 border-t-emerald-500">
+          <CardHeader className="pb-2 border-b">
+            <div className="flex items-center gap-2">
+              <Car className="h-5 w-5 text-slate-500" />
+              <CardTitle className="text-lg font-medium text-slate-700">Monthly Car Repair Report</CardTitle>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="h-[300px] w-full">
+          <CardContent className="pt-6">
+            <div className="text-center mb-4">
+              <span className="text-sm font-bold text-slate-600">Car Repair: 1 Jan, 2025 - 31 December, 2025</span>
+            </div>
+            <div className="h-[350px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={revenueData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <AreaChart data={repairData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
-                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                    <linearGradient id="colorRepairs" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#00A65A" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#00A65A" stopOpacity={0.1}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={true} horizontal={true} stroke="#f0f0f0" />
                   <XAxis 
                     dataKey="name" 
-                    stroke="hsl(var(--muted-foreground))" 
+                    stroke="#9ca3af" 
                     fontSize={12} 
                     tickLine={false} 
-                    axisLine={false}
                   />
                   <YAxis 
-                    stroke="hsl(var(--muted-foreground))" 
+                    stroke="#9ca3af" 
                     fontSize={12} 
-                    tickLine={false} 
-                    axisLine={false}
-                    tickFormatter={(value) => `$${value}`}
+                    tickLine={false}
+                    domain={[0, 3]}
+                    tickCount={4}
                   />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--popover))', 
-                      borderRadius: '8px', 
-                      border: '1px solid hsl(var(--border))',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                    }}
-                    itemStyle={{ color: 'hsl(var(--foreground))' }}
-                  />
+                  <Tooltip />
                   <Area 
                     type="monotone" 
-                    dataKey="revenue" 
-                    stroke="hsl(var(--primary))" 
-                    strokeWidth={3}
+                    dataKey="repairs" 
+                    stroke="#00A65A" 
+                    strokeWidth={2}
                     fillOpacity={1} 
-                    fill="url(#colorRevenue)" 
+                    fill="url(#colorRepairs)" 
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -163,66 +194,92 @@ export function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Live Activity Feed */}
-        <Card className="glass-card border-none shadow-sm h-full">
-          <CardHeader>
-            <CardTitle>Live Activity</CardTitle>
-            <CardDescription>Real-time workshop updates</CardDescription>
-          </CardHeader>
-          <CardContent className="h-[350px] overflow-auto pr-2 custom-scrollbar">
-            <div className="space-y-6">
-              {[
-                { time: "10 mins ago", text: "Job #4052 completed by Mike", icon: CheckCircle2, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-                { time: "25 mins ago", text: "New booking: Toyota Land Cruiser", icon: Car, color: "text-blue-500", bg: "bg-blue-500/10" },
-                { time: "1 hour ago", text: "Parts order #992 delayed", icon: AlertCircle, color: "text-amber-500", bg: "bg-amber-500/10" },
-                { time: "2 hours ago", text: "Inspection report sent to Sarah", icon: FileText, color: "text-purple-500", bg: "bg-purple-500/10" },
-                { time: "3 hours ago", text: "Tech John started Job #4055", icon: Wrench, color: "text-orange-500", bg: "bg-orange-500/10" },
-              ].map((activity, i) => (
-                <div key={i} className="flex gap-4 group">
-                  <div className={`mt-1 h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 ${activity.bg} ${activity.color}`}>
-                    <activity.icon className="h-4 w-4" />
-                  </div>
-                  <div className="flex-1 space-y-1">
-                    <p className="text-sm font-medium leading-none text-foreground">{activity.text}</p>
-                    <p className="text-xs text-muted-foreground">{activity.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Technician Status Board */}
-      <h2 className="text-xl font-bold text-foreground tracking-tight mt-8">Technician Status</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { name: "John Doe", status: "Working", job: "Brake Service - BMW X5", avatar: "JD", color: "emerald" },
-          { name: "Mike Ross", status: "Available", job: "Waiting for assignment", avatar: "MR", color: "blue" },
-          { name: "Sarah Smith", status: "Break", job: "Returning at 2:00 PM", avatar: "SS", color: "amber" },
-        ].map((tech, i) => (
-          <Card key={i} className="glass-card hover:bg-muted/50 transition-colors">
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-slate-600 dark:text-slate-300">
-                {tech.avatar}
+        {/* Right Column: Donut Charts */}
+        <div className="space-y-6">
+          
+          {/* Chart 1: Parts Sold */}
+          <Card className="shadow-sm border-t-2 border-t-emerald-500">
+            <CardHeader className="pb-2 border-b">
+              <div className="flex items-center gap-2">
+                <Wrench className="h-5 w-5 text-slate-500" />
+                <CardTitle className="text-lg font-medium text-slate-700">Monthly Parts Sold Report</CardTitle>
               </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-center mb-1">
-                  <h4 className="font-bold text-sm">{tech.name}</h4>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium border ${
-                    tech.color === 'emerald' ? 'bg-emerald-100/50 text-emerald-700 border-emerald-200' :
-                    tech.color === 'blue' ? 'bg-blue-100/50 text-blue-700 border-blue-200' :
-                    'bg-amber-100/50 text-amber-700 border-amber-200'
-                  }`}>
-                    {tech.status}
-                  </span>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="h-[200px] w-full relative">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={donutData1}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      paddingAngle={0}
+                      dataKey="value"
+                      startAngle={90}
+                      endAngle={-270}
+                    >
+                      {donutData1.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                {/* Center Text */}
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                  <span className="text-xl font-bold text-amber-500">45%</span>
                 </div>
-                <p className="text-xs text-muted-foreground truncate">{tech.job}</p>
+              </div>
+              <div className="mt-4 flex justify-between items-center border-t pt-4">
+                <span className="text-sm font-medium text-slate-600">Total Parts Sold Year 2025</span>
+                <span className="bg-green-500 text-white text-xs px-2 py-1 rounded">1</span>
               </div>
             </CardContent>
           </Card>
-        ))}
+
+          {/* Chart 2: Car Sold */}
+          <Card className="shadow-sm border-t-2 border-t-emerald-500">
+            <CardHeader className="pb-2 border-b">
+              <div className="flex items-center gap-2">
+                <Car className="h-5 w-5 text-slate-500" />
+                <CardTitle className="text-lg font-medium text-slate-700">Monthly Car Sold Report</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-6">
+               <div className="h-[200px] w-full relative">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={donutData2}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      paddingAngle={0}
+                      dataKey="value"
+                      startAngle={90}
+                      endAngle={-270}
+                    >
+                      {donutData2.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS_TEAL[index % COLORS_TEAL.length]} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                {/* Center Text */}
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                  <span className="text-xl font-bold text-teal-500">30%</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+        </div>
       </div>
+
     </div>
   )
 }

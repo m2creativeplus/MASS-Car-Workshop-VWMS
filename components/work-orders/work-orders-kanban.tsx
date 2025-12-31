@@ -1,49 +1,49 @@
 "use client"
 
 import { useState } from "react"
-import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { 
-  Search, 
   Plus, 
-  Clock, 
-  Wrench, 
-  CheckCircle2,
-  AlertCircle,
-  Calendar,
-  DollarSign,
-  User,
-  Car,
-  Phone,
-  Mail,
-  MoreVertical,
   Eye,
-  Edit,
-  Trash2
+  Pencil,
+  Trash2,
+  Wrench,
+  Car,
+  Clock,
+  CheckCircle2
 } from "lucide-react"
 
-// Work Order statuses
-const STATUSES = {
-  CHECK_IN: { label: "Check-In", color: "bg-blue-500", icon: Clock },
-  INSPECTING: { label: "Inspecting", color: "bg-yellow-500", icon: Search },
-  AWAITING_APPROVAL: { label: "Awaiting Approval", color: "bg-orange-500", icon: AlertCircle },
-  IN_PROGRESS: { label: "In Progress", color: "bg-purple-500", icon: Wrench },
-  COMPLETE: { label: "Complete", color: "bg-green-500", icon: CheckCircle2 },
+// Work Order statuses with colors
+const STATUSES: Record<string, { label: string; color: string }> = {
+  CHECK_IN: { label: "Check-In", color: "bg-blue-500" },
+  INSPECTING: { label: "Inspecting", color: "bg-yellow-500" },
+  AWAITING_APPROVAL: { label: "Awaiting Approval", color: "bg-orange-500" },
+  IN_PROGRESS: { label: "In Progress", color: "bg-purple-500" },
+  COMPLETE: { label: "Complete", color: "bg-green-500" },
+}
+
+interface WorkOrder {
+  id: string
+  status: keyof typeof STATUSES
+  vehicle: { make: string; model: string; year: number; plate: string }
+  customer: { name: string; phone: string }
+  checkinDate: string
+  services: string[]
+  assignedTech: string
+  priority: "normal" | "high" | "urgent"
+  estimate?: number
 }
 
 // Mock work orders data
-const mockWorkOrders = [
+const mockWorkOrders: WorkOrder[] = [
   {
     id: "WO-001",
     status: "CHECK_IN",
-    vehicle: { make: "Toyota", model: "Camry", year: 2020, plate: "ABC-1234", vin: "1HGBH41JXMN109186" },
-    customer: { name: "Ahmed Hassan", phone: "+252-63-4567890", email: "ahmed@email.com" },
+    vehicle: { make: "Toyota", model: "Camry", year: 2020, plate: "ABC-1234" },
+    customer: { name: "Ahmed Hassan", phone: "+252-63-4567890" },
     checkinDate: "2024-12-26",
-    checkinTime: "08:30 AM",
-    estimatedCompletion: "2024-12-27",
-    mileage: 45280,
     services: ["Oil Change", "Brake Inspection"],
     assignedTech: "Mohamed Ali",
     priority: "normal"
@@ -51,12 +51,9 @@ const mockWorkOrders = [
   {
     id: "WO-002",
     status: "INSPECTING",
-    vehicle: { make: "Honda", model: "Civic", year: 2019, plate: "XYZ-5678", vin: "2HGFC2F59LH123456" },
-    customer: { name: "Fatima Omar", phone: "+252-63-7890123", email: "fatima@email.com" },
+    vehicle: { make: "Honda", model: "Civic", year: 2019, plate: "XYZ-5678" },
+    customer: { name: "Fatima Omar", phone: "+252-63-7890123" },
     checkinDate: "2024-12-25",
-    checkinTime: "10:00 AM",
-    estimatedCompletion: "2024-12-26",
-    mileage: 62000,
     services: ["Full Service", "A/C Repair"],
     assignedTech: "Abdi Kareem",
     priority: "high"
@@ -64,12 +61,9 @@ const mockWorkOrders = [
   {
     id: "WO-003",
     status: "IN_PROGRESS",
-    vehicle: { make: "Nissan", model: "Patrol", year: 2021, plate: "DEF-9012", vin: "5N1AR2MM0LC123456" },
-    customer: { name: "Said Ibrahim", phone: "+252-63-2345678", email: "said@email.com" },
+    vehicle: { make: "Nissan", model: "Patrol", year: 2021, plate: "DEF-9012" },
+    customer: { name: "Said Ibrahim", phone: "+252-63-2345678" },
     checkinDate: "2024-12-24",
-    checkinTime: "02:00 PM",
-    estimatedCompletion: "2024-12-26",
-    mileage: 38500,
     services: ["Engine Diagnostics", "Transmission Service"],
     assignedTech: "Mohamed Ali",
     priority: "urgent",
@@ -78,13 +72,10 @@ const mockWorkOrders = [
   {
     id: "WO-004",
     status: "AWAITING_APPROVAL",
-    vehicle: { make: "Toyota", model: "Land Cruiser", year: 2018, plate: "GHI-3456", vin: "JTMHV05J604123456" },
-    customer: { name: "Khadija Jama", phone: "+252-63-5678901", email: "khadija@email.com" },
+    vehicle: { make: "Toyota", model: "Land Cruiser", year: 2018, plate: "GHI-3456" },
+    customer: { name: "Khadija Jama", phone: "+252-63-5678901" },
     checkinDate: "2024-12-25",
-    checkinTime: "11:30 AM",
-    estimatedCompletion: "2024-12-27",
-    mileage: 78200,
-    services: ["Brake Replacement", "Tire Alignment", "Oil Change"],
+    services: ["Brake Replacement", "Tire Alignment"],
     assignedTech: "Abdi Kareem",
     priority: "normal",
     estimate: 2800
@@ -92,197 +83,228 @@ const mockWorkOrders = [
   {
     id: "WO-005",
     status: "COMPLETE",
-    vehicle: { make: "Hyundai", model: "Elantra", year: 2022, plate: "JKL-7890", vin: "KMHD84LF5NU123456" },
-    customer: { name: "Ali Yusuf", phone: "+252-63-8901234", email: "ali@email.com" },
+    vehicle: { make: "Hyundai", model: "Elantra", year: 2022, plate: "JKL-7890" },
+    customer: { name: "Ali Yusuf", phone: "+252-63-8901234" },
     checkinDate: "2024-12-24",
-    checkinTime: "09:00 AM",
-    completedDate: "2024-12-25",
-    completedTime: "04:30 PM",
-    mileage: 22100,
-    services: ["General Service"],
+    services: ["Oil Change", "Filter Replacement"],
     assignedTech: "Mohamed Ali",
     priority: "normal",
-    estimate: 850,
-    final: 850
+    estimate: 850
   },
 ]
 
 export function WorkOrdersKanban() {
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedWO, setSelectedWO] = useState<typeof mockWorkOrders[0] | null>(null)
+  const [statusFilter, setStatusFilter] = useState<string>("all")
 
-  const filteredOrders = mockWorkOrders.filter(wo => 
-    wo.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    wo.vehicle.plate.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    wo.customer.name.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const filteredOrders = mockWorkOrders.filter(order => {
+    const matchesSearch = 
+      order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.vehicle.plate.toLowerCase().includes(searchQuery.toLowerCase())
+    
+    const matchesStatus = statusFilter === "all" || order.status === statusFilter
+    
+    return matchesSearch && matchesStatus
+  })
 
-  const groupedOrders = Object.keys(STATUSES).reduce((acc, status) => {
-    acc[status] = filteredOrders.filter(wo => wo.status === status)
-    return acc
-  }, {} as Record<string, typeof mockWorkOrders>)
+  const getPriorityBadge = (priority: WorkOrder["priority"]) => {
+    switch (priority) {
+      case "urgent":
+        return <Badge className="bg-red-500 hover:bg-red-600">Urgent</Badge>
+      case "high":
+        return <Badge className="bg-orange-500 hover:bg-orange-600">High</Badge>
+      default:
+        return <Badge className="bg-slate-400 hover:bg-slate-500">Normal</Badge>
+    }
+  }
 
   return (
-    <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-950">
-      {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4 flex-1">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Work Orders</h2>
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <Input
-                placeholder="Search by WO#, Plate, or Customer..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
-              />
-            </div>
-          </div>
-          <Button className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white">
+    <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-950 p-6">
+      
+      {/* Header Controls (Sakosys Style) */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <h2 className="text-xl font-bold text-slate-800 dark:text-white uppercase tracking-tight">
+          Repair Car / Work Orders
+        </h2>
+        
+        <div className="flex gap-2 w-full md:w-auto">
+          <Button className="bg-[#00A65A] hover:bg-[#008d4c] text-white">
             <Plus className="h-4 w-4 mr-2" />
-            New Work Order
+            Add Repair
           </Button>
-        </div>
-
-        {/* Stats */}
-        <div className="flex items-center gap-6 mt-4">
-          <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
-            <span className="text-sm text-slate-600 dark:text-slate-400">
-              {groupedOrders.CHECK_IN.length + groupedOrders.INSPECTING.length} Check-ins
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-purple-500 animate-pulse" />
-            <span className="text-sm text-slate-600 dark:text-slate-400">
-              {groupedOrders.IN_PROGRESS.length} In Progress
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
-            <span className="text-sm text-slate-600 dark:text-slate-400">
-              {groupedOrders.AWAITING_APPROVAL.length} Awaiting Approval
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-green-500" />
-            <span className="text-sm text-slate-600 dark:text-slate-400">
-              {groupedOrders.COMPLETE.length} Completed Today
-            </span>
-          </div>
         </div>
       </div>
 
-      {/* Kanban Board */}
-      <div className="flex-1 overflow-x-auto p-4">
-        <div className="flex gap-4 h-full min-w-max">
-          {Object.entries(STATUSES).map(([status, config]) => {
-            const Icon = config.icon
-            const orders = groupedOrders[status] || []
+      {/* Status Tabs */}
+      <div className="flex gap-2 mb-4 flex-wrap">
+        <Button 
+          size="sm" 
+          variant={statusFilter === "all" ? "default" : "outline"}
+          onClick={() => setStatusFilter("all")}
+          className={statusFilter === "all" ? "bg-slate-800" : ""}
+        >
+          All ({mockWorkOrders.length})
+        </Button>
+        {Object.entries(STATUSES).map(([key, value]) => (
+          <Button 
+            key={key}
+            size="sm" 
+            variant={statusFilter === key ? "default" : "outline"}
+            onClick={() => setStatusFilter(key)}
+            className={statusFilter === key ? value.color : ""}
+          >
+            {value.label} ({mockWorkOrders.filter(o => o.status === key).length})
+          </Button>
+        ))}
+      </div>
 
-            return (
-              <div key={status} className="flex-1 min-w-[320px] max-w-[400px] flex flex-col">
-                {/* Column Header */}
-                <div className="flex items-center justify-between mb-3 pb-3 border-b-2 border-slate-200 dark:border-slate-800">
+      {/* Filter Bar */}
+      <div className="bg-white dark:bg-slate-900 p-4 rounded-t-lg border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-slate-600">Show</span>
+          <select className="border border-slate-300 rounded px-2 py-1 text-sm bg-transparent">
+            <option>10</option>
+            <option>25</option>
+            <option>50</option>
+          </select>
+          <span className="text-sm text-slate-600">entries</span>
+        </div>
+        
+        <div className="relative w-64">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-500">Search:</span>
+          <Input 
+            className="pl-16 h-8" 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* Data Table (Sakosys AdminLTE Style) */}
+      <div className="bg-white dark:bg-slate-900 rounded-b-lg border border-t-0 border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+        <table className="w-full text-sm text-left">
+          <thead className="text-xs text-slate-700 uppercase bg-slate-50 dark:bg-slate-800 dark:text-slate-400 border-b border-slate-200">
+            <tr>
+              <th className="px-4 py-4 font-bold">Order ID</th>
+              <th className="px-4 py-4 font-bold">Vehicle</th>
+              <th className="px-4 py-4 font-bold">Customer</th>
+              <th className="px-4 py-4 font-bold">Services</th>
+              <th className="px-4 py-4 font-bold">Technician</th>
+              <th className="px-4 py-4 font-bold">Check-In</th>
+              <th className="px-4 py-4 font-bold">Priority</th>
+              <th className="px-4 py-4 font-bold">Status</th>
+              <th className="px-4 py-4 font-bold text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+            {filteredOrders.map((order) => (
+              <tr key={order.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                {/* Order ID */}
+                <td className="px-4 py-3 font-bold text-blue-600">
+                  {order.id}
+                </td>
+                
+                {/* Vehicle */}
+                <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <div className={`h-8 w-8 rounded-lg ${config.color} bg-opacity-10 flex items-center justify-center`}>
-                      <Icon className={`h-4 w-4 ${config.color.replace('bg-', 'text-')}`} />
+                    <Car className="h-4 w-4 text-slate-400" />
+                    <div>
+                      <div className="font-medium text-slate-900 dark:text-white">
+                        {order.vehicle.year} {order.vehicle.make} {order.vehicle.model}
+                      </div>
+                      <div className="text-xs text-orange-600 font-mono">{order.vehicle.plate}</div>
                     </div>
-                    <h3 className="font-semibold text-slate-900 dark:text-white">{config.label}</h3>
-                    <Badge variant="secondary" className="ml-2">{orders.length}</Badge>
                   </div>
-                </div>
+                </td>
+                
+                {/* Customer */}
+                <td className="px-4 py-3">
+                  <div className="font-medium">{order.customer.name}</div>
+                  <div className="text-xs text-slate-500">{order.customer.phone}</div>
+                </td>
+                
+                {/* Services */}
+                <td className="px-4 py-3">
+                  <div className="flex flex-wrap gap-1 max-w-[200px]">
+                    {order.services.slice(0, 2).map((service, i) => (
+                      <span key={i} className="text-xs bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded">
+                        {service}
+                      </span>
+                    ))}
+                    {order.services.length > 2 && (
+                      <span className="text-xs text-slate-500">+{order.services.length - 2}</span>
+                    )}
+                  </div>
+                </td>
+                
+                {/* Technician */}
+                <td className="px-4 py-3 text-slate-600">
+                  <div className="flex items-center gap-1">
+                    <Wrench className="h-3 w-3" />
+                    {order.assignedTech}
+                  </div>
+                </td>
+                
+                {/* Check-In Date */}
+                <td className="px-4 py-3 text-slate-600">
+                  <div className="flex items-center gap-1">
+                    <Clock className="h-3 w-3" />
+                    {new Date(order.checkinDate).toLocaleDateString()}
+                  </div>
+                </td>
+                
+                {/* Priority */}
+                <td className="px-4 py-3">
+                  {getPriorityBadge(order.priority)}
+                </td>
+                
+                {/* Status */}
+                <td className="px-4 py-3">
+                  <Badge className={`${STATUSES[order.status].color} hover:opacity-80`}>
+                    {STATUSES[order.status].label}
+                  </Badge>
+                </td>
+                
+                {/* Actions (4 color buttons) */}
+                <td className="px-4 py-3">
+                  <div className="flex justify-center gap-1">
+                    {/* Blue: Start/Continue */}
+                    <Button size="icon" className="h-7 w-7 bg-[#00c0ef] hover:bg-[#00acd6] text-white rounded shadow-sm">
+                      {order.status === "COMPLETE" ? <CheckCircle2 className="h-3 w-3" /> : <Wrench className="h-3 w-3" />}
+                    </Button>
+                    
+                    {/* Yellow: View */}
+                    <Button size="icon" className="h-7 w-7 bg-[#f39c12] hover:bg-[#d58512] text-white rounded shadow-sm">
+                      <Eye className="h-3 w-3" />
+                    </Button>
 
-                {/* Cards */}
-                <div className="flex-1 space-y-3 overflow-y-auto">
-                  {orders.map((wo) => (
-                    <Card 
-                      key={wo.id}
-                      className="p-4 hover:shadow-lg transition-shadow cursor-pointer border-l-4 dark:bg-slate-900"
-                      style={{ borderLeftColor: config.color.replace('bg-', '#') }}
-                      onClick={() => setSelectedWO(wo)}
-                    >
-                      {/* WO Header */}
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <h4 className="font-bold text-lg text-slate-900 dark:text-white">{wo.id}</h4>
-                            {wo.priority === "urgent" && (
-                              <Badge variant="destructive" className="text-xs">Urgent</Badge>
-                            )}
-                            {wo.priority === "high" && (
-                              <Badge className="bg-orange-500 text-xs">High</Badge>
-                            )}
-                          </div>
-                          <p className="text-sm text-slate-600 dark:text-slate-400">
-                            {wo.checkinDate} • {wo.checkinTime}
-                          </p>
-                        </div>
-                        <button className="text-slate-400 hover:text-slate-600">
-                          <MoreVertical className="h-4 w-4" />
-                        </button>
-                      </div>
+                    {/* Light Blue: Edit */}
+                    <Button size="icon" className="h-7 w-7 bg-[#3c8dbc] hover:bg-[#367fa9] text-white rounded shadow-sm">
+                      <Pencil className="h-3 w-3" />
+                    </Button>
 
-                      {/* Vehicle Info */}
-                      <div className="mb-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Car className="h-4 w-4 text-orange-500" />
-                          <span className="font-semibold text-slate-900 dark:text-white">
-                            {wo.vehicle.year} {wo.vehicle.make} {wo.vehicle.model}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
-                          <span>Plate: {wo.vehicle.plate}</span>
-                          <span>{wo.mileage.toLocaleString()} km</span>
-                        </div>
-                      </div>
-
-                      {/* Customer */}
-                      <div className="mb-3 flex items-center gap-2">
-                        <User className="h-4 w-4 text-slate-400" />
-                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{wo.customer.name}</span>
-                      </div>
-
-                      {/* Services */}
-                      <div className="mb-3">
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">Services:</p>
-                        <div className="flex flex-wrap gap-1">
-                          {wo.services.slice(0, 2).map((service, i) => (
-                            <Badge key={i} variant="outline" className="text-xs">{service}</Badge>
-                          ))}
-                          {wo.services.length > 2 && (
-                            <Badge variant="outline" className="text-xs">+{wo.services.length - 2} more</Badge>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Tech & Estimate */}
-                      <div className="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-700">
-                        <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
-                          <Wrench className="h-3 w-3" />
-                          <span>{wo.assignedTech}</span>
-                        </div>
-                        {wo.estimate && (
-                          <div className="flex items-center gap-1 text-sm font-semibold text-green-600">
-                            <DollarSign className="h-4 w-4" />
-                            <span>{wo.estimate.toLocaleString()}</span>
-                          </div>
-                        )}
-                      </div>
-                    </Card>
-                  ))}
-
-                  {orders.length === 0 && (
-                    <div className="text-center py-8 text-slate-400">
-                      <Icon className="h-12 w-12 mx-auto mb-2 opacity-20" />
-                      <p className="text-sm">No work orders</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )
-          })}
+                    {/* Red: Delete */}
+                    <Button size="icon" className="h-7 w-7 bg-[#dd4b39] hover:bg-[#d73925] text-white rounded shadow-sm">
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        
+        {/* Pagination Footer */}
+        <div className="bg-slate-50 dark:bg-slate-800 px-4 py-3 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center sm:px-6">
+           <div className="text-xs text-slate-500">
+             Showing 1 to {filteredOrders.length} of {mockWorkOrders.length} entries
+           </div>
+           <div className="flex gap-1">
+             <Button variant="outline" size="sm" className="h-7 text-xs" disabled>Previous</Button>
+             <Button size="sm" className="h-7 text-xs bg-blue-500 text-white hover:bg-blue-600">1</Button>
+             <Button variant="outline" size="sm" className="h-7 text-xs">Next</Button>
+           </div>
         </div>
       </div>
     </div>

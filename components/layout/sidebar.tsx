@@ -40,12 +40,17 @@ const menuItems = [
   { id: "vehicles", label: "Vehicles", icon: Car, roles: ["admin", "staff", "technician", "customer"] },
   { id: "appointments", label: "Appointments", icon: Calendar, roles: ["admin", "staff", "technician", "customer"] },
   { id: "inventory", label: "Inventory", icon: Package, roles: ["admin", "staff"] },
+  { id: "pos", label: "Part Sells", icon: Package, roles: ["admin", "staff"] },
+  { id: "delivery", label: "Delivery", icon: Car, roles: ["admin", "staff"] },
+  { id: "reminders", label: "Reminders", icon: Calendar, roles: ["admin", "staff"] },
   { id: "technicians", label: "Technicians", icon: UserCheck, roles: ["admin", "staff"] },
   { id: "suppliers", label: "Suppliers", icon: Building2, roles: ["admin", "staff"] },
   { id: "inspections", label: "DVI Inspections", icon: ClipboardCheck, roles: ["admin", "staff", "technician"] },
+  { id: "diagnostics", label: "AI Diagnostics", icon: Bot, roles: ["admin", "staff", "technician"] },
   { id: "estimates", label: "Estimates & Invoices", icon: FileText, roles: ["admin", "staff", "technician"] },
   { id: "reports", label: "Analytics", icon: BarChart3, roles: ["admin", "staff"] },
   { id: "ai-tools", label: "AI Assistant", icon: Bot, roles: ["admin", "staff", "technician"] },
+  { id: "settings", label: "Settings", icon: Settings, roles: ["admin"] },
 ]
 
 export function Sidebar({ activeModule, onModuleChange, userRole }: SidebarProps) {
