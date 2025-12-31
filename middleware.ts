@@ -9,7 +9,7 @@ export async function middleware(request: NextRequest) {
   })
 
   // Create a Supabase client configured to use cookies
-  constsupabase = createServerClient(
+  const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
