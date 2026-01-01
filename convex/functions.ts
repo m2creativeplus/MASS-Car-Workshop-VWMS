@@ -722,3 +722,571 @@ export const getDeliveries = query({
     return deliveries;
   },
 });
+
+// ============ AUTOMOTIVE POIs (Stakeholder Network) ============
+export const getAutomotivePois = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("automotivePois").collect();
+  },
+});
+
+export const getPoisByCity = query({
+  args: { city: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("automotivePois")
+      .withIndex("by_city", (q) => q.eq("city", args.city))
+      .collect();
+  },
+});
+
+export const getPoisByCategory = query({
+  args: { category: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("automotivePois")
+      .filter((q) => q.eq(q.field("category"), args.category))
+      .collect();
+  },
+});
+
+export const addAutomotivePoi = mutation({
+  args: {
+    businessName: v.string(),
+    category: v.union(
+      v.literal("garage"),
+      v.literal("spare_parts"),
+      v.literal("car_dealer"),
+      v.literal("tire_shop"),
+      v.literal("fuel_station"),
+      v.literal("fleet_operator"),
+      v.literal("oil_lubricants"),
+      v.literal("batteries"),
+      v.literal("tools_equipment")
+    ),
+    city: v.string(),
+    address: v.optional(v.string()),
+    phone: v.optional(v.string()),
+    email: v.optional(v.string()),
+    contactPerson: v.optional(v.string()),
+    source: v.string(),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("automotivePois", {
+      ...args,
+      isActive: true,
+      verifiedAt: new Date().toISOString(),
+    });
+  },
+});
+
+// ============ SPARE PARTS MASTER (Toyota/Suzuki Catalog) ============
+export const getSparePartsMaster = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("sparePartsMaster").collect();
+  },
+});
+
+export const getPartsByCategory = query({
+  args: { category: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("sparePartsMaster")
+      .withIndex("by_category", (q) => q.eq("category", args.category))
+      .collect();
+  },
+});
+
+export const getPartsByModel = query({
+  args: { model: v.string() },
+  handler: async (ctx, args) => {
+    const parts = await ctx.db.query("sparePartsMaster").collect();
+    return parts.filter((part) => 
+      part.compatibleModels.some((m) => 
+        m.toLowerCase().includes(args.model.toLowerCase())
+      )
+    );
+  },
+});
+
+export const getSteeringSideCriticalParts = query({
+  args: {},
+  handler: async (ctx) => {
+    const parts = await ctx.db.query("sparePartsMaster").collect();
+    return parts.filter((part) => part.steeringSideCritical);
+  },
+});
+
+export const addSparePart = mutation({
+  args: {
+    partNumber: v.string(),
+    oemNumber: v.optional(v.string()),
+    name: v.string(),
+    category: v.string(),
+    subcategory: v.optional(v.string()),
+    compatibleMakes: v.array(v.string()),
+    compatibleModels: v.array(v.string()),
+    engineCodes: v.optional(v.array(v.string())),
+    priceUaeUsd: v.optional(v.number()),
+    priceTier: v.union(
+      v.literal("genuine_oem"),
+      v.literal("premium_aftermarket"),
+      v.literal("tijari_commercial")
+    ),
+    brand: v.optional(v.string()),
+    steeringSideCritical: v.boolean(),
+    failureRank: v.optional(v.number()),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Calculate landed cost: (UAE * 1.25) + 20
+    const landedCostUsd = args.priceUaeUsd 
+      ? (args.priceUaeUsd * 1.25) + 20 
+      : undefined;
+    
+    return await ctx.db.insert("sparePartsMaster", {
+      ...args,
+      landedCostUsd,
+      isActive: true,
+    });
+  },
+});
+
+// ============ MARKET PRICE INTELLIGENCE ============
+export const getMarketPrices = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("marketPriceIntelligence").collect();
+  },
+});
+
+export const getPricesByMake = query({
+  args: { make: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("marketPriceIntelligence")
+      .withIndex("by_make", (q) => q.eq("vehicleMake", args.make))
+      .collect();
+  },
+});
+
+export const addMarketPrice = mutation({
+  args: {
+    vehicleMake: v.string(),
+    vehicleModel: v.string(),
+    yearFrom: v.number(),
+    yearTo: v.number(),
+    source: v.string(),
+    fobPriceUsd: v.optional(v.number()),
+    cAndFPriceUsd: v.optional(v.number()),
+    streetPriceUsd: v.optional(v.number()),
+    averageMileage: v.optional(v.number()),
+    condition: v.optional(v.string()),
+    sampleSize: v.optional(v.number()),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("marketPriceIntelligence", {
+      ...args,
+      recordedAt: new Date().toISOString(),
+    });
+  },
+});
+
+// ============ MASS PARTNERS (B2B Network) ============
+export const getMassPartners = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("massPartners").collect();
+  },
+});
+
+export const getPartnersByCity = query({
+  args: { city: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("massPartners")
+      .withIndex("by_city", (q) => q.eq("city", args.city))
+      .collect();
+  },
+});
+
+export const getPartnersByStatus = query({
+  args: { 
+    status: v.union(
+      v.literal("prospect"),
+      v.literal("contacted"),
+      v.literal("onboarding"),
+      v.literal("active"),
+      v.literal("inactive")
+    )
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("massPartners")
+      .withIndex("by_status", (q) => q.eq("partnershipStatus", args.status))
+      .collect();
+  },
+});
+
+export const addMassPartner = mutation({
+  args: {
+    partnerName: v.string(),
+    partnerType: v.union(
+      v.literal("importer"),
+      v.literal("distributor"),
+      v.literal("fleet_operator"),
+      v.literal("garage_network"),
+      v.literal("government"),
+      v.literal("ngo")
+    ),
+    city: v.string(),
+    contactPerson: v.optional(v.string()),
+    phone: v.optional(v.string()),
+    email: v.optional(v.string()),
+    supplyRegion: v.optional(v.string()),
+    fleetSize: v.optional(v.number()),
+    specializations: v.optional(v.array(v.string())),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("massPartners", {
+      ...args,
+      partnershipStatus: "prospect",
+    });
+  },
+});
+// ============ FINANCIAL INTEGRITY (Schema 2.0) ============
+
+// --- PAYMENTS ---
+export const getPaymentsByInvoice = query({
+  args: { invoiceId: v.id("invoices") },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("payments")
+      .withIndex("by_invoice", (q) => q.eq("invoiceId", args.invoiceId))
+      .collect();
+  },
+});
+
+export const addPayment = mutation({
+  args: {
+    invoiceId: v.id("invoices"),
+    amount: v.number(),
+    method: v.union(
+      v.literal("cash"),
+      v.literal("zaad"),
+      v.literal("edahab"),
+      v.literal("card"),
+      v.literal("bank_transfer"),
+      v.literal("check")
+    ),
+    reference: v.optional(v.string()),
+    receivedBy: v.id("users"),
+    notes: v.optional(v.string()),
+    isDeposit: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const payment = await ctx.db.insert("payments", {
+      ...args,
+      paymentDate: new Date().toISOString(),
+    });
+
+    // Update Invoice status and balances
+    const invoice = await ctx.db.get(args.invoiceId);
+    if (invoice) {
+      const newPaidAmount = (invoice.paidAmount || 0) + args.amount;
+      const newBalanceDue = invoice.totalAmount - newPaidAmount;
+      
+      let newStatus = invoice.status;
+      if (newBalanceDue <= 0) {
+        newStatus = "paid";
+      } else if (newPaidAmount > 0) {
+        newStatus = "partial";
+      }
+
+      await ctx.db.patch(args.invoiceId, {
+        paidAmount: newPaidAmount,
+        balanceDue: newBalanceDue,
+        status: newStatus as any,
+      });
+    }
+
+    return payment;
+  },
+});
+
+// --- EXPENSES ---
+export const getExpenses = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("expenses").collect();
+  },
+});
+
+export const addExpense = mutation({
+  args: {
+    category: v.string(),
+    amount: v.number(),
+    description: v.string(),
+    paidBy: v.id("users"),
+    paymentMethod: v.string(),
+    receiptUrl: v.optional(v.string()),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("approved"),
+      v.literal("rejected"),
+      v.literal("paid")
+    ),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("expenses", {
+      ...args,
+      date: new Date().toISOString(),
+    });
+  },
+});
+
+// --- EXPENSE CATEGORIES ---
+export const getExpenseCategories = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("expenseCategories").collect();
+  },
+});
+
+export const addExpenseCategory = mutation({
+  args: {
+    name: v.string(),
+    type: v.union(
+      v.literal("overhead"),
+      v.literal("cogs"),
+      v.literal("labor"),
+      v.literal("marketing"),
+      v.literal("equipment")
+    ),
+    description: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("expenseCategories", {
+      ...args,
+      isActive: true,
+    });
+  },
+});
+
+// ============ SUPPLY CHAIN (Schema 2.0) ============
+
+// --- PURCHASE ORDERS ---
+export const getPurchaseOrders = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("purchaseOrders").collect();
+  },
+});
+
+export const createPurchaseOrder = mutation({
+  args: {
+    supplierId: v.id("suppliers"),
+    items: v.array(v.object({
+      partNumber: v.string(),
+      name: v.string(),
+      quantityOrdered: v.number(),
+      quantityReceived: v.number(),
+      unitCost: v.number(),
+      totalCost: v.number(),
+    })),
+    totalAmount: v.number(),
+    expectedDate: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const count = await ctx.db.query("purchaseOrders").collect();
+    const poNumber = `PO-${String(count.length + 1).padStart(6, "0")}`;
+    
+    return await ctx.db.insert("purchaseOrders", {
+      ...args,
+      poNumber,
+      status: "draft",
+      orderedAt: new Date().toISOString(),
+    });
+  },
+});
+
+/**
+ * RECEIVE PURCHASE ORDER
+ * Automatically updates status to "received" and INCREASES inventory stock
+ */
+export const receivePurchaseOrder = mutation({
+  args: {
+    id: v.id("purchaseOrders"),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const po = await ctx.db.get(args.id);
+    if (!po) throw new Error("PO not found");
+    if (po.status === "received") throw new Error("PO already received");
+
+    // 1. Update PO status
+    await ctx.db.patch(args.id, {
+      status: "received",
+      receivedAt: new Date().toISOString(),
+      notes: args.notes,
+    });
+
+    // 2. AUTO-INCREASE INVENTORY
+    for (const item of po.items) {
+      // Find inventory item by part number (or create if logic becomes more complex)
+      const inventoryItem = await ctx.db
+        .query("inventory")
+        .withIndex("by_partNumber", (q) => q.eq("partNumber", item.partNumber))
+        .first();
+
+      if (inventoryItem) {
+        const newQuantity = inventoryItem.stockQuantity + item.quantityOrdered;
+        await ctx.db.patch(inventoryItem._id, {
+          stockQuantity: newQuantity,
+          // Optionally update cost price to moving average
+        });
+      }
+    }
+  },
+});
+
+// --- INVENTORY ADJUSTMENTS ---
+export const getInventoryAdjustments = query({
+  args: { inventoryId: v.optional(v.id("inventory")) },
+  handler: async (ctx, args) => {
+    if (args.inventoryId) {
+      return await ctx.db
+        .query("inventoryAdjustments")
+        .withIndex("by_inventory", (q) => q.eq("inventoryId", args.inventoryId))
+        .collect();
+    }
+    return await ctx.db.query("inventoryAdjustments").collect();
+  },
+});
+
+/**
+ * ADJUST INVENTORY STOCK
+ * Creates an audit record and immediately updates the live stock quantity
+ */
+export const adjustStock = mutation({
+  args: {
+    inventoryId: v.id("inventory"),
+    quantityChange: v.number(), // +5 or -2
+    reason: v.union(
+      v.literal("damage"),
+      v.literal("theft"),
+      v.literal("audit_correction"),
+      v.literal("return_restock"),
+      v.literal("other")
+    ),
+    adjustedBy: v.id("users"),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // 1. Create Audit Record
+    await ctx.db.insert("inventoryAdjustments", {
+      ...args,
+      date: new Date().toISOString(),
+    });
+
+    // 2. Update Live Inventory
+    const item = await ctx.db.get(args.inventoryId);
+    if (item) {
+      const newQuantity = item.stockQuantity + args.quantityChange;
+      await ctx.db.patch(args.inventoryId, {
+        stockQuantity: newQuantity, // Allow negative checking in validation if needed
+      });
+    }
+  },
+});
+
+// ============ OPERATIONS (Schema 2.0) ============
+
+// --- SERVICE PACKAGES ---
+export const getServicePackages = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db
+      .query("servicePackages")
+      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .collect();
+  },
+});
+
+export const createServicePackage = mutation({
+  args: {
+    name: v.string(),
+    description: v.optional(v.string()),
+    vehicleType: v.optional(v.string()),
+    basePrice: v.number(),
+    includedItems: v.array(v.object({
+      type: v.union(v.literal("part"), v.literal("labor"), v.literal("fee")),
+      itemId: v.optional(v.string()), 
+      description: v.string(),
+      quantity: v.number(),
+    })),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("servicePackages", {
+      ...args,
+      isActive: true,
+    });
+  },
+});
+
+// --- TIME ENTRIES (Technician Clock-in/out) ---
+export const getTechnicianTimes = query({
+  args: { technicianId: v.id("users") },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("timeEntries")
+      .withIndex("by_tech", (q) => q.eq("technicianId", args.technicianId))
+      .collect();
+  },
+});
+
+export const clockIn = mutation({
+  args: {
+    technicianId: v.id("users"),
+    workOrderId: v.id("workOrders"),
+    serviceId: v.optional(v.string()), // e.g. "Oil Change" line item ID
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Check if already clocked in? Implementation simplified for now.
+    return await ctx.db.insert("timeEntries", {
+      ...args,
+      startTime: new Date().toISOString(),
+    });
+  },
+});
+
+export const clockOut = mutation({
+  args: {
+    entryId: v.id("timeEntries"),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const entry = await ctx.db.get(args.entryId);
+    if (!entry) throw new Error("Time entry not found");
+    if (entry.endTime) throw new Error("Already clocked out");
+
+    const endTime = new Date().toISOString();
+    const start = new Date(entry.startTime).getTime();
+    const end = new Date(endTime).getTime();
+    const durationMinutes = Math.round((end - start) / 1000 / 60);
+
+    await ctx.db.patch(args.entryId, {
+      endTime,
+      durationMinutes,
+      notes: args.notes ? (entry.notes ? entry.notes + "\n" + args.notes : args.notes) : entry.notes,
+    });
+
+    return durationMinutes;
+  },
+});

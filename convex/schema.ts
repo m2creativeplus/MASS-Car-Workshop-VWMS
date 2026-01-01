@@ -455,4 +455,250 @@ export default defineSchema({
     .index("by_dueDate", ["dueDate"])
     .index("by_status", ["status"])
     .index("by_type", ["type"]),
+
+  // ============ 14. AUTOMOTIVE POIs (Points of Interest) ============
+  // Stakeholder mapping for garages, dealers, and parts shops
+  automotivePois: defineTable({
+    businessName: v.string(),
+    category: v.union(
+      v.literal("garage"),
+      v.literal("spare_parts"),
+      v.literal("car_dealer"),
+      v.literal("tire_shop"),
+      v.literal("fuel_station"),
+      v.literal("fleet_operator"),
+      v.literal("oil_lubricants"),
+      v.literal("batteries"),
+      v.literal("tools_equipment")
+    ),
+    city: v.string(),
+    address: v.optional(v.string()),
+    latitude: v.optional(v.number()),
+    longitude: v.optional(v.number()),
+    phone: v.optional(v.string()),
+    email: v.optional(v.string()),
+    rating: v.optional(v.number()),
+    reviewCount: v.optional(v.number()),
+    website: v.optional(v.string()),
+    source: v.string(), // "manual", "directory", "research"
+    contactPerson: v.optional(v.string()),
+    operatingHours: v.optional(v.string()),
+    verifiedAt: v.optional(v.string()),
+    notes: v.optional(v.string()),
+    isActive: v.boolean(),
+  }).index("by_city", ["city"])
+    .index("by_category", ["category"]),
+
+  // ============ 15. SPARE PARTS MASTER (Toyota/Suzuki Catalog) ============
+  // Common failure parts for 2010-2016 Japanese vehicles in Somaliland
+  sparePartsMaster: defineTable({
+    partNumber: v.string(),
+    oemNumber: v.optional(v.string()),
+    name: v.string(),
+    nameArabic: v.optional(v.string()),
+    category: v.string(), // Engine, Suspension, Brakes, Electrical, Interior
+    subcategory: v.optional(v.string()),
+    compatibleMakes: v.array(v.string()), // ["Toyota", "Suzuki"]
+    compatibleModels: v.array(v.string()), // ["Hilux 2010-2016", "Vitz", "Crown"]
+    engineCodes: v.optional(v.array(v.string())), // ["2KD-FTV", "1NZ-FE"]
+    priceUaeUsd: v.optional(v.number()),
+    landedCostUsd: v.optional(v.number()), // (UAE * 1.25) + 20
+    localPriceUsd: v.optional(v.number()), // Hargeisa market price
+    priceTier: v.union(
+      v.literal("genuine_oem"),
+      v.literal("premium_aftermarket"),
+      v.literal("tijari_commercial")
+    ),
+    brand: v.optional(v.string()), // Denso, KYB, NGK, etc.
+    steeringSideCritical: v.boolean(), // LHD/RHD safety warning
+    failureRank: v.optional(v.number()), // 1-10, how common is failure
+    averageLifespanKm: v.optional(v.number()),
+    warrantyMonths: v.optional(v.number()),
+    notes: v.optional(v.string()),
+    isActive: v.boolean(),
+  }).index("by_partNumber", ["partNumber"])
+    .index("by_category", ["category"])
+    .index("by_priceTier", ["priceTier"]),
+
+  // ============ 16. MARKET PRICE INTELLIGENCE ============
+  // Vehicle pricing benchmarks: BE FORWARD vs Street Price
+  marketPriceIntelligence: defineTable({
+    vehicleMake: v.string(),
+    vehicleModel: v.string(),
+    yearFrom: v.number(),
+    yearTo: v.number(),
+    source: v.string(), // "beforward", "local_market", "research"
+    fobPriceUsd: v.optional(v.number()), // Japan FOB price
+    cAndFPriceUsd: v.optional(v.number()), // Cost + Freight to Berbera
+    streetPriceUsd: v.optional(v.number()), // Hargeisa street price
+    averageMileage: v.optional(v.number()),
+    condition: v.optional(v.string()), // "Excellent", "Good", "Fair"
+    sampleSize: v.optional(v.number()),
+    recordedAt: v.string(),
+    notes: v.optional(v.string()),
+  }).index("by_make", ["vehicleMake"])
+    .index("by_model", ["vehicleModel"]),
+
+  // ============ 17. MASS PARTNERS (B2B Network) ============
+  // Importers, fleet operators, and potential partners
+  massPartners: defineTable({
+    partnerName: v.string(),
+    partnerType: v.union(
+      v.literal("importer"),
+      v.literal("distributor"),
+      v.literal("fleet_operator"),
+      v.literal("garage_network"),
+      v.literal("government"),
+      v.literal("ngo")
+    ),
+    registrationYear: v.optional(v.number()),
+    supplyRegion: v.optional(v.string()), // "Dubai", "Japan", "Local"
+    contactPerson: v.optional(v.string()),
+    phone: v.optional(v.string()),
+    email: v.optional(v.string()),
+    city: v.string(),
+    fleetSize: v.optional(v.number()),
+    specializations: v.optional(v.array(v.string())),
+    partnershipStatus: v.union(
+      v.literal("prospect"),
+      v.literal("contacted"),
+      v.literal("onboarding"),
+      v.literal("active"),
+      v.literal("inactive")
+    ),
+    notes: v.optional(v.string()),
+  }).index("by_city", ["city"])
+    .index("by_type", ["partnerType"])
+    .index("by_status", ["partnershipStatus"]),
+
+  // ============ 18. PAYMENTS (Financial Integrity) ============
+  // Tracks split payments, deposits, and payment methods
+  payments: defineTable({
+    invoiceId: v.id("invoices"),
+    amount: v.number(),
+    method: v.union(
+      v.literal("cash"),
+      v.literal("zaad"),
+      v.literal("edahab"),
+      v.literal("card"),
+      v.literal("bank_transfer"),
+      v.literal("check")
+    ),
+    reference: v.optional(v.string()),
+    receivedBy: v.id("users"), // Staff who took payment
+    paymentDate: v.string(),
+    notes: v.optional(v.string()),
+    isDeposit: v.boolean(),
+  }).index("by_invoice", ["invoiceId"])
+    .index("by_date", ["paymentDate"])
+    .index("by_method", ["method"]),
+
+  // ============ 19. EXPENSES (Operational Costs) ============
+  // Tracks shop spending beyond COGS
+  expenses: defineTable({
+    category: v.string(), // "Rent", "Utilities", "Tools"
+    amount: v.number(),
+    description: v.string(),
+    paidBy: v.id("users"),
+    paymentMethod: v.string(),
+    date: v.string(),
+    receiptUrl: v.optional(v.string()), // For uploaded receipts
+    status: v.union(
+      v.literal("pending"),
+      v.literal("approved"),
+      v.literal("rejected"),
+      v.literal("paid")
+    ),
+  }).index("by_category", ["category"])
+    .index("by_date", ["date"]),
+
+  // ============ 20. EXPENSE CATEGORIES ============
+  // Configurable types for expense reporting
+  expenseCategories: defineTable({
+    name: v.string(),
+    type: v.union(
+      v.literal("overhead"), // Rent, Utilities
+      v.literal("cogs"),     // Cost of Goods Sold adjustment
+      v.literal("labor"),    // Contract labor
+      v.literal("marketing"),
+      v.literal("equipment")
+    ),
+    description: v.optional(v.string()),
+    isActive: v.boolean(),
+  }).index("by_type", ["type"]),
+
+  // ============ 21. PURCHASE ORDERS (Supply Chain) ============
+  // Tracks stock ordering from suppliers
+  purchaseOrders: defineTable({
+    poNumber: v.string(),
+    supplierId: v.id("suppliers"),
+    status: v.union(
+      v.literal("draft"),
+      v.literal("ordered"),
+      v.literal("partial"), // Partially received
+      v.literal("received"),
+      v.literal("cancelled")
+    ),
+    items: v.array(v.object({
+      partNumber: v.string(),
+      name: v.string(),
+      quantityOrdered: v.number(),
+      quantityReceived: v.number(),
+      unitCost: v.number(),
+      totalCost: v.number(),
+    })),
+    totalAmount: v.number(),
+    expectedDate: v.optional(v.string()),
+    orderedAt: v.optional(v.string()),
+    receivedAt: v.optional(v.string()),
+    notes: v.optional(v.string()),
+  }).index("by_supplier", ["supplierId"])
+    .index("by_status", ["status"]),
+
+  // ============ 22. INVENTORY ADJUSTMENTS (Audit Trail) ============
+  // Tracks manual corrections, shrinkage, or damages
+  inventoryAdjustments: defineTable({
+    inventoryId: v.id("inventory"),
+    adjustedBy: v.id("users"),
+    quantityChange: v.number(), // Positive or Negative
+    reason: v.union(
+      v.literal("damage"),
+      v.literal("theft"),
+      v.literal("audit_correction"),
+      v.literal("return_restock"),
+      v.literal("other")
+    ),
+    notes: v.optional(v.string()),
+    date: v.string(),
+  }).index("by_inventory", ["inventoryId"])
+    .index("by_date", ["date"]),
+
+  // ============ 23. SERVICE PACKAGES (Operations) ============
+  // Bundled services for efficiency (e.g., "Full Service - Toyota Vitz")
+  servicePackages: defineTable({
+    name: v.string(), // "Gold Service Package"
+    description: v.optional(v.string()),
+    vehicleType: v.optional(v.string()), // "Sedan", "SUV", or specific model
+    basePrice: v.number(),
+    includedItems: v.array(v.object({
+      type: v.union(v.literal("part"), v.literal("labor"), v.literal("fee")),
+      itemId: v.optional(v.string()), // ID of part or labor operation
+      description: v.string(),
+      quantity: v.number(),
+    })),
+    isActive: v.boolean(),
+  }).index("by_active", ["isActive"]),
+
+  // ============ 24. TIME ENTRIES (Technician Efficiency) ============
+  // Tracks actual time spent vs. billed time
+  timeEntries: defineTable({
+    technicianId: v.id("users"),
+    workOrderId: v.id("workOrders"),
+    serviceId: v.optional(v.string()), // Which specific job on the ticket
+    startTime: v.string(),
+    endTime: v.optional(v.string()),
+    durationMinutes: v.optional(v.number()),
+    notes: v.optional(v.string()),
+  }).index("by_tech", ["technicianId"])
+    .index("by_workOrder", ["workOrderId"]),
 });

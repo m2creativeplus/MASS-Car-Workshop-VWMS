@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 // Convex provider disabled until NEXT_PUBLIC_CONVEX_URL is set
-// import { ConvexClientProvider } from '@/components/providers/convex-provider'
+import { ConvexClientProvider } from '@/components/providers/convex-provider'
 
 export const metadata: Metadata = {
   title: 'MASS Car Workshop - Vehicle Workshop Management System',
@@ -18,8 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {/* Enable Convex when ready: <ConvexClientProvider>{children}</ConvexClientProvider> */}
-        {children}
+        <ConvexClientProvider>{children}</ConvexClientProvider>
       </body>
     </html>
   )
