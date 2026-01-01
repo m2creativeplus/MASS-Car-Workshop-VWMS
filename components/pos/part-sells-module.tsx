@@ -170,6 +170,16 @@ export function PartSellsModule() {
     }
   }
 
+  // Barcode integration logic
+  const handleBarcodeScan = (code: string) => {
+    const part = partsInventory.find(p => p.sku === code || p.sku.endsWith(code) || p.id === code)
+    if (part) {
+      addToCart(part)
+      return true
+    }
+    return false
+  }
+
   return (
     <div className="h-full flex bg-slate-50 dark:bg-slate-950">
       
@@ -181,15 +191,31 @@ export function PartSellsModule() {
           </h2>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative mb-6">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input 
-            className="pl-10 h-12 text-lg" 
-            placeholder="Search parts by name or SKU..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+        {/* Search Bar & Barcode */}
+        <div className="flex gap-4 mb-6">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input 
+              className="pl-10 h-12 text-lg" 
+              placeholder="Search parts by name or SKU..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="w-1/3">
+             <Input 
+               className="h-12 border-orange-500/50 focus:border-orange-500" 
+               placeholder="Scan Barcode (Enter SKU)"
+               onKeyDown={(e) => {
+                 if (e.key === 'Enter') {
+                   const success = handleBarcodeScan(e.currentTarget.value)
+                   if (success) {
+                      e.currentTarget.value = ''
+                   }
+                 }
+               }}
+             />
+          </div>
         </div>
 
         {/* Parts Grid */}

@@ -18,6 +18,7 @@ import {
   Clock,
   Image as ImageIcon
 } from "lucide-react"
+import { analyzePart as aiAnalyzePart } from "@/lib/ai-diagnostics"
 
 interface DiagnosisResult {
   partName: string
@@ -47,23 +48,33 @@ export function AutoDiagnosticsModule() {
   }
 
   const analyzePart = async () => {
+    if (!imagePreview) return
+    
     setAnalyzing(true)
+    setDiagnosis(null)
     
-    // Simulate AI analysis with Gemini 3 Pro
-    await new Promise(resolve => setTimeout(resolve, 3000))
-    
-    // Mock diagnosis result
-    const mockDiagnosis: DiagnosisResult = {
-      partName: "Front Brake Rotor",
-      condition: "poor",
-      issue: "Visible scoring and uneven wear pattern detected. Minimum thickness appears to be below specification. Rust pitting present on outer edges.",
-      recommendation: "Replace both front brake rotors. Recommend replacing brake pads simultaneously for optimal braking performance. Check caliper slides for proper lubrication.",
-      estimatedCost: 280,
-      urgency: "high"
+    try {
+      // Call real AI analysis
+      const result = await aiAnalyzePart({
+        imageBase64: imagePreview,
+        additionalContext: additionalNotes
+      })
+
+      if (result.success) {
+        setDiagnosis({
+          partName: result.partIdentified,
+          condition: result.condition as DiagnosisResult["condition"],
+          issue: result.issues[0] || "No major issues detected",
+          recommendation: result.recommendations[0] || "No specific recommendations",
+          estimatedCost: result.estimatedCost.low,
+          urgency: result.urgency as DiagnosisResult["urgency"]
+        })
+      }
+    } catch (error) {
+      console.error("Diagnosis error:", error)
+    } finally {
+      setAnalyzing(false)
     }
-    
-    setDiagnosis(mockDiagnosis)
-    setAnalyzing(false)
   }
 
   const getConditionBadge = (condition: DiagnosisResult["condition"]) => {
