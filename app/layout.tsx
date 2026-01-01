@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { ConvexClientProvider } from '@/components/providers/convex-provider'
 
 export const metadata: Metadata = {
   title: 'MASS Car Workshop - Vehicle Workshop Management System',
@@ -15,7 +16,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ConvexClientProvider>
+          {children}
+        </ConvexClientProvider>
+      </body>
     </html>
   )
 }
+
