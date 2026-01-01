@@ -31,6 +31,7 @@ const AutoDiagnosticsModule = dynamic(() => import("@/components/ai-diagnostics/
 const CarRequestModule = dynamic(() => import("@/components/car-request/car-request-module"), { ssr: false })
 const ContactModule = dynamic(() => import("@/components/contact/contact-module"), { ssr: false })
 const CatalogModule = dynamic(() => import("@/components/catalog/catalog-module"), { ssr: false })
+const NetworkModule = dynamic(() => import("@/components/network/network-explorer"), { ssr: false })
 
 function WorkshopSystemContent() {
   const { user, logout } = useConvexAuth()
@@ -60,6 +61,8 @@ function WorkshopSystemContent() {
         return <TechnicianDashboard />
       case "suppliers":
         return <SuppliersModule />
+      case "network":
+        return <NetworkModule />
       case "inspections":
         return <EnhancedInspectionChecklist />
       case "estimates":
@@ -101,6 +104,7 @@ function WorkshopSystemContent() {
       diagnostics: "AI Auto-Diagnostics",
       technicians: "Technician Portal",
       suppliers: "Supplier Directory",
+      network: "Stakeholder Network",
       inspections: "Digital Vehicle Inspections",
       estimates: "Estimates & Invoices",
       reports: "Analytics & Reports",

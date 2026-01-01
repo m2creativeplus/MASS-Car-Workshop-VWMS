@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { 
   Plus, 
   Minus,
@@ -17,20 +17,24 @@ import {
   Search,
   Package,
   CheckCircle2,
-  Loader2
+  Loader2,
+  FileText,
+  Download
 } from "lucide-react"
+import { processPayment } from "@/lib/payments"
+import { generateInvoicePDF, downloadInvoice } from "@/lib/pdf-invoice"
+import { AuditLog } from "@/lib/activity-logs"
+import { inventoryData } from "@/lib/data"
 
-// Mock parts inventory
-const partsInventory = [
-  { id: "P-001", name: "Engine Oil 5W-30 (4L)", sku: "OIL-5W30-4L", price: 45, stock: 45, category: "Fluids" },
-  { id: "P-002", name: "Brake Pads (Front)", sku: "BP-FRONT-001", price: 150, stock: 8, category: "Brakes" },
-  { id: "P-003", name: "Air Filter", sku: "AF-UNI-001", price: 25, stock: 32, category: "Filters" },
-  { id: "P-004", name: "Spark Plugs (Set of 4)", sku: "SP-SET4-001", price: 35, stock: 24, category: "Ignition" },
-  { id: "P-005", name: "Transmission Fluid (1L)", sku: "TF-ATF-1L", price: 18, stock: 56, category: "Fluids" },
-  { id: "P-006", name: "Wiper Blades (Pair)", sku: "WB-PAIR-001", price: 22, stock: 15, category: "Accessories" },
-  { id: "P-007", name: "Battery 12V 60Ah", sku: "BAT-12V-60", price: 120, stock: 6, category: "Electrical" },
-  { id: "P-008", name: "Oil Filter", sku: "OF-UNI-001", price: 12, stock: 48, category: "Filters" },
-]
+// Use real inventory data
+const partsInventory = inventoryData.map(part => ({
+  id: part.id,
+  name: part.name,
+  sku: part.partNumber,
+  price: part.price,
+  stock: part.stock,
+  category: part.category
+}))
 
 interface CartItem {
   id: string
@@ -47,6 +51,9 @@ export function PartSellsModule() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash")
   const [processing, setProcessing] = useState(false)
   const [saleComplete, setSaleComplete] = useState(false)
+  const [customerPhone, setCustomerPhone] = useState("")
+  const [lastInvoiceId, setLastInvoiceId] = useState<string | null>(null)
+  const [paymentResult, setPaymentResult] = useState<{ transactionId: string; message: string } | null>(null)
 
   const filteredParts = partsInventory.filter(part =>
     part.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -86,16 +93,72 @@ export function PartSellsModule() {
 
   const processSale = async () => {
     setProcessing(true)
-    // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    setProcessing(false)
-    setSaleComplete(true)
+    setPaymentResult(null)
     
-    // Reset after showing success
-    setTimeout(() => {
-      setCart([])
-      setSaleComplete(false)
-    }, 3000)
+    const invoiceId = `INV-${Date.now().toString(36).toUpperCase()}`
+    
+    try {
+      // Process payment via API
+      const result = await processPayment(paymentMethod, {
+        amount: total,
+        currency: 'USD',
+        customerPhone: customerPhone || '+252-63-0000000',
+        description: `MASS Workshop - ${cart.length} items`,
+        invoiceId
+      })
+      
+      setPaymentResult({ transactionId: result.transactionId, message: result.message })
+      
+      // Log the activity
+      AuditLog.processPayment('system', 'POS User', 'staff', invoiceId, total, paymentMethod)
+      
+      setLastInvoiceId(invoiceId)
+      setSaleComplete(true)
+      
+    } catch (error) {
+      console.error('Payment error:', error)
+      setPaymentResult({ transactionId: '', message: 'Payment failed. Please try again.' })
+    } finally {
+      setProcessing(false)
+    }
+  }
+  
+  const handleDownloadInvoice = async () => {
+    if (!lastInvoiceId) return
+    
+    const invoiceData = {
+      invoiceNumber: lastInvoiceId,
+      date: new Date().toLocaleDateString(),
+      dueDate: new Date().toLocaleDateString(),
+      customerName: 'Walk-in Customer',
+      customerPhone: customerPhone || '+252-63-0000000',
+      vehiclePlate: 'N/A',
+      vehicleModel: 'Parts Sale',
+      items: cart.map(item => ({
+        description: item.name,
+        quantity: item.quantity,
+        unitPrice: item.price,
+        total: item.price * item.quantity
+      })),
+      subtotal,
+      tax,
+      total,
+      paymentMethod,
+      notes: paymentResult?.transactionId ? `Transaction: ${paymentResult.transactionId}` : undefined
+    }
+    
+    const blob = await generateInvoicePDF(invoiceData)
+    downloadInvoice(blob, `${lastInvoiceId}.pdf`)
+    
+    AuditLog.printInvoice('system', 'POS User', 'staff', lastInvoiceId)
+  }
+  
+  const resetSale = () => {
+    setCart([])
+    setSaleComplete(false)
+    setLastInvoiceId(null)
+    setPaymentResult(null)
+    setCustomerPhone("")
   }
 
   const getPaymentIcon = (method: PaymentMethod) => {
@@ -217,6 +280,19 @@ export function PartSellsModule() {
         {/* Payment Section */}
         <div className="border-t border-slate-200 dark:border-slate-800 p-4 space-y-4">
           
+          {/* Customer Phone for Mobile Payments */}
+          {(paymentMethod === "zaad" || paymentMethod === "edahab") && (
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-slate-600">Customer Phone</p>
+              <Input 
+                placeholder="+252-63-XXXXXXX"
+                value={customerPhone}
+                onChange={(e) => setCustomerPhone(e.target.value)}
+                className="h-10"
+              />
+            </div>
+          )}
+          
           {/* Totals */}
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
@@ -241,6 +317,7 @@ export function PartSellsModule() {
                 variant={paymentMethod === "cash" ? "default" : "outline"}
                 className={paymentMethod === "cash" ? "bg-orange-500 hover:bg-orange-600" : ""}
                 onClick={() => setPaymentMethod("cash")}
+                disabled={saleComplete}
               >
                 <DollarSign className="h-4 w-4 mr-2" />
                 Cash
@@ -249,6 +326,7 @@ export function PartSellsModule() {
                 variant={paymentMethod === "zaad" ? "default" : "outline"}
                 className={paymentMethod === "zaad" ? "bg-green-600 hover:bg-green-700" : ""}
                 onClick={() => setPaymentMethod("zaad")}
+                disabled={saleComplete}
               >
                 <Smartphone className="h-4 w-4 mr-2" />
                 Zaad
@@ -257,6 +335,7 @@ export function PartSellsModule() {
                 variant={paymentMethod === "edahab" ? "default" : "outline"}
                 className={paymentMethod === "edahab" ? "bg-blue-600 hover:bg-blue-700" : ""}
                 onClick={() => setPaymentMethod("edahab")}
+                disabled={saleComplete}
               >
                 <Smartphone className="h-4 w-4 mr-2" />
                 e-Dahab
@@ -265,6 +344,7 @@ export function PartSellsModule() {
                 variant={paymentMethod === "card" ? "default" : "outline"}
                 className={paymentMethod === "card" ? "bg-slate-800 hover:bg-slate-900" : ""}
                 onClick={() => setPaymentMethod("card")}
+                disabled={saleComplete}
               >
                 <CreditCard className="h-4 w-4 mr-2" />
                 Card
@@ -272,35 +352,59 @@ export function PartSellsModule() {
             </div>
           </div>
 
+          {/* Payment Result */}
+          {paymentResult && (
+            <div className={`text-xs p-3 rounded ${paymentResult.transactionId ? 'bg-green-50 dark:bg-green-900/20 text-green-700' : 'bg-red-50 dark:bg-red-900/20 text-red-700'}`}>
+              <p className="font-medium">{paymentResult.message}</p>
+              {paymentResult.transactionId && (
+                <p className="mt-1">ID: {paymentResult.transactionId}</p>
+              )}
+            </div>
+          )}
+
           {/* Process Payment Button */}
-          <Button 
-            className="w-full h-12 text-lg bg-orange-500 hover:bg-orange-600 text-white"
-            disabled={cart.length === 0 || processing}
-            onClick={processSale}
-          >
-            {processing ? (
-              <>
-                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                Processing...
-              </>
-            ) : saleComplete ? (
-              <>
-                <CheckCircle2 className="h-5 w-5 mr-2" />
-                Sale Complete!
-              </>
-            ) : (
-              <>
-                <Receipt className="h-5 w-5 mr-2" />
-                Complete Sale (${total.toFixed(2)})
-              </>
-            )}
-          </Button>
+          {!saleComplete ? (
+            <Button 
+              className="w-full h-12 text-lg bg-orange-500 hover:bg-orange-600 text-white"
+              disabled={cart.length === 0 || processing}
+              onClick={processSale}
+            >
+              {processing ? (
+                <>
+                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                  Processing {paymentMethod === 'zaad' ? 'Zaad' : paymentMethod === 'edahab' ? 'e-Dahab' : ''}...
+                </>
+              ) : (
+                <>
+                  <Receipt className="h-5 w-5 mr-2" />
+                  Complete Sale (${total.toFixed(2)})
+                </>
+              )}
+            </Button>
+          ) : (
+            <div className="space-y-2">
+              <Button 
+                className="w-full h-12 text-lg bg-green-600 hover:bg-green-700 text-white"
+                onClick={handleDownloadInvoice}
+              >
+                <Download className="h-5 w-5 mr-2" />
+                Download Invoice PDF
+              </Button>
+              <Button 
+                variant="outline"
+                className="w-full"
+                onClick={resetSale}
+              >
+                New Sale
+              </Button>
+            </div>
+          )}
 
           {/* Zaad/eDahab Payment Info */}
-          {(paymentMethod === "zaad" || paymentMethod === "edahab") && (
+          {(paymentMethod === "zaad" || paymentMethod === "edahab") && !saleComplete && (
             <div className="text-xs text-center text-slate-500 p-2 bg-slate-50 dark:bg-slate-800 rounded">
               <p className="font-medium">Payment will be processed via {paymentMethod === "zaad" ? "Zaad" : "e-Dahab"}</p>
-              <p>Customer will receive SMS confirmation</p>
+              <p>Customer will receive USSD prompt on their phone</p>
             </div>
           )}
         </div>

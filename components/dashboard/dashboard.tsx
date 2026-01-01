@@ -13,6 +13,7 @@ import {
   MoreHorizontal
 } from "lucide-react"
 import { useState } from "react"
+import { dashboardStats } from "@/lib/data"
 import { 
   AreaChart, 
   Area, 
@@ -114,7 +115,7 @@ export function Dashboard() {
             <CardContent className="p-4 relative z-10">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-4xl font-bold">465</h3>
+                  <h3 className="text-4xl font-bold">{dashboardStats.partsInStock}</h3>
                   <p className="text-sm font-medium opacity-90 mt-1">PARTS IN STOCK</p>
                 </div>
                 <Wrench className="h-16 w-16 opacity-20 absolute right-4 top-2 text-black" />
@@ -138,7 +139,7 @@ export function Dashboard() {
             <CardContent className="p-4 relative z-10">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-4xl font-bold">35</h3>
+                  <h3 className="text-4xl font-bold">{dashboardStats.totalCustomers}</h3>
                   <p className="text-sm font-medium opacity-90 mt-1">CUSTOMERS</p>
                 </div>
                 <Users className="h-16 w-16 opacity-20 absolute right-4 top-2 text-black" />
@@ -162,7 +163,7 @@ export function Dashboard() {
             <CardContent className="p-4 relative z-10">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-4xl font-bold">10</h3>
+                  <h3 className="text-4xl font-bold">{dashboardStats.carsInStock}</h3>
                   <p className="text-sm font-medium opacity-90 mt-1">CARS IN STOCK</p>
                 </div>
                 <Car className="h-16 w-16 opacity-20 absolute right-4 top-2 text-black" />
@@ -186,7 +187,7 @@ export function Dashboard() {
             <CardContent className="p-4 relative z-10">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="text-4xl font-bold">12</h3>
+                  <h3 className="text-4xl font-bold">{dashboardStats.mechanics}</h3>
                   <p className="text-sm font-medium opacity-90 mt-1">MECHANICS</p>
                 </div>
                 <Settings className="h-16 w-16 opacity-20 absolute right-4 top-2 text-black" />

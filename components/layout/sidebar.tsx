@@ -30,6 +30,7 @@ import {
   Phone,
   BookOpen,
   CarFront,
+  Network,
 } from "lucide-react"
 import { useConvexAuth } from "@/components/auth/convex-auth-provider"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -54,6 +55,7 @@ const menuItems = [
   { id: "reminders", label: "Reminders", icon: Bell, roles: ["admin", "staff"] },
   { id: "technicians", label: "Mechanics", icon: UserCheck, roles: ["admin", "staff"] },
   { id: "suppliers", label: "Suppliers", icon: Building2, roles: ["admin", "staff"] },
+  { id: "network", label: "Network", icon: Network, roles: ["admin", "staff"] },
   { id: "inspections", label: "DVI Inspections", icon: ClipboardCheck, roles: ["admin", "staff", "technician"] },
   { id: "diagnostics", label: "AI Diagnostics", icon: Bot, roles: ["admin", "staff", "technician"] },
   { id: "estimates", label: "Estimates & Invoices", icon: FileText, roles: ["admin", "staff", "technician"] },
