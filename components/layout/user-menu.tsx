@@ -12,11 +12,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { useSupabaseAuth } from "../auth/supabase-auth-provider"
+import { useConvexAuth } from "../auth/convex-auth-provider"
 import { User, Settings, LogOut, Shield } from "lucide-react"
 
 export function UserMenu() {
-  const { user, logout } = useSupabaseAuth()
+  const { user, logout } = useConvexAuth()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
   if (!user) return null

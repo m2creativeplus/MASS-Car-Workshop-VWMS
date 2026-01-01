@@ -1,12 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { SupabaseAuthProvider } from "@/components/auth/supabase-auth-provider"
-import { SupabaseLoginForm } from "@/components/auth/supabase-login-form"
-import { useSupabaseAuth } from "@/components/auth/supabase-auth-provider"
+import { ConvexAuthProvider } from "@/components/auth/convex-auth-provider"
+import { ConvexLoginForm } from "@/components/auth/convex-login-form"
+import { useConvexAuth } from "@/components/auth/convex-auth-provider"
 import { Sidebar } from "@/components/layout/sidebar"
 import { UserMenu } from "@/components/layout/user-menu"
-import { ConnectionStatus } from "@/components/connection-status"
 import dynamic from "next/dynamic"
 
 // Import Standard Modules
@@ -24,19 +23,21 @@ import { EnhancedInspectionChecklist } from "@/components/inspections/enhanced-i
 
 // Dynamically import optional/admin modules
 const SuppliersModule = dynamic(() => import("@/components/suppliers/suppliers-module"), { ssr: false })
-const DatabaseTest = dynamic(() => import("@/components/admin/database-test"), { ssr: false })
 const SettingsModule = dynamic(() => import("@/components/settings/settings-module"), { ssr: false })
 const DeliveryModule = dynamic(() => import("@/components/delivery/delivery-module"), { ssr: false })
 const RemindersModule = dynamic(() => import("@/components/reminders/reminders-module"), { ssr: false })
 const PartSellsModule = dynamic(() => import("@/components/pos/part-sells-module"), { ssr: false })
 const AutoDiagnosticsModule = dynamic(() => import("@/components/ai-diagnostics/auto-diagnostics-module"), { ssr: false })
+const CarRequestModule = dynamic(() => import("@/components/car-request/car-request-module"), { ssr: false })
+const ContactModule = dynamic(() => import("@/components/contact/contact-module"), { ssr: false })
+const CatalogModule = dynamic(() => import("@/components/catalog/catalog-module"), { ssr: false })
 
 function WorkshopSystemContent() {
-  const { user, logout } = useSupabaseAuth()
+  const { user, logout } = useConvexAuth()
   const [activeModule, setActiveModule] = useState("dashboard")
 
   if (!user) {
-    return <SupabaseLoginForm />
+    return <ConvexLoginForm />
   }
 
   const renderModule = () => {
@@ -51,6 +52,8 @@ function WorkshopSystemContent() {
         return <Vehicles />
       case "appointments":
         return <Appointments />
+      case "car-request":
+        return <CarRequestModule />
       case "inventory":
         return <InventoryManagement />
       case "technicians":
@@ -67,16 +70,18 @@ function WorkshopSystemContent() {
         return <AITools />
       case "pos":
         return <PartSellsModule />
+      case "catalog":
+        return <CatalogModule />
       case "delivery":
         return <DeliveryModule />
       case "reminders":
         return <RemindersModule />
       case "diagnostics":
         return <AutoDiagnosticsModule />
+      case "contact":
+        return <ContactModule />
       case "settings":
         return user.role === "admin" ? <SettingsModule /> : <Dashboard />
-      case "database-test":
-        return user.role === "admin" ? <DatabaseTest /> : <Dashboard />
       default:
         return <Dashboard />
     }
@@ -100,8 +105,7 @@ function WorkshopSystemContent() {
       estimates: "Estimates & Invoices",
       reports: "Analytics & Reports",
       "ai-tools": "AI Assistant",
-      settings: "System Settings",
-      "database-test": "System Diagnostics"
+      settings: "System Settings"
     }
     return titles[id] || "Dashboard"
   }
@@ -119,7 +123,6 @@ function WorkshopSystemContent() {
             </h1>
           </div>
           <div className="flex items-center gap-3">
-             <ConnectionStatus />
              <UserMenu />
           </div>
         </header>
@@ -137,8 +140,8 @@ function WorkshopSystemContent() {
 
 export default function MassWorkshopSystem() {
   return (
-    <SupabaseAuthProvider>
+    <ConvexAuthProvider>
       <WorkshopSystemContent />
-    </SupabaseAuthProvider>
+    </ConvexAuthProvider>
   )
 }

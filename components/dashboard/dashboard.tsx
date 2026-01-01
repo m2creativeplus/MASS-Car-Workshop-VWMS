@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { motion } from "framer-motion"
 import { 
   Users, 
   Car, 
@@ -53,16 +54,42 @@ const donutData2 = [
 const COLORS = ['#F59E0B', '#e5e7eb'] // Amber and Gray
 const COLORS_TEAL = ['#14b8a6', '#e5e7eb'] // Teal and Gray
 
+// Animation variants for spring physics
+const cardVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 300,
+      damping: 25,
+      delay: i * 0.1
+    }
+  }),
+  hover: {
+    scale: 1.02,
+    y: -5,
+    transition: { type: "spring", stiffness: 400, damping: 20 }
+  }
+}
+
 export function Dashboard() {
   const [timeRange, setTimeRange] = useState("year")
 
   return (
-    <div className="space-y-6 animate-fade-in-up p-2">
+    <div className="space-y-6 p-2">
       
       {/* 1. Header is handled by the main layout, so we focus on the content */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-emerald-600 tracking-tight uppercase">
-          SAKO WORKSHOP DASHBOARD
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="flex justify-between items-center mb-4"
+      >
+        <h2 className="text-xl font-bold text-orange-600 tracking-tight uppercase">
+          MASS WORKSHOP DASHBOARD
         </h2>
         <div className="flex gap-2">
           <span className="text-xs text-muted-foreground flex items-center">
@@ -70,74 +97,106 @@ export function Dashboard() {
             System Live
           </span>
         </div>
-      </div>
+      </motion.div>
 
-      {/* 2. Info Cards Row (Replicating Sakosys Colors) */}
+      {/* 2. Info Cards Row with Framer Motion Spring Physics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         
         {/* Card 1: Parts (Cyan/Blue) */}
-        <Card className="bg-[#00c0ef] text-white border-none shadow-md overflow-hidden relative">
-          <CardContent className="p-4 relative z-10">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-4xl font-bold">465</h3>
-                <p className="text-sm font-medium opacity-90 mt-1">PARTS IN STOCK</p>
+        <motion.div
+          custom={0}
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          whileHover="hover"
+        >
+          <Card className="bg-[#00c0ef] text-white border-none shadow-md overflow-hidden relative cursor-pointer">
+            <CardContent className="p-4 relative z-10">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-4xl font-bold">465</h3>
+                  <p className="text-sm font-medium opacity-90 mt-1">PARTS IN STOCK</p>
+                </div>
+                <Wrench className="h-16 w-16 opacity-20 absolute right-4 top-2 text-black" />
               </div>
-              <Wrench className="h-16 w-16 opacity-20 absolute right-4 top-2 text-black" />
+            </CardContent>
+            <div className="bg-black/10 p-2 text-center text-xs font-medium cursor-pointer flex justify-center items-center hover:bg-black/20 transition-colors">
+              More info <ArrowRight className="h-3 w-3 ml-1" />
             </div>
-          </CardContent>
-          <div className="bg-black/10 p-2 text-center text-xs font-medium cursor-pointer flex justify-center items-center hover:bg-black/20 transition-colors">
-            More info <ArrowRight className="h-3 w-3 ml-1" />
-          </div>
-        </Card>
+          </Card>
+        </motion.div>
 
         {/* Card 2: Customers (Orange) */}
-        <Card className="bg-[#F39C12] text-white border-none shadow-md overflow-hidden relative">
-          <CardContent className="p-4 relative z-10">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-4xl font-bold">35</h3>
-                <p className="text-sm font-medium opacity-90 mt-1">CUSTOMERS</p>
+        <motion.div
+          custom={1}
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          whileHover="hover"
+        >
+          <Card className="bg-[#F39C12] text-white border-none shadow-md overflow-hidden relative cursor-pointer">
+            <CardContent className="p-4 relative z-10">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-4xl font-bold">35</h3>
+                  <p className="text-sm font-medium opacity-90 mt-1">CUSTOMERS</p>
+                </div>
+                <Users className="h-16 w-16 opacity-20 absolute right-4 top-2 text-black" />
               </div>
-              <Users className="h-16 w-16 opacity-20 absolute right-4 top-2 text-black" />
+            </CardContent>
+            <div className="bg-black/10 p-2 text-center text-xs font-medium cursor-pointer flex justify-center items-center hover:bg-black/20 transition-colors">
+              More info <ArrowRight className="h-3 w-3 ml-1" />
             </div>
-          </CardContent>
-          <div className="bg-black/10 p-2 text-center text-xs font-medium cursor-pointer flex justify-center items-center hover:bg-black/20 transition-colors">
-            More info <ArrowRight className="h-3 w-3 ml-1" />
-          </div>
-        </Card>
+          </Card>
+        </motion.div>
 
         {/* Card 3: Cars (Green) */}
-        <Card className="bg-[#00A65A] text-white border-none shadow-md overflow-hidden relative">
-          <CardContent className="p-4 relative z-10">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-4xl font-bold">10</h3>
-                <p className="text-sm font-medium opacity-90 mt-1">CARS IN STOCK</p>
+        <motion.div
+          custom={2}
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          whileHover="hover"
+        >
+          <Card className="bg-[#00A65A] text-white border-none shadow-md overflow-hidden relative cursor-pointer">
+            <CardContent className="p-4 relative z-10">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-4xl font-bold">10</h3>
+                  <p className="text-sm font-medium opacity-90 mt-1">CARS IN STOCK</p>
+                </div>
+                <Car className="h-16 w-16 opacity-20 absolute right-4 top-2 text-black" />
               </div>
-              <Car className="h-16 w-16 opacity-20 absolute right-4 top-2 text-black" />
+            </CardContent>
+            <div className="bg-black/10 p-2 text-center text-xs font-medium cursor-pointer flex justify-center items-center hover:bg-black/20 transition-colors">
+              More info <ArrowRight className="h-3 w-3 ml-1" />
             </div>
-          </CardContent>
-          <div className="bg-black/10 p-2 text-center text-xs font-medium cursor-pointer flex justify-center items-center hover:bg-black/20 transition-colors">
-            More info <ArrowRight className="h-3 w-3 ml-1" />
-          </div>
-        </Card>
+          </Card>
+        </motion.div>
 
         {/* Card 4: Mechanics (Red) */}
-        <Card className="bg-[#DD4B39] text-white border-none shadow-md overflow-hidden relative">
-          <CardContent className="p-4 relative z-10">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-4xl font-bold">12</h3>
-                <p className="text-sm font-medium opacity-90 mt-1">MECHANICS</p>
+        <motion.div
+          custom={3}
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          whileHover="hover"
+        >
+          <Card className="bg-[#DD4B39] text-white border-none shadow-md overflow-hidden relative cursor-pointer">
+            <CardContent className="p-4 relative z-10">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-4xl font-bold">12</h3>
+                  <p className="text-sm font-medium opacity-90 mt-1">MECHANICS</p>
+                </div>
+                <Settings className="h-16 w-16 opacity-20 absolute right-4 top-2 text-black" />
               </div>
-              <Settings className="h-16 w-16 opacity-20 absolute right-4 top-2 text-black" />
+            </CardContent>
+            <div className="bg-black/10 p-2 text-center text-xs font-medium cursor-pointer flex justify-center items-center hover:bg-black/20 transition-colors">
+              More info <ArrowRight className="h-3 w-3 ml-1" />
             </div>
-          </CardContent>
-          <div className="bg-black/10 p-2 text-center text-xs font-medium cursor-pointer flex justify-center items-center hover:bg-black/20 transition-colors">
-            More info <ArrowRight className="h-3 w-3 ml-1" />
-          </div>
-        </Card>
+          </Card>
+        </motion.div>
 
       </div>
 

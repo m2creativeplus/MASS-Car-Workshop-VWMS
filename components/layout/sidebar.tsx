@@ -23,8 +23,15 @@ import {
   Settings,
   LogOut,
   Menu,
+  Truck,
+  Bell,
+  ShoppingCart,
+  Wrench,
+  Phone,
+  BookOpen,
+  CarFront,
 } from "lucide-react"
-import { useSupabaseAuth } from "@/components/auth/supabase-auth-provider"
+import { useConvexAuth } from "@/components/auth/convex-auth-provider"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface SidebarProps {
@@ -35,27 +42,30 @@ interface SidebarProps {
 
 const menuItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["admin", "staff", "technician", "customer"] },
-  { id: "work-orders", label: "Work Orders", icon: ClipboardList, roles: ["admin", "staff", "technician"] },
+  { id: "work-orders", label: "Work Orders", icon: Wrench, roles: ["admin", "staff", "technician"] },
   { id: "customers", label: "Customers", icon: Users, roles: ["admin", "staff"] },
   { id: "vehicles", label: "Vehicles", icon: Car, roles: ["admin", "staff", "technician", "customer"] },
   { id: "appointments", label: "Appointments", icon: Calendar, roles: ["admin", "staff", "technician", "customer"] },
-  { id: "inventory", label: "Inventory", icon: Package, roles: ["admin", "staff"] },
-  { id: "pos", label: "Part Sells", icon: Package, roles: ["admin", "staff"] },
-  { id: "delivery", label: "Delivery", icon: Car, roles: ["admin", "staff"] },
-  { id: "reminders", label: "Reminders", icon: Calendar, roles: ["admin", "staff"] },
-  { id: "technicians", label: "Technicians", icon: UserCheck, roles: ["admin", "staff"] },
+  { id: "car-request", label: "Car Request", icon: CarFront, roles: ["admin", "staff", "customer"] },
+  { id: "inventory", label: "Parts Stock", icon: Package, roles: ["admin", "staff"] },
+  { id: "pos", label: "Part Sells", icon: ShoppingCart, roles: ["admin", "staff"] },
+  { id: "catalog", label: "Catalog", icon: BookOpen, roles: ["admin", "staff"] },
+  { id: "delivery", label: "Delivery", icon: Truck, roles: ["admin", "staff"] },
+  { id: "reminders", label: "Reminders", icon: Bell, roles: ["admin", "staff"] },
+  { id: "technicians", label: "Mechanics", icon: UserCheck, roles: ["admin", "staff"] },
   { id: "suppliers", label: "Suppliers", icon: Building2, roles: ["admin", "staff"] },
   { id: "inspections", label: "DVI Inspections", icon: ClipboardCheck, roles: ["admin", "staff", "technician"] },
   { id: "diagnostics", label: "AI Diagnostics", icon: Bot, roles: ["admin", "staff", "technician"] },
   { id: "estimates", label: "Estimates & Invoices", icon: FileText, roles: ["admin", "staff", "technician"] },
-  { id: "reports", label: "Analytics", icon: BarChart3, roles: ["admin", "staff"] },
+  { id: "reports", label: "Reports", icon: BarChart3, roles: ["admin", "staff"] },
   { id: "ai-tools", label: "AI Assistant", icon: Bot, roles: ["admin", "staff", "technician"] },
+  { id: "contact", label: "Contact", icon: Phone, roles: ["admin", "staff"] },
   { id: "settings", label: "Settings", icon: Settings, roles: ["admin"] },
 ]
 
 export function Sidebar({ activeModule, onModuleChange, userRole }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
-  const { user, hasPermission } = useSupabaseAuth()
+  const { user, hasPermission } = useConvexAuth()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -66,13 +76,8 @@ export function Sidebar({ activeModule, onModuleChange, userRole }: SidebarProps
     // If userRole prop is passed, use it, otherwise fall back to user object or allow all if neither
     const role = userRole || user?.role || "admin" 
     
-    // Check role inclusion
-    if (item.roles && !item.roles.includes(role)) return false
-    
-    // Check permission if user object exists
-    if (user && !hasPermission(item.id, "read")) return false
-    
-    return true
+    // Check role inclusion - simplified to just role-based filtering
+    return !item.roles || item.roles.includes(role)
   })
 
   return (
