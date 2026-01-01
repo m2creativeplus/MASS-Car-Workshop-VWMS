@@ -33,43 +33,10 @@ export async function middleware(request: NextRequest) {
   )
 
   // Refresh session if expired - required for Server Components
-  // https://supabase.com/docs/guides/auth/server-side/nextjs
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  await supabase.auth.getSession()
 
-  const { pathname } = request.nextUrl
-
-  // Protected Routes (Require Login)
-  const protectedRoutes = ["/dashboard", "/vehicles", "/customers", "/work-orders", "/inventory"]
-  const isProtectedRoute = protectedRoutes.some((path) => pathname.startsWith(path))
-
-  // Auth Routes (Redirect to Dashboard if already logged in)
-  const authRoutes = ["/login", "/register", "/auth"]
-  const isAuthRoute = authRoutes.some((path) => pathname.startsWith(path))
-
-  // Root route handling - redirect based on session
-  if (pathname === "/") {
-      if (session) {
-          return NextResponse.redirect(new URL("/dashboard", request.url))
-      }
-      // Allow landing page if we have one, or redirect to login
-      // For now, let's redirect to login
-      return NextResponse.redirect(new URL("/login", request.url))
-  }
-
-  // 1. Unauthenticated User trying to access Protected Route -> Redirect to Login
-  if (isProtectedRoute && !session) {
-    const redirectUrl = new URL("/login", request.url)
-    redirectUrl.searchParams.set("redirectTo", pathname)
-    return NextResponse.redirect(redirectUrl)
-  }
-
-  // 2. Authenticated User trying to access Auth Route -> Redirect to Dashboard
-  if (isAuthRoute && session) {
-    return NextResponse.redirect(new URL("/dashboard", request.url))
-  }
-
+  // Let the SPA handle authentication internally
+  // The MassWorkshopSystem component shows login form when no user
   return response
 }
 
@@ -80,7 +47,7 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - api/ (API routes - handled separately or allowed)
+     * - api/ (API routes)
      */
     "/((?!_next/static|_next/image|favicon.ico|api/).*)",
   ],
