@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { ModeToggle } from "@/components/theme-toggle"
 import { Car, Menu, X, Github, Twitter, Linkedin } from "lucide-react"
 
 export default function PublicLayout({
@@ -29,6 +30,7 @@ export default function PublicLayout({
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-4">
+            <ModeToggle />
             <Link href="/login">
               <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-white/10">Log in</Button>
             </Link>
