@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useConvexAuth } from "./convex-auth-provider"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,9 +12,18 @@ import { Loader2, Car, AlertCircle, User, Shield, Wrench, UserCircle } from "luc
 
 export function ConvexLoginForm() {
   const { login, isLoading } = useConvexAuth()
+  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
+
+  const handleLoginSuccess = (email: string) => {
+    if (email.toLowerCase().includes("customer")) {
+      router.push("/client")
+    } else {
+      router.push("/dashboard")
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -22,6 +32,8 @@ export function ConvexLoginForm() {
     const result = await login(email, password)
     if (!result.success) {
       setError(result.error || "Login failed")
+    } else {
+      handleLoginSuccess(email)
     }
   }
 
@@ -33,6 +45,8 @@ export function ConvexLoginForm() {
     const result = await login(demoEmail, "123456")
     if (!result.success) {
       setError(result.error || "Login failed")
+    } else {
+      handleLoginSuccess(demoEmail)
     }
   }
 
