@@ -12,6 +12,13 @@ export const metadata: Metadata = {
   description: 'Comprehensive workshop management solution for automotive businesses',
   generator: 'Next.js',
   keywords: ['car workshop', 'vehicle management', 'automotive', 'service center', 'work orders'],
+  manifest: '/manifest.json',
+  themeColor: '#f97316',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'MASS Workshop',
+  },
 }
 
 export default function RootLayout({

@@ -1290,3 +1290,372 @@ export const clockOut = mutation({
     return durationMinutes;
   },
 });
+
+// ============ INSPECTION TEMPLATES (Tekmetric-style DVI) ============
+export const getInspectionTemplates = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db
+      .query("inspectionTemplates")
+      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .collect();
+  },
+});
+
+export const getDefaultTemplate = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db
+      .query("inspectionTemplates")
+      .withIndex("by_default", (q) => q.eq("isDefault", true))
+      .first();
+  },
+});
+
+export const createInspectionTemplate = mutation({
+  args: {
+    name: v.string(),
+    description: v.optional(v.string()),
+    vehicleType: v.optional(v.string()),
+    groups: v.array(v.object({
+      id: v.string(),
+      name: v.string(),
+      order: v.number(),
+      tasks: v.array(v.object({
+        id: v.string(),
+        name: v.string(),
+        order: v.number(),
+        defaultFindings: v.optional(v.array(v.string())),
+        cannedJobId: v.optional(v.id("cannedJobs")),
+      })),
+    })),
+    isDefault: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    // If setting as default, unset other defaults
+    if (args.isDefault) {
+      const existing = await ctx.db
+        .query("inspectionTemplates")
+        .withIndex("by_default", (q) => q.eq("isDefault", true))
+        .collect();
+      for (const template of existing) {
+        await ctx.db.patch(template._id, { isDefault: false });
+      }
+    }
+    
+    return await ctx.db.insert("inspectionTemplates", {
+      ...args,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+    });
+  },
+});
+
+export const updateInspectionTemplate = mutation({
+  args: {
+    id: v.id("inspectionTemplates"),
+    name: v.optional(v.string()),
+    description: v.optional(v.string()),
+    groups: v.optional(v.array(v.object({
+      id: v.string(),
+      name: v.string(),
+      order: v.number(),
+      tasks: v.array(v.object({
+        id: v.string(),
+        name: v.string(),
+        order: v.number(),
+        defaultFindings: v.optional(v.array(v.string())),
+        cannedJobId: v.optional(v.id("cannedJobs")),
+      })),
+    }))),
+    isDefault: v.optional(v.boolean()),
+    isActive: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...updates } = args;
+    await ctx.db.patch(id, updates);
+  },
+});
+
+// ============ CANNED JOBS (Pre-Built Service Packages) ============
+export const getCannedJobs = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db
+      .query("cannedJobs")
+      .withIndex("by_active", (q) => q.eq("isActive", true))
+      .collect();
+  },
+});
+
+export const getCannedJobsByCategory = query({
+  args: { category: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("cannedJobs")
+      .withIndex("by_category", (q) => q.eq("category", args.category))
+      .collect();
+  },
+});
+
+export const createCannedJob = mutation({
+  args: {
+    name: v.string(),
+    code: v.optional(v.string()),
+    description: v.optional(v.string()),
+    category: v.string(),
+    laborHours: v.number(),
+    laborRate: v.number(),
+    parts: v.array(v.object({
+      partId: v.optional(v.id("inventory")),
+      partNumber: v.optional(v.string()),
+      name: v.string(),
+      quantity: v.number(),
+      unitPrice: v.number(),
+    })),
+    applicableVehicles: v.optional(v.array(v.string())),
+    isPackageDeal: v.optional(v.boolean()),
+    packageDiscount: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const totalLaborCost = args.laborHours * args.laborRate;
+    const totalPartsCost = args.parts.reduce((sum, p) => sum + (p.quantity * p.unitPrice), 0);
+    let totalPrice = totalLaborCost + totalPartsCost;
+    
+    // Apply package discount if applicable
+    if (args.isPackageDeal && args.packageDiscount) {
+      totalPrice = totalPrice * (1 - args.packageDiscount / 100);
+    }
+    
+    return await ctx.db.insert("cannedJobs", {
+      ...args,
+      totalLaborCost,
+      totalPartsCost,
+      totalPrice,
+      isActive: true,
+    });
+  },
+});
+
+export const updateCannedJob = mutation({
+  args: {
+    id: v.id("cannedJobs"),
+    name: v.optional(v.string()),
+    description: v.optional(v.string()),
+    category: v.optional(v.string()),
+    laborHours: v.optional(v.number()),
+    laborRate: v.optional(v.number()),
+    parts: v.optional(v.array(v.object({
+      partId: v.optional(v.id("inventory")),
+      partNumber: v.optional(v.string()),
+      name: v.string(),
+      quantity: v.number(),
+      unitPrice: v.number(),
+    }))),
+    isActive: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...updates } = args;
+    
+    // Recalculate prices if parts or labor changed
+    if (updates.laborHours || updates.laborRate || updates.parts) {
+      const existing = await ctx.db.get(id);
+      if (existing) {
+        const laborHours = updates.laborHours ?? existing.laborHours;
+        const laborRate = updates.laborRate ?? existing.laborRate;
+        const parts = updates.parts ?? existing.parts;
+        
+        const totalLaborCost = laborHours * laborRate;
+        const totalPartsCost = parts.reduce((sum, p) => sum + (p.quantity * p.unitPrice), 0);
+        
+        Object.assign(updates, {
+          totalLaborCost,
+          totalPartsCost,
+          totalPrice: totalLaborCost + totalPartsCost,
+        });
+      }
+    }
+    
+    await ctx.db.patch(id, updates);
+  },
+});
+
+// ============ CUSTOMER APPROVALS (Digital Signatures) ============
+export const createCustomerApproval = mutation({
+  args: {
+    estimateId: v.id("estimates"),
+    customerId: v.id("customers"),
+    sentVia: v.union(v.literal("sms"), v.literal("email"), v.literal("whatsapp")),
+  },
+  handler: async (ctx, args) => {
+    // Generate unique token
+    const token = `APR-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+    
+    return await ctx.db.insert("customerApprovals", {
+      ...args,
+      approvalToken: token,
+      sentAt: new Date().toISOString(),
+      status: "pending",
+    });
+  },
+});
+
+export const getApprovalByToken = query({
+  args: { token: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("customerApprovals")
+      .withIndex("by_token", (q) => q.eq("approvalToken", args.token))
+      .first();
+  },
+});
+
+export const approveEstimate = mutation({
+  args: {
+    token: v.string(),
+    signatureData: v.optional(v.string()),
+    approvedItems: v.array(v.string()),
+    declinedItems: v.optional(v.array(v.string())),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const approval = await ctx.db
+      .query("customerApprovals")
+      .withIndex("by_token", (q) => q.eq("approvalToken", args.token))
+      .first();
+    
+    if (!approval) throw new Error("Invalid approval token");
+    if (approval.status !== "pending" && approval.status !== "viewed") {
+      throw new Error("Approval already processed");
+    }
+    
+    await ctx.db.patch(approval._id, {
+      status: "approved",
+      approvedAt: new Date().toISOString(),
+      signatureData: args.signatureData,
+      approvedItems: args.approvedItems,
+      declinedItems: args.declinedItems,
+      notes: args.notes,
+    });
+    
+    // Update estimate status
+    await ctx.db.patch(approval.estimateId, {
+      status: "approved",
+    });
+    
+    return approval._id;
+  },
+});
+
+// ============ DVI RESULTS (Completed Inspections) ============
+export const getDviByWorkOrder = query({
+  args: { workOrderId: v.id("workOrders") },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("dviResults")
+      .withIndex("by_workOrder", (q) => q.eq("workOrderId", args.workOrderId))
+      .first();
+  },
+});
+
+export const startDvi = mutation({
+  args: {
+    workOrderId: v.id("workOrders"),
+    vehicleId: v.id("vehicles"),
+    templateId: v.optional(v.id("inspectionTemplates")),
+    technicianId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    // Get template if specified, or use default
+    let template;
+    if (args.templateId) {
+      template = await ctx.db.get(args.templateId);
+    } else {
+      template = await ctx.db
+        .query("inspectionTemplates")
+        .withIndex("by_default", (q) => q.eq("isDefault", true))
+        .first();
+    }
+    
+    // Initialize findings from template
+    const findings = template?.groups.flatMap(group => 
+      group.tasks.map(task => ({
+        taskId: task.id,
+        taskName: task.name,
+        groupName: group.name,
+        severity: "good" as const,
+        finding: undefined,
+        notes: undefined,
+        photos: [],
+        videos: [],
+        markedUpPhotos: [],
+        recommendedCannedJobId: task.cannedJobId,
+      }))
+    ) || [];
+    
+    return await ctx.db.insert("dviResults", {
+      ...args,
+      startedAt: new Date().toISOString(),
+      status: "in_progress",
+      findings,
+    });
+  },
+});
+
+export const updateDviFinding = mutation({
+  args: {
+    dviId: v.id("dviResults"),
+    taskId: v.string(),
+    severity: v.union(v.literal("good"), v.literal("attention"), v.literal("urgent")),
+    finding: v.optional(v.string()),
+    notes: v.optional(v.string()),
+    photos: v.optional(v.array(v.string())),
+    videos: v.optional(v.array(v.string())),
+    markedUpPhotos: v.optional(v.array(v.string())),
+  },
+  handler: async (ctx, args) => {
+    const dvi = await ctx.db.get(args.dviId);
+    if (!dvi) throw new Error("DVI not found");
+    
+    const updatedFindings = dvi.findings.map(f => {
+      if (f.taskId === args.taskId) {
+        return {
+          ...f,
+          severity: args.severity,
+          finding: args.finding ?? f.finding,
+          notes: args.notes ?? f.notes,
+          photos: args.photos ?? f.photos,
+          videos: args.videos ?? f.videos,
+          markedUpPhotos: args.markedUpPhotos ?? f.markedUpPhotos,
+        };
+      }
+      return f;
+    });
+    
+    await ctx.db.patch(args.dviId, { findings: updatedFindings });
+  },
+});
+
+export const completeDvi = mutation({
+  args: {
+    dviId: v.id("dviResults"),
+    overallNotes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.dviId, {
+      status: "completed",
+      completedAt: new Date().toISOString(),
+      overallNotes: args.overallNotes,
+    });
+  },
+});
+
+export const sendDviToCustomer = mutation({
+  args: { dviId: v.id("dviResults") },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.dviId, {
+      status: "sent_to_customer",
+      sentToCustomerAt: new Date().toISOString(),
+    });
+  },
+});

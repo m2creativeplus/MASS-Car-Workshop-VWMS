@@ -9,6 +9,7 @@ import {
   XCircle, 
   AlertCircle, 
   Camera, 
+  Video,
   Upload,
   Wrench,
   Settings,
@@ -16,7 +17,8 @@ import {
   Car,
   ArrowLeft,
   ArrowRight,
-  Save
+  Save,
+  Square
 } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
@@ -247,8 +249,18 @@ export function EnhancedInspectionChecklist() {
                             size="sm"
                             variant="outline"
                             className="h-8 w-8 p-0"
+                            title="Take Photo"
                           >
                             <Camera className="h-4 w-4" />
+                          </Button>
+
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:border-red-300"
+                            title="Record Video"
+                          >
+                            <Video className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>

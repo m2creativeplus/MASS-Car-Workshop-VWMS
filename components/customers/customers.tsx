@@ -4,6 +4,15 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { Label } from "@/components/ui/label"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
 import { 
   Plus, 
   Eye,
@@ -11,8 +20,15 @@ import {
   Trash2,
   Phone,
   Mail,
-  Users
+  Users,
+  MapPin,
+  Calendar,
+  X,
+  Check,
+  AlertTriangle
 } from "lucide-react"
+// In production: import { useQuery, useMutation } from "convex/react"
+// import { api } from "@/convex/_generated/api"
 
 interface Customer {
   id: string
@@ -75,26 +91,117 @@ const mockCustomers: Customer[] = [
   },
 ]
 
+// Empty customer for new entries
+const emptyCustomer = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+  address: "",
+}
+
 export function Customers() {
   const [searchQuery, setSearchQuery] = useState("")
+  const [customers, setCustomers] = useState(mockCustomers)
+  
+  // Dialog states
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [isViewOpen, setIsViewOpen] = useState(false)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null)
+  
+  // Form state
+  const [formData, setFormData] = useState(emptyCustomer)
 
-  const filteredCustomers = mockCustomers.filter(customer =>
+  // In production, use Convex:
+  // const customers = useQuery(api.functions.getCustomers) || []
+  // const createCustomer = useMutation(api.functions.createCustomer)
+  // const updateCustomer = useMutation(api.functions.updateCustomer)
+  // const deleteCustomer = useMutation(api.functions.deleteCustomer)
+
+  const filteredCustomers = customers.filter(customer =>
     `${customer.firstName} ${customer.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
     customer.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     customer.phone.includes(searchQuery)
   )
 
+  const handleCreate = () => {
+    setFormData(emptyCustomer)
+    setIsCreateOpen(true)
+  }
+
+  const handleEdit = (customer: Customer) => {
+    setSelectedCustomer(customer)
+    setFormData({
+      firstName: customer.firstName,
+      lastName: customer.lastName,
+      email: customer.email,
+      phone: customer.phone,
+      address: customer.address || "",
+    })
+    setIsEditOpen(true)
+  }
+
+  const handleView = (customer: Customer) => {
+    setSelectedCustomer(customer)
+    setIsViewOpen(true)
+  }
+
+  const handleDelete = (customer: Customer) => {
+    setSelectedCustomer(customer)
+    setIsDeleteOpen(true)
+  }
+
+  const submitCreate = () => {
+    // In production: createCustomer({ ...formData, customerNumber: `CUST-${Date.now()}`, isActive: true })
+    const newCustomer: Customer = {
+      id: String(Date.now()),
+      ...formData,
+      vehicles: 0,
+      totalSpent: 0,
+      lastVisit: new Date().toISOString().split("T")[0],
+      status: "active",
+    }
+    setCustomers([...customers, newCustomer])
+    setIsCreateOpen(false)
+    setFormData(emptyCustomer)
+  }
+
+  const submitEdit = () => {
+    if (!selectedCustomer) return
+    // In production: updateCustomer({ id: selectedCustomer._id, ...formData })
+    setCustomers(customers.map(c => 
+      c.id === selectedCustomer.id 
+        ? { ...c, ...formData }
+        : c
+    ))
+    setIsEditOpen(false)
+    setSelectedCustomer(null)
+  }
+
+  const submitDelete = () => {
+    if (!selectedCustomer) return
+    // In production: deleteCustomer({ id: selectedCustomer._id })
+    setCustomers(customers.filter(c => c.id !== selectedCustomer.id))
+    setIsDeleteOpen(false)
+    setSelectedCustomer(null)
+  }
+
   return (
     <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-950 p-6">
       
-      {/* Header Controls (Sakosys Style) */}
+      {/* Header Controls */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <h2 className="text-xl font-bold text-slate-800 dark:text-white uppercase tracking-tight">
           Customer List
         </h2>
         
         <div className="flex gap-2 w-full md:w-auto">
-          <Button className="bg-[#00A65A] hover:bg-[#008d4c] text-white">
+          <Button 
+            className="bg-[#00A65A] hover:bg-[#008d4c] text-white"
+            onClick={handleCreate}
+          >
             <Plus className="h-4 w-4 mr-2" />
             Add Customer
           </Button>
@@ -123,7 +230,7 @@ export function Customers() {
         </div>
       </div>
 
-      {/* Data Table (Sakosys AdminLTE Style) */}
+      {/* Data Table */}
       <div className="bg-white dark:bg-slate-900 rounded-b-lg border border-t-0 border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
         <table className="w-full text-sm text-left">
           <thead className="text-xs text-slate-700 uppercase bg-slate-50 dark:bg-slate-800 dark:text-slate-400 border-b border-slate-200">
@@ -141,22 +248,17 @@ export function Customers() {
           <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
             {filteredCustomers.map((customer) => (
               <tr key={customer.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                {/* Avatar */}
                 <td className="px-6 py-3">
                   <div className="h-10 w-10 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white font-bold text-sm shadow">
                     {customer.firstName[0]}{customer.lastName[0]}
                   </div>
                 </td>
-                
-                {/* Name */}
                 <td className="px-6 py-3 font-medium text-slate-900 dark:text-white">
                   {customer.firstName} {customer.lastName}
                   {customer.address && (
                     <div className="text-xs text-slate-500 font-normal">{customer.address}</div>
                   )}
                 </td>
-                
-                {/* Contact */}
                 <td className="px-6 py-3">
                   <div className="flex items-center gap-1 text-xs text-slate-600 mb-1">
                     <Mail className="h-3 w-3" />
@@ -167,26 +269,18 @@ export function Customers() {
                     {customer.phone}
                   </div>
                 </td>
-                
-                {/* Vehicles */}
                 <td className="px-6 py-3">
                   <span className="inline-flex items-center gap-1 text-sm font-semibold">
                     <Users className="h-4 w-4 text-blue-500" />
                     {customer.vehicles}
                   </span>
                 </td>
-                
-                {/* Total Spent */}
                 <td className="px-6 py-3 font-bold text-emerald-600">
                   ${customer.totalSpent.toLocaleString()}
                 </td>
-                
-                {/* Last Visit */}
                 <td className="px-6 py-3 text-slate-600">
                   {new Date(customer.lastVisit).toLocaleDateString()}
                 </td>
-                
-                {/* Status */}
                 <td className="px-6 py-3">
                   <Badge className={customer.status === 'active' 
                     ? "bg-green-500 hover:bg-green-600" 
@@ -195,22 +289,27 @@ export function Customers() {
                     {customer.status}
                   </Badge>
                 </td>
-                
-                {/* Actions (4 color buttons) */}
                 <td className="px-6 py-3">
                   <div className="flex justify-center gap-2">
-                    {/* Yellow: View */}
-                    <Button size="icon" className="h-8 w-8 bg-[#f39c12] hover:bg-[#d58512] text-white rounded shadow-sm">
+                    <Button 
+                      size="icon" 
+                      className="h-8 w-8 bg-[#f39c12] hover:bg-[#d58512] text-white rounded shadow-sm"
+                      onClick={() => handleView(customer)}
+                    >
                       <Eye className="h-4 w-4" />
                     </Button>
-
-                    {/* Light Blue: Edit */}
-                    <Button size="icon" className="h-8 w-8 bg-[#3c8dbc] hover:bg-[#367fa9] text-white rounded shadow-sm">
+                    <Button 
+                      size="icon" 
+                      className="h-8 w-8 bg-[#3c8dbc] hover:bg-[#367fa9] text-white rounded shadow-sm"
+                      onClick={() => handleEdit(customer)}
+                    >
                       <Pencil className="h-4 w-4" />
                     </Button>
-
-                    {/* Red: Delete */}
-                    <Button size="icon" className="h-8 w-8 bg-[#dd4b39] hover:bg-[#d73925] text-white rounded shadow-sm">
+                    <Button 
+                      size="icon" 
+                      className="h-8 w-8 bg-[#dd4b39] hover:bg-[#d73925] text-white rounded shadow-sm"
+                      onClick={() => handleDelete(customer)}
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -223,7 +322,7 @@ export function Customers() {
         {/* Pagination Footer */}
         <div className="bg-slate-50 dark:bg-slate-800 px-4 py-3 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center sm:px-6">
            <div className="text-xs text-slate-500">
-             Showing 1 to {filteredCustomers.length} of {mockCustomers.length} entries
+             Showing 1 to {filteredCustomers.length} of {customers.length} entries
            </div>
            <div className="flex gap-1">
              <Button variant="outline" size="sm" className="h-7 text-xs" disabled>Previous</Button>
@@ -232,6 +331,259 @@ export function Customers() {
            </div>
         </div>
       </div>
+
+      {/* CREATE CUSTOMER DIALOG */}
+      <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Plus className="h-5 w-5 text-green-500" />
+              Add New Customer
+            </DialogTitle>
+            <DialogDescription>
+              Enter customer details to create a new record
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>First Name *</Label>
+                <Input 
+                  value={formData.firstName}
+                  onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                  placeholder="Mohamed"
+                />
+              </div>
+              <div>
+                <Label>Last Name *</Label>
+                <Input 
+                  value={formData.lastName}
+                  onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                  placeholder="Ahmed"
+                />
+              </div>
+            </div>
+            <div>
+              <Label>Email</Label>
+              <Input 
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                placeholder="customer@email.com"
+              />
+            </div>
+            <div>
+              <Label>Phone *</Label>
+              <Input 
+                value={formData.phone}
+                onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                placeholder="+252 63 XXX XXXX"
+              />
+            </div>
+            <div>
+              <Label>Address</Label>
+              <Input 
+                value={formData.address}
+                onChange={(e) => setFormData({...formData, address: e.target.value})}
+                placeholder="Hargeisa, Somaliland"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsCreateOpen(false)}>
+              <X className="h-4 w-4 mr-2" /> Cancel
+            </Button>
+            <Button 
+              className="bg-green-500 hover:bg-green-600"
+              onClick={submitCreate}
+              disabled={!formData.firstName || !formData.lastName || !formData.phone}
+            >
+              <Check className="h-4 w-4 mr-2" /> Create Customer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* EDIT CUSTOMER DIALOG */}
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Pencil className="h-5 w-5 text-blue-500" />
+              Edit Customer
+            </DialogTitle>
+            <DialogDescription>
+              Update customer information
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>First Name *</Label>
+                <Input 
+                  value={formData.firstName}
+                  onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label>Last Name *</Label>
+                <Input 
+                  value={formData.lastName}
+                  onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                />
+              </div>
+            </div>
+            <div>
+              <Label>Email</Label>
+              <Input 
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label>Phone *</Label>
+              <Input 
+                value={formData.phone}
+                onChange={(e) => setFormData({...formData, phone: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label>Address</Label>
+              <Input 
+                value={formData.address}
+                onChange={(e) => setFormData({...formData, address: e.target.value})}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              className="bg-blue-500 hover:bg-blue-600"
+              onClick={submitEdit}
+            >
+              <Check className="h-4 w-4 mr-2" /> Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* VIEW CUSTOMER DIALOG */}
+      <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Eye className="h-5 w-5 text-orange-500" />
+              Customer Details
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedCustomer && (
+            <div className="space-y-4 py-4">
+              <div className="flex items-center gap-4">
+                <div className="h-16 w-16 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white font-bold text-xl">
+                  {selectedCustomer.firstName[0]}{selectedCustomer.lastName[0]}
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold">{selectedCustomer.firstName} {selectedCustomer.lastName}</h3>
+                  <Badge className={selectedCustomer.status === 'active' ? "bg-green-500" : "bg-slate-400"}>
+                    {selectedCustomer.status}
+                  </Badge>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-slate-400" />
+                  <span className="text-sm">{selectedCustomer.email}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-slate-400" />
+                  <span className="text-sm">{selectedCustomer.phone}</span>
+                </div>
+                {selectedCustomer.address && (
+                  <div className="flex items-center gap-2 col-span-2">
+                    <MapPin className="h-4 w-4 text-slate-400" />
+                    <span className="text-sm">{selectedCustomer.address}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-3 gap-4 pt-4 border-t">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-blue-500">{selectedCustomer.vehicles}</p>
+                  <p className="text-xs text-slate-500">Vehicles</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-emerald-500">${selectedCustomer.totalSpent.toLocaleString()}</p>
+                  <p className="text-xs text-slate-500">Total Spent</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-bold">{new Date(selectedCustomer.lastVisit).toLocaleDateString()}</p>
+                  <p className="text-xs text-slate-500">Last Visit</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsViewOpen(false)}>
+              Close
+            </Button>
+            <Button 
+              className="bg-blue-500 hover:bg-blue-600"
+              onClick={() => {
+                setIsViewOpen(false)
+                if (selectedCustomer) handleEdit(selectedCustomer)
+              }}
+            >
+              <Pencil className="h-4 w-4 mr-2" /> Edit
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* DELETE CONFIRMATION DIALOG */}
+      <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-500">
+              <AlertTriangle className="h-5 w-5" />
+              Confirm Delete
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this customer?
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedCustomer && (
+            <div className="py-4">
+              <p className="font-semibold">{selectedCustomer.firstName} {selectedCustomer.lastName}</p>
+              <p className="text-sm text-slate-500">{selectedCustomer.email}</p>
+              <p className="text-xs text-red-500 mt-2">This action cannot be undone.</p>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              className="bg-red-500 hover:bg-red-600"
+              onClick={submitDelete}
+            >
+              <Trash2 className="h-4 w-4 mr-2" /> Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
+

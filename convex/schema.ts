@@ -701,4 +701,127 @@ export default defineSchema({
     notes: v.optional(v.string()),
   }).index("by_tech", ["technicianId"])
     .index("by_workOrder", ["workOrderId"]),
+
+  // ============ 25. INSPECTION TEMPLATES (Customizable DVI) ============
+  // Allows shops to create custom inspection checklists
+  inspectionTemplates: defineTable({
+    name: v.string(), // "18-Point Inspection", "Pre-Purchase Inspection"
+    description: v.optional(v.string()),
+    vehicleType: v.optional(v.string()), // "SUV", "Sedan", "All"
+    groups: v.array(v.object({
+      id: v.string(),
+      name: v.string(), // "Exterior", "Under Hood", "Brakes"
+      order: v.number(),
+      tasks: v.array(v.object({
+        id: v.string(),
+        name: v.string(), // "Front Brake Pads"
+        order: v.number(),
+        defaultFindings: v.optional(v.array(v.string())), // ["Good", "Worn 50%", "Needs Replacement"]
+        cannedJobId: v.optional(v.id("cannedJobs")), // Auto-add to estimate if fail
+      })),
+    })),
+    isDefault: v.optional(v.boolean()), // Use as default template
+    isActive: v.boolean(),
+    createdBy: v.optional(v.id("users")),
+    createdAt: v.optional(v.string()),
+  }).index("by_active", ["isActive"])
+    .index("by_default", ["isDefault"]),
+
+  // ============ 26. CANNED JOBS (Pre-Built Service Packages) ============
+  // Like Tekmetric's canned jobs - pre-configured labor + parts bundles
+  cannedJobs: defineTable({
+    name: v.string(), // "Oil Change - Synthetic"
+    code: v.optional(v.string()), // "OIL-SYN-001"
+    description: v.optional(v.string()),
+    category: v.string(), // "Maintenance", "Brakes", "Suspension"
+    laborHours: v.number(), // 0.5
+    laborRate: v.number(), // 50 (SL Shilling)
+    parts: v.array(v.object({
+      partId: v.optional(v.id("inventory")),
+      partNumber: v.optional(v.string()),
+      name: v.string(),
+      quantity: v.number(),
+      unitPrice: v.number(),
+    })),
+    totalLaborCost: v.number(),
+    totalPartsCost: v.number(),
+    totalPrice: v.number(),
+    marginPercent: v.optional(v.number()),
+    applicableVehicles: v.optional(v.array(v.string())), // ["Toyota", "Suzuki"]
+    isPackageDeal: v.optional(v.boolean()), // Bundle discount
+    packageDiscount: v.optional(v.number()), // Percentage off
+    isActive: v.boolean(),
+    sortOrder: v.optional(v.number()),
+  }).index("by_category", ["category"])
+    .index("by_active", ["isActive"]),
+
+  // ============ 27. CUSTOMER APPROVALS (Digital Signatures) ============
+  // Track customer approval of estimates via unique links
+  customerApprovals: defineTable({
+    estimateId: v.id("estimates"),
+    customerId: v.id("customers"),
+    approvalToken: v.string(), // Unique URL token
+    sentAt: v.string(),
+    sentVia: v.union(v.literal("sms"), v.literal("email"), v.literal("whatsapp")),
+    viewedAt: v.optional(v.string()),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("viewed"),
+      v.literal("approved"),
+      v.literal("declined"),
+      v.literal("expired")
+    ),
+    approvedAt: v.optional(v.string()),
+    declinedAt: v.optional(v.string()),
+    declineReason: v.optional(v.string()),
+    signatureData: v.optional(v.string()), // Base64 signature image
+    ipAddress: v.optional(v.string()),
+    userAgent: v.optional(v.string()),
+    approvedItems: v.optional(v.array(v.string())), // IDs of approved line items
+    declinedItems: v.optional(v.array(v.string())), // IDs of declined line items
+    notes: v.optional(v.string()),
+  }).index("by_estimate", ["estimateId"])
+    .index("by_token", ["approvalToken"])
+    .index("by_customer", ["customerId"])
+    .index("by_status", ["status"]),
+
+  // ============ 28. DVI RESULTS (Completed Inspections) ============
+  // Store completed inspections with findings, photos, videos
+  dviResults: defineTable({
+    workOrderId: v.id("workOrders"),
+    vehicleId: v.id("vehicles"),
+    templateId: v.optional(v.id("inspectionTemplates")),
+    technicianId: v.id("users"),
+    startedAt: v.string(),
+    completedAt: v.optional(v.string()),
+    status: v.union(
+      v.literal("in_progress"),
+      v.literal("completed"),
+      v.literal("sent_to_customer"),
+      v.literal("approved")
+    ),
+    findings: v.array(v.object({
+      taskId: v.string(),
+      taskName: v.string(),
+      groupName: v.string(),
+      severity: v.union(
+        v.literal("good"),
+        v.literal("attention"),
+        v.literal("urgent")
+      ),
+      finding: v.optional(v.string()),
+      notes: v.optional(v.string()),
+      photos: v.optional(v.array(v.string())), // Storage IDs
+      videos: v.optional(v.array(v.string())), // Storage IDs
+      markedUpPhotos: v.optional(v.array(v.string())), // With annotations
+      recommendedCannedJobId: v.optional(v.id("cannedJobs")),
+    })),
+    overallNotes: v.optional(v.string()),
+    customerViewedAt: v.optional(v.string()),
+    customerApprovedAt: v.optional(v.string()),
+    sentToCustomerAt: v.optional(v.string()),
+  }).index("by_workOrder", ["workOrderId"])
+    .index("by_vehicle", ["vehicleId"])
+    .index("by_technician", ["technicianId"])
+    .index("by_status", ["status"]),
 });

@@ -32,6 +32,9 @@ const CarRequestModule = dynamic(() => import("@/components/car-request/car-requ
 const ContactModule = dynamic(() => import("@/components/contact/contact-module"), { ssr: false })
 const CatalogModule = dynamic(() => import("@/components/catalog/catalog-module"), { ssr: false })
 const NetworkModule = dynamic(() => import("@/components/network/network-explorer"), { ssr: false })
+const DeclinedJobsTracker = dynamic(() => import("@/components/estimates/declined-jobs-tracker"), { ssr: false })
+const CannedJobsLibrary = dynamic(() => import("@/components/canned-jobs/canned-jobs-library"), { ssr: false })
+const InspectionTemplateBuilder = dynamic(() => import("@/components/inspections/inspection-template-builder"), { ssr: false })
 
 function WorkshopSystemContent() {
   const { user, logout } = useConvexAuth()
@@ -85,6 +88,12 @@ function WorkshopSystemContent() {
         return <ContactModule />
       case "settings":
         return user.role === "admin" ? <SettingsModule /> : <Dashboard />
+      case "declined-jobs":
+        return <DeclinedJobsTracker />
+      case "canned-jobs":
+        return <CannedJobsLibrary />
+      case "inspection-templates":
+        return <InspectionTemplateBuilder />
       default:
         return <Dashboard />
     }
