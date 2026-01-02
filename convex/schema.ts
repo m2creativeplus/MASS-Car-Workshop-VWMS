@@ -25,6 +25,32 @@ export default defineSchema({
   }).index("by_email", ["email"])
     .index("by_role", ["role"]),
 
+  // ============ 1.1 ORGANIZATIONS (Tenants) ============
+  organizations: defineTable({
+    name: v.string(),
+    slug: v.string(), // URL friendly ID
+    ownerId: v.id("users"),
+    logoUrl: v.optional(v.string()),
+    plan: v.union(v.literal("free"), v.literal("pro"), v.literal("enterprise")),
+    isActive: v.boolean(),
+    subscriptionStatus: v.optional(v.string()),
+    stripeCustomerId: v.optional(v.string()),
+  }).index("by_slug", ["slug"]),
+
+  // ============ 1.2 USER ORG ROLES (Permissions) ============
+  userOrgRoles: defineTable({
+    userId: v.id("users"),
+    orgId: v.id("organizations"),
+    role: v.union(
+      v.literal("admin"),
+      v.literal("staff"),
+      v.literal("technician")
+    ),
+    isActive: v.boolean(),
+  }).index("by_user", ["userId"])
+    .index("by_org", ["orgId"])
+    .index("by_user_org", ["userId", "orgId"]),
+
   // ============ 2. CUSTOMERS (CRM) ============
   customers: defineTable({
     customerNumber: v.string(),
@@ -43,9 +69,11 @@ export default defineSchema({
     )),
     notes: v.optional(v.string()),
     isActive: v.boolean(),
+    orgId: v.string(),
   }).index("by_email", ["email"])
     .index("by_phone", ["phone"])
-    .index("by_customerNumber", ["customerNumber"]),
+    .index("by_customerNumber", ["customerNumber"])
+    .index("by_org", ["orgId"]),
 
   // ============ 3. VEHICLES (Fleet Registry) ============
   vehicles: defineTable({
@@ -76,10 +104,12 @@ export default defineSchema({
       v.literal("delivered"),
       v.literal("inactive")
     ),
+    orgId: v.string(),
   }).index("by_customer", ["customerId"])
     .index("by_vin", ["vin"])
     .index("by_plate", ["licensePlate"])
-    .index("by_status", ["status"]),
+    .index("by_status", ["status"])
+    .index("by_org", ["orgId"]),
 
   // ============ 4. SUPPLIERS (Vendor Database) ============
   suppliers: defineTable({
@@ -98,8 +128,10 @@ export default defineSchema({
     website: v.optional(v.string()),
     notes: v.optional(v.string()),
     isActive: v.boolean(),
+    orgId: v.string(),
   }).index("by_code", ["supplierCode"])
-    .index("by_category", ["category"]),
+    .index("by_category", ["category"])
+    .index("by_org", ["orgId"]),
 
   // ============ 5. INVENTORY (Parts Catalog) ============
   inventory: defineTable({
@@ -129,10 +161,12 @@ export default defineSchema({
       v.literal("refurbished")
     ),
     isActive: v.boolean(),
+    orgId: v.string(),
   }).index("by_partNumber", ["partNumber"])
     .index("by_category", ["category"])
     .index("by_supplier", ["supplierId"])
-    .index("by_barcode", ["barcode"]),
+    .index("by_barcode", ["barcode"])
+    .index("by_org", ["orgId"]),
 
   // ============ 6. LABOR GUIDE (Service Operations) ============
   laborGuide: defineTable({
@@ -182,11 +216,13 @@ export default defineSchema({
     internalNotes: v.optional(v.string()),
     estimatedCost: v.optional(v.number()),
     reminderSent: v.boolean(),
+    orgId: v.string(),
   }).index("by_date", ["appointmentDate"])
     .index("by_customer", ["customerId"])
     .index("by_vehicle", ["vehicleId"])
     .index("by_technician", ["technicianId"])
-    .index("by_status", ["status"]),
+    .index("by_status", ["status"])
+    .index("by_org", ["orgId"]),
 
   // ============ 8. WORK ORDERS (Job Cards) ============
   workOrders: defineTable({
@@ -227,11 +263,13 @@ export default defineSchema({
     checkinDate: v.string(),
     startedAt: v.optional(v.string()),
     completedAt: v.optional(v.string()),
+    orgId: v.string(),
   }).index("by_jobNumber", ["jobNumber"])
     .index("by_customer", ["customerId"])
     .index("by_vehicle", ["vehicleId"])
     .index("by_technician", ["technicianId"])
-    .index("by_status", ["status"]),
+    .index("by_status", ["status"])
+    .index("by_org", ["orgId"]),
 
   // ============ 9. INSPECTIONS (Digital Vehicle Inspection) ============
   inspections: defineTable({
@@ -279,10 +317,12 @@ export default defineSchema({
     startedAt: v.optional(v.string()),
     completedAt: v.optional(v.string()),
     approvedAt: v.optional(v.string()),
+    orgId: v.string(),
   }).index("by_vehicle", ["vehicleId"])
     .index("by_customer", ["customerId"])
     .index("by_technician", ["technicianId"])
-    .index("by_status", ["status"]),
+    .index("by_status", ["status"])
+    .index("by_org", ["orgId"]),
 
   // ============ 10. ESTIMATES (Quotes) ============
   estimates: defineTable({
@@ -339,10 +379,12 @@ export default defineSchema({
     approvedAt: v.optional(v.string()),
     declinedAt: v.optional(v.string()),
     declineReason: v.optional(v.string()),
+    orgId: v.string(),
   }).index("by_customer", ["customerId"])
     .index("by_vehicle", ["vehicleId"])
     .index("by_status", ["status"])
-    .index("by_estimateNumber", ["estimateNumber"]),
+    .index("by_estimateNumber", ["estimateNumber"])
+    .index("by_org", ["orgId"]),
 
   // ============ 11. INVOICES (Billing) ============
   invoices: defineTable({
@@ -381,10 +423,12 @@ export default defineSchema({
     paymentTerms: v.optional(v.string()),
     notes: v.optional(v.string()),
     sentAt: v.optional(v.string()),
+    orgId: v.string(),
   }).index("by_customer", ["customerId"])
     .index("by_vehicle", ["vehicleId"])
     .index("by_status", ["status"])
-    .index("by_invoiceNumber", ["invoiceNumber"]),
+    .index("by_invoiceNumber", ["invoiceNumber"])
+    .index("by_org", ["orgId"]),
 
   // ============ 12. SALES (POS Transactions) ============
   // KEY FEATURE: Inventory auto-decrements when a sale is recorded
@@ -414,9 +458,11 @@ export default defineSchema({
     cashierId: v.optional(v.id("users")),
     notes: v.optional(v.string()),
     createdAt: v.string(),
+    orgId: v.string(),
   }).index("by_date", ["createdAt"])
     .index("by_customer", ["customerId"])
-    .index("by_paymentMethod", ["paymentMethod"]),
+    .index("by_paymentMethod", ["paymentMethod"])
+    .index("by_org", ["orgId"]),
 
   // ============ 13. REMINDERS (Notifications) ============
   reminders: defineTable({
@@ -450,11 +496,13 @@ export default defineSchema({
     sentAt: v.optional(v.string()),
     completedAt: v.optional(v.string()),
     notes: v.optional(v.string()),
+    orgId: v.string(),
   }).index("by_customer", ["customerId"])
     .index("by_vehicle", ["vehicleId"])
     .index("by_dueDate", ["dueDate"])
     .index("by_status", ["status"])
-    .index("by_type", ["type"]),
+    .index("by_type", ["type"])
+    .index("by_org", ["orgId"]),
 
   // ============ 14. AUTOMOTIVE POIs (Points of Interest) ============
   // Stakeholder mapping for garages, dealers, and parts shops
@@ -589,9 +637,11 @@ export default defineSchema({
     paymentDate: v.string(),
     notes: v.optional(v.string()),
     isDeposit: v.boolean(),
+    orgId: v.string(),
   }).index("by_invoice", ["invoiceId"])
     .index("by_date", ["paymentDate"])
-    .index("by_method", ["method"]),
+    .index("by_method", ["method"])
+    .index("by_org", ["orgId"]),
 
   // ============ 19. EXPENSES (Operational Costs) ============
   // Tracks shop spending beyond COGS
@@ -609,8 +659,10 @@ export default defineSchema({
       v.literal("rejected"),
       v.literal("paid")
     ),
+    orgId: v.string(),
   }).index("by_category", ["category"])
-    .index("by_date", ["date"]),
+    .index("by_date", ["date"])
+    .index("by_org", ["orgId"]),
 
   // ============ 20. EXPENSE CATEGORIES ============
   // Configurable types for expense reporting
@@ -625,7 +677,9 @@ export default defineSchema({
     ),
     description: v.optional(v.string()),
     isActive: v.boolean(),
-  }).index("by_type", ["type"]),
+    orgId: v.string(),
+  }).index("by_type", ["type"])
+    .index("by_org", ["orgId"]),
 
   // ============ 21. PURCHASE ORDERS (Supply Chain) ============
   // Tracks stock ordering from suppliers
@@ -652,8 +706,10 @@ export default defineSchema({
     orderedAt: v.optional(v.string()),
     receivedAt: v.optional(v.string()),
     notes: v.optional(v.string()),
+    orgId: v.string(),
   }).index("by_supplier", ["supplierId"])
-    .index("by_status", ["status"]),
+    .index("by_status", ["status"])
+    .index("by_org", ["orgId"]),
 
   // ============ 22. INVENTORY ADJUSTMENTS (Audit Trail) ============
   // Tracks manual corrections, shrinkage, or damages
@@ -670,8 +726,10 @@ export default defineSchema({
     ),
     notes: v.optional(v.string()),
     date: v.string(),
+    orgId: v.string(),
   }).index("by_inventory", ["inventoryId"])
-    .index("by_date", ["date"]),
+    .index("by_date", ["date"])
+    .index("by_org", ["orgId"]),
 
   // ============ 23. SERVICE PACKAGES (Operations) ============
   // Bundled services for efficiency (e.g., "Full Service - Toyota Vitz")
@@ -699,8 +757,10 @@ export default defineSchema({
     endTime: v.optional(v.string()),
     durationMinutes: v.optional(v.number()),
     notes: v.optional(v.string()),
+    orgId: v.string(),
   }).index("by_tech", ["technicianId"])
-    .index("by_workOrder", ["workOrderId"]),
+    .index("by_workOrder", ["workOrderId"])
+    .index("by_org", ["orgId"]),
 
   // ============ 25. INSPECTION TEMPLATES (Customizable DVI) ============
   // Allows shops to create custom inspection checklists
@@ -724,8 +784,10 @@ export default defineSchema({
     isActive: v.boolean(),
     createdBy: v.optional(v.id("users")),
     createdAt: v.optional(v.string()),
+    orgId: v.string(),
   }).index("by_active", ["isActive"])
-    .index("by_default", ["isDefault"]),
+    .index("by_default", ["isDefault"])
+    .index("by_org", ["orgId"]),
 
   // ============ 26. CANNED JOBS (Pre-Built Service Packages) ============
   // Like Tekmetric's canned jobs - pre-configured labor + parts bundles
@@ -752,8 +814,10 @@ export default defineSchema({
     packageDiscount: v.optional(v.number()), // Percentage off
     isActive: v.boolean(),
     sortOrder: v.optional(v.number()),
+    orgId: v.string(),
   }).index("by_category", ["category"])
-    .index("by_active", ["isActive"]),
+    .index("by_active", ["isActive"])
+    .index("by_org", ["orgId"]),
 
   // ============ 27. CUSTOMER APPROVALS (Digital Signatures) ============
   // Track customer approval of estimates via unique links
@@ -780,10 +844,12 @@ export default defineSchema({
     approvedItems: v.optional(v.array(v.string())), // IDs of approved line items
     declinedItems: v.optional(v.array(v.string())), // IDs of declined line items
     notes: v.optional(v.string()),
+    orgId: v.string(),
   }).index("by_estimate", ["estimateId"])
     .index("by_token", ["approvalToken"])
     .index("by_customer", ["customerId"])
-    .index("by_status", ["status"]),
+    .index("by_status", ["status"])
+    .index("by_org", ["orgId"]),
 
   // ============ 28. DVI RESULTS (Completed Inspections) ============
   // Store completed inspections with findings, photos, videos
@@ -820,10 +886,12 @@ export default defineSchema({
     customerViewedAt: v.optional(v.string()),
     customerApprovedAt: v.optional(v.string()),
     sentToCustomerAt: v.optional(v.string()),
+    orgId: v.string(),
   }).index("by_workOrder", ["workOrderId"])
     .index("by_vehicle", ["vehicleId"])
     .index("by_technician", ["technicianId"])
-    .index("by_status", ["status"]),
+    .index("by_status", ["status"])
+    .index("by_org", ["orgId"]),
 
   // ============ 29. CMS CONTENT (Dynamic Website Config) ============
   // Stores text and settings for the Public Landing Page
@@ -839,6 +907,8 @@ export default defineSchema({
     ),
     isActive: v.boolean(),
     lastUpdatedBy: v.optional(v.id("users")),
+    orgId: v.string(),
   }).index("by_section", ["section"])
-    .index("by_key", ["section", "key"]),
+    .index("by_key", ["section", "key"])
+    .index("by_org", ["orgId"]),
 });

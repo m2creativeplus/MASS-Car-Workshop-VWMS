@@ -36,21 +36,71 @@ export const createUser = mutation({
       v.literal("technician"),
       v.literal("customer")
     ),
+    orgName: v.optional(v.string()), // Optional, defaults to "My Workshop"
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert("users", {
-      ...args,
+    // 1. Create User
+    const userId = await ctx.db.insert("users", {
+      email: args.email,
+      firstName: args.firstName,
+      lastName: args.lastName,
+      phone: args.phone,
+      role: args.role,
       isActive: true,
       lastLoginAt: new Date().toISOString(),
     });
+
+    // 2. If Admin, Create Default Organization
+    if (args.role === "admin") {
+      const orgId = await ctx.db.insert("organizations", {
+        name: args.orgName || "My Workshop",
+        slug: (args.orgName || "my-workshop").toLowerCase().replace(/\s+/g, "-") + "-" + Date.now(),
+        ownerId: userId,
+        plan: "free",
+        isActive: true,
+      });
+
+      // 3. Assign Role
+      await ctx.db.insert("userOrgRoles", {
+        userId,
+        orgId,
+        role: "admin",
+        isActive: true,
+      });
+    }
+
+    return userId;
+  },
+});
+
+export const getUserOrgs = query({
+  args: { userId: v.id("users") },
+  handler: async (ctx, args) => {
+    const roles = await ctx.db
+      .query("userOrgRoles")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .collect();
+    
+    // Fetch org details for each role
+    const orgs = await Promise.all(
+      roles.map(async (role) => {
+        const org = await ctx.db.get(role.orgId);
+        return { ...org, role: role.role };
+      })
+    );
+    
+    return orgs.filter(o => o.isActive); // Only active orgs
   },
 });
 
 // ============ CUSTOMERS ============
 export const getCustomers = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("customers").collect();
+  args: { orgId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("customers")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .collect();
   },
 });
 
@@ -70,9 +120,14 @@ export const addCustomer = mutation({
     address: v.optional(v.string()),
     city: v.optional(v.string()),
     country: v.optional(v.string()),
+    country: v.optional(v.string()),
+    orgId: v.string(),
   },
   handler: async (ctx, args) => {
-    const count = await ctx.db.query("customers").collect();
+    const count = await ctx.db
+      .query("customers")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .collect();
     const customerNumber = `CUST-${String(count.length + 1).padStart(6, "0")}`;
     
     return await ctx.db.insert("customers", {
@@ -102,9 +157,12 @@ export const updateCustomer = mutation({
 
 // ============ VEHICLES ============
 export const getVehicles = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("vehicles").collect();
+  args: { orgId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("vehicles")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .collect();
   },
 });
 
@@ -134,6 +192,10 @@ export const addVehicle = mutation({
       v.literal("delivered"),
       v.literal("inactive")
     ),
+      v.literal("delivered"),
+      v.literal("inactive")
+    ),
+    orgId: v.string(),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("vehicles", args);
@@ -160,9 +222,12 @@ export const updateVehicle = mutation({
 
 // ============ SUPPLIERS ============
 export const getSuppliers = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("suppliers").collect();
+  args: { orgId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("suppliers")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .collect();
   },
 });
 
@@ -175,9 +240,13 @@ export const addSupplier = mutation({
     address: v.optional(v.string()),
     city: v.optional(v.string()),
     category: v.optional(v.string()),
+    orgId: v.string(),
   },
   handler: async (ctx, args) => {
-    const count = await ctx.db.query("suppliers").collect();
+    const count = await ctx.db
+      .query("suppliers")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .collect();
     const supplierCode = `SUP-${String(count.length + 1).padStart(4, "0")}`;
     
     return await ctx.db.insert("suppliers", {
@@ -190,9 +259,12 @@ export const addSupplier = mutation({
 
 // ============ INVENTORY (with stock tracking) ============
 export const getInventory = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("inventory").collect();
+  args: { orgId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("inventory")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .collect();
   },
 });
 
@@ -232,6 +304,7 @@ export const addInventoryItem = mutation({
       v.literal("used"),
       v.literal("refurbished")
     ),
+    orgId: v.string(),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("inventory", {
@@ -300,7 +373,6 @@ export const getAppointmentsByDate = query({
 });
 
 export const createAppointment = mutation({
-  args: {
     customerId: v.id("customers"),
     vehicleId: v.id("vehicles"),
     technicianId: v.optional(v.id("users")),
@@ -314,9 +386,13 @@ export const createAppointment = mutation({
       v.literal("urgent")
     ),
     customerNotes: v.optional(v.string()),
+    orgId: v.string(),
   },
   handler: async (ctx, args) => {
-    const count = await ctx.db.query("appointments").collect();
+    const count = await ctx.db
+      .query("appointments")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .collect();
     const appointmentNumber = `APT-${String(count.length + 1).padStart(6, "0")}`;
     
     return await ctx.db.insert("appointments", {
@@ -330,9 +406,12 @@ export const createAppointment = mutation({
 
 // ============ WORK ORDERS ============
 export const getWorkOrders = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("workOrders").collect();
+  args: { orgId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("workOrders")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .collect();
   },
 });
 
@@ -370,9 +449,13 @@ export const createWorkOrder = mutation({
       v.literal("urgent")
     ),
     customerComplaint: v.optional(v.string()),
+    orgId: v.string(),
   },
   handler: async (ctx, args) => {
-    const count = await ctx.db.query("workOrders").collect();
+    const count = await ctx.db
+      .query("workOrders")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .collect();
     const jobNumber = `JOB-${String(count.length + 1).padStart(6, "0")}`;
     
     // Update vehicle status to in-service
@@ -424,9 +507,12 @@ export const updateWorkOrderStatus = mutation({
 
 // ============ INSPECTIONS ============
 export const getInspections = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("inspections").collect();
+  args: { orgId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("inspections")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .collect();
   },
 });
 
@@ -443,13 +529,17 @@ export const createInspection = mutation({
         v.literal("ok"),
         v.literal("attention"),
         v.literal("immediate-attention"),
-        v.literal("not-applicable")
+      v.literal("not-applicable")
       ),
       notes: v.optional(v.string()),
     })),
+    orgId: v.string(),
   },
   handler: async (ctx, args) => {
-    const count = await ctx.db.query("inspections").collect();
+    const count = await ctx.db
+      .query("inspections")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .collect();
     const inspectionNumber = `INS-${String(count.length + 1).padStart(6, "0")}`;
     
     // Determine overall condition based on items
@@ -473,9 +563,12 @@ export const createInspection = mutation({
 
 // ============ ESTIMATES ============
 export const getEstimates = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("estimates").collect();
+  args: { orgId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("estimates")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .collect();
   },
 });
 
@@ -497,9 +590,13 @@ export const createEstimate = mutation({
       isApproved: v.boolean(),
     })),
     workDescription: v.optional(v.string()),
+    orgId: v.string(),
   },
   handler: async (ctx, args) => {
-    const count = await ctx.db.query("estimates").collect();
+    const count = await ctx.db
+      .query("estimates")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .collect();
     const estimateNumber = `EST-${String(count.length + 1).padStart(6, "0")}`;
     
     const subtotal = args.lineItems.reduce((sum, item) => sum + item.totalPrice, 0);
@@ -520,18 +617,24 @@ export const createEstimate = mutation({
 
 // ============ INVOICES ============
 export const getInvoices = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("invoices").collect();
+  args: { orgId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("invoices")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .collect();
   },
 });
 
 // ============ SALES / POS ============
 // KEY FEATURE: Automatic inventory decrement on sale
 export const getSales = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("sales").collect();
+  args: { orgId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("sales")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .collect();
   },
 });
 

@@ -36,70 +36,90 @@ const DeclinedJobsTracker = dynamic(() => import("@/components/estimates/decline
 const CannedJobsLibrary = dynamic(() => import("@/components/canned-jobs/canned-jobs-library"), { ssr: false })
 const InspectionTemplateBuilder = dynamic(() => import("@/components/inspections/inspection-template-builder"), { ssr: false })
 
+import { useOrganization } from "@/components/providers/organization-provider"
+
 function WorkshopSystemContent() {
   const { user, logout } = useConvexAuth()
+  const { organization, isLoading: orgLoading } = useOrganization()
   const [activeModule, setActiveModule] = useState("dashboard")
 
   if (!user) {
     return <ConvexLoginForm />
   }
 
+  if (orgLoading) {
+    return <div className="flex h-screen items-center justify-center">Loading organization...</div>
+  }
+
+  if (!organization) {
+    return (
+        <div className="flex h-screen items-center justify-center flex-col gap-4">
+            <h2 className="text-xl font-bold">No Organization Found</h2>
+            <p>You are not a member of any workshop.</p>
+        </div>
+    )
+  }
+
   const renderModule = () => {
+    // Props to pass to all modules
+    const commonProps = { orgId: organization._id }
+    
     switch (activeModule) {
       case "dashboard":
-        return <Dashboard />
+        return <Dashboard {...commonProps} />
       case "work-orders":
-        return <WorkOrdersKanban />
+        return <WorkOrdersKanban {...commonProps} />
       case "customers":
-        return <Customers />
+        return <Customers {...commonProps} />
       case "vehicles":
-        return <Vehicles />
+        return <Vehicles {...commonProps} />
       case "appointments":
-        return <Appointments />
+        return <Appointments {...commonProps} />
       case "car-request":
-        return <CarRequestModule />
+        return <CarRequestModule {...commonProps} />
       case "inventory":
-        return <InventoryManagement />
+        return <InventoryManagement {...commonProps} />
       case "technicians":
-        return <TechnicianDashboard />
+        return <TechnicianDashboard {...commonProps} />
       case "suppliers":
-        return <SuppliersModule />
+        return <SuppliersModule {...commonProps} />
       case "network":
-        return <NetworkModule />
+        return <NetworkModule {...commonProps} />
       case "inspections":
-        return <EnhancedInspectionChecklist />
+        return <EnhancedInspectionChecklist {...commonProps} />
       case "estimates":
-        return <CreateEstimate />
+        return <CreateEstimate {...commonProps} />
       case "reports":
-        return <ReportsAnalytics />
+        return <ReportsAnalytics {...commonProps} />
       case "ai-tools":
-        return <AITools />
+        return <AITools {...commonProps} />
       case "pos":
-        return <PartSellsModule />
+        return <PartSellsModule {...commonProps} />
       case "catalog":
-        return <CatalogModule />
+        return <CatalogModule {...commonProps} />
       case "delivery":
-        return <DeliveryModule />
+        return <DeliveryModule {...commonProps} />
       case "reminders":
-        return <RemindersModule />
+        return <RemindersModule {...commonProps} />
       case "diagnostics":
-        return <AutoDiagnosticsModule />
+        return <AutoDiagnosticsModule {...commonProps} />
       case "contact":
-        return <ContactModule />
+        return <ContactModule {...commonProps} />
       case "settings":
-        return user.role === "admin" ? <SettingsModule /> : <Dashboard />
+        return user.role === "admin" ? <SettingsModule {...commonProps} /> : <Dashboard {...commonProps} />
       case "declined-jobs":
-        return <DeclinedJobsTracker />
+        return <DeclinedJobsTracker {...commonProps} />
       case "canned-jobs":
-        return <CannedJobsLibrary />
+        return <CannedJobsLibrary {...commonProps} />
       case "inspection-templates":
-        return <InspectionTemplateBuilder />
+        return <InspectionTemplateBuilder {...commonProps} />
       default:
-        return <Dashboard />
+        return <Dashboard {...commonProps} />
     }
   }
 
   const getModuleTitle = (id: string) => {
+    // ... existing ...
     const titles: Record<string, string> = {
       dashboard: "Dashboard Overview",
       "work-orders": "Work Orders",
@@ -134,6 +154,9 @@ function WorkshopSystemContent() {
             <h1 className="text-lg font-bold text-foreground tracking-tight">
               {getModuleTitle(activeModule)}
             </h1>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300 font-medium">
+               {organization.name}
+            </span>
           </div>
           <div className="flex items-center gap-3">
              <UserMenu />
