@@ -102,6 +102,14 @@ const demoUsers: Record<string, AuthUser> = {
     lastName: "User",
     isActive: true,
   },
+  "owner@masscar.com": {
+    id: "demo-owner-001",
+    email: "owner@masscar.com",
+    role: "admin",
+    firstName: "Owner / Super Admin",
+    lastName: "Executive",
+    isActive: true,
+  },
   "staff@masscar.com": {
     id: "demo-staff-001",
     email: "staff@masscar.com",

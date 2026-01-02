@@ -76,20 +76,28 @@ const cardVariants = {
   }
 }
 
+import { useConvexAuth } from "@/components/auth/convex-auth-provider"
+import { DollarSign, TrendingUp, CreditCard } from "lucide-react"
+
+// ... existing imports
+
 export function Dashboard() {
   const [timeRange, setTimeRange] = useState("year")
+  const { user } = useConvexAuth()
+  const isOwner = user?.email === "owner@masscar.com"
 
   return (
     <div className="space-y-6 p-2">
       
-      {/* 1. Header is handled by the main layout, so we focus on the content */}
+      {/* 1. Header is handled by the main layout */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
         className="flex justify-between items-center mb-4"
       >
-        <h2 className="text-xl font-bold text-orange-600 tracking-tight uppercase">
+        <h2 className="text-xl font-bold text-orange-600 tracking-tight uppercase flex items-center gap-2">
+          {isOwner && <span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-sm border border-amber-200">Executive View</span>}
           MASS WORKSHOP DASHBOARD
         </h2>
         <div className="flex gap-2">
@@ -99,6 +107,60 @@ export function Dashboard() {
           </span>
         </div>
       </motion.div>
+
+      {/* OWNER ONLY: Financial Overview */}
+      {isOwner && (
+        <motion.div 
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6"
+        >
+          <Card className="bg-slate-900 text-white border-slate-800">
+            <CardContent className="p-6 flex items-center justify-between">
+              <div>
+                <p className="text-slate-400 text-sm font-medium">Total Revenue (YTD)</p>
+                <h3 className="text-3xl font-bold text-emerald-400 mt-1">$142,500</h3>
+                <p className="text-xs text-emerald-500 flex items-center mt-2">
+                  <TrendingUp className="w-3 h-3 mr-1" /> +12.5% vs last month
+                </p>
+              </div>
+              <div className="h-12 w-12 bg-slate-800 rounded-full flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-emerald-400" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-slate-900 text-white border-slate-800">
+            <CardContent className="p-6 flex items-center justify-between">
+              <div>
+                <p className="text-slate-400 text-sm font-medium">Net Profit (Est.)</p>
+                <h3 className="text-3xl font-bold text-blue-400 mt-1">$48,250</h3>
+                 <p className="text-xs text-blue-500 flex items-center mt-2">
+                  33.8% Margin
+                </p>
+              </div>
+              <div className="h-12 w-12 bg-slate-800 rounded-full flex items-center justify-center">
+                 <TrendingUp className="w-6 h-6 text-blue-400" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-slate-900 text-white border-slate-800">
+            <CardContent className="p-6 flex items-center justify-between">
+              <div>
+                <p className="text-slate-400 text-sm font-medium">Outstanding Invoices</p>
+                <h3 className="text-3xl font-bold text-amber-400 mt-1">$4,120</h3>
+                <p className="text-xs text-amber-500 flex items-center mt-2">
+                  5 Overdue Accounts
+                </p>
+              </div>
+               <div className="h-12 w-12 bg-slate-800 rounded-full flex items-center justify-center">
+                <CreditCard className="w-6 h-6 text-amber-400" />
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       {/* 2. Info Cards Row with Framer Motion Spring Physics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

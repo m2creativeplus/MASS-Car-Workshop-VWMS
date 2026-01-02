@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, Car, AlertCircle, User, Shield, Wrench, UserCircle } from "lucide-react"
+import { Loader2, Car, AlertCircle, User, Shield, Wrench, UserCircle, Crown } from "lucide-react"
 
 export function ConvexLoginForm() {
   const { login, isLoading } = useConvexAuth()
@@ -51,6 +51,7 @@ export function ConvexLoginForm() {
   }
 
   const demoAccounts = [
+    { email: "owner@masscar.com", role: "Owner", icon: Crown, color: "text-amber-500" },
     { email: "admin@masscar.com", role: "Admin", icon: Shield, color: "text-red-500" },
     { email: "staff@masscar.com", role: "Staff", icon: User, color: "text-blue-500" },
     { email: "tech@masscar.com", role: "Technician", icon: Wrench, color: "text-green-500" },
