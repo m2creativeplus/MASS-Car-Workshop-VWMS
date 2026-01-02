@@ -824,4 +824,21 @@ export default defineSchema({
     .index("by_vehicle", ["vehicleId"])
     .index("by_technician", ["technicianId"])
     .index("by_status", ["status"]),
+
+  // ============ 29. CMS CONTENT (Dynamic Website Config) ============
+  // Stores text and settings for the Public Landing Page
+  cmsContent: defineTable({
+    section: v.string(), // "hero", "features", "pricing", "contact"
+    key: v.string(), // "headline", "subheadline", "banner_image"
+    value: v.string(), // The text content or image URL
+    type: v.union(
+      v.literal("text"),
+      v.literal("image"),
+      v.literal("boolean"),
+      v.literal("json")
+    ),
+    isActive: v.boolean(),
+    lastUpdatedBy: v.optional(v.id("users")),
+  }).index("by_section", ["section"])
+    .index("by_key", ["section", "key"]),
 });
