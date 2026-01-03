@@ -370,9 +370,12 @@ export const addLaborOperation = mutation({
 
 // ============ APPOINTMENTS ============
 export const getAppointments = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("appointments").collect();
+  args: { orgId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("appointments")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .collect();
   },
 });
 
@@ -415,6 +418,13 @@ export const createAppointment = mutation({
       status: "scheduled",
       reminderSent: false,
     });
+  },
+});
+
+export const deleteAppointment = mutation({
+  args: { id: v.id("appointments") },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id);
   },
 });
 
@@ -516,6 +526,13 @@ export const updateWorkOrderStatus = mutation({
     }
     
     await ctx.db.patch(args.id, updates);
+  },
+});
+
+export const deleteWorkOrder = mutation({
+  args: { id: v.id("workOrders") },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id);
   },
 });
 
