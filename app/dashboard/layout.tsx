@@ -5,7 +5,7 @@ import { useConvexAuth } from "@/components/auth/convex-auth-provider"
 import { Sidebar } from "@/components/layout/sidebar"
 import { UserMenu } from "@/components/layout/user-menu"
 import { OrganizationProvider, useOrganization } from "@/components/providers/organization-provider"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 
 function DashboardLayoutContent({
   children,
@@ -50,8 +50,14 @@ function DashboardLayoutContent({
     return titles[path] || "Dashboard"
   }
 
+  const router = useRouter()
+
   if (!user) {
-    return null // Middleware or AuthGuard handles redirect
+    // Redirect to login if not authenticated
+    if (typeof window !== 'undefined') {
+      router.replace("/login")
+    }
+    return <div className="flex h-screen items-center justify-center">Redirecting to login...</div>
   }
 
   if (orgLoading) {

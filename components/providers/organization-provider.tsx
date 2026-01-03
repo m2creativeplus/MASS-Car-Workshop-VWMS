@@ -52,10 +52,11 @@ export function OrganizationProvider({ children }: { children: React.ReactNode }
   }, [isDemoUser, user, userOrgs])
   
   // Loading states:
-  // 1. Auth is loading -> we're loading
-  // 2. Demo user with a user object -> NOT loading (instant data)
-  // 3. Real user without Convex data yet -> loading
-  const isLoading = authLoading || (!isDemoUser && !userOrgs && !!user)
+  // 1. Auth is still loading -> we're loading
+  // 2. Demo user -> NOT loading (instant mock data available)  
+  // 3. Real user waiting for Convex query to return -> loading
+  // NOTE: userOrgs === undefined means query hasn't returned yet; [] means no orgs
+  const isLoading = authLoading || (!!user && !isDemoUser && userOrgs === undefined)
 
   // Set default active org when organizations change
   useEffect(() => {
