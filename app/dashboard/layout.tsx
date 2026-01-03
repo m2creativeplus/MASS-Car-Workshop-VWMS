@@ -12,9 +12,18 @@ function DashboardLayoutContent({
 }: {
   children: React.ReactNode
 }) {
-  const { user } = useConvexAuth()
+  const { user, isLoading: authLoading } = useConvexAuth()
   const { organization, isLoading: orgLoading } = useOrganization()
   const pathname = usePathname()
+
+  // Debug logging to trace the issue
+  console.log("[DashboardLayout] State:", { 
+    authLoading, 
+    hasUser: !!user, 
+    userId: user?.id, 
+    orgLoading, 
+    hasOrg: !!organization 
+  })
 
   // Helper to extract active module from pathname
   // e.g., /dashboard/work-orders -> work-orders
@@ -63,6 +72,7 @@ function DashboardLayoutContent({
   if (orgLoading) {
     return <div className="flex h-screen items-center justify-center">Loading organization...</div>
   }
+
 
   if (!organization) {
     return (
