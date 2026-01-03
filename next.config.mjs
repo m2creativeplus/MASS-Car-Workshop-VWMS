@@ -9,6 +9,10 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  generateBuildId: async () => {
+    // Force a new build ID to bust cache
+    return `build-${Date.now()}`
+  },
 }
 
 export default nextConfig
