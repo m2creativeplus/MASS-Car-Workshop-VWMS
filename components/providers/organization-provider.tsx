@@ -32,21 +32,38 @@ const DEMO_ORGANIZATION: Organization = {
 export function OrganizationProvider({ children }: { children: React.ReactNode }) {
   const { user, isLoading: authLoading } = useConvexAuth()
   const [activeOrgId, setActiveOrgId] = useState<string | null>(null)
+  const [isLocalStorageDemo, setIsLocalStorageDemo] = useState(false)
   
-  // ROBUSTNESS FIX: Check the ACTUAL localStorage key used by convex-auth-provider
-  // The auth provider stores user in "mass_workshop_auth" (line 139 of convex-auth-provider.tsx)
-  const isLocalStorageDemo = typeof window !== 'undefined' ? 
-    (() => {
+  // REACTIVE localStorage check - must run in useEffect to detect changes after login
+  useEffect(() => {
+    const checkLocalStorage = () => {
       try {
         const storedUser = window.localStorage.getItem("mass_workshop_auth")
         if (storedUser) {
           const parsed = JSON.parse(storedUser)
-          return parsed?.id?.startsWith("demo-") ?? false
+          setIsLocalStorageDemo(parsed?.id?.startsWith("demo-") ?? false)
+        } else {
+          setIsLocalStorageDemo(false)
         }
-        return false
-      } catch { return false }
-    })()
-    : false
+      } catch { 
+        setIsLocalStorageDemo(false) 
+      }
+    }
+    
+    // Check immediately
+    checkLocalStorage()
+    
+    // Also listen for storage events (cross-tab sync)
+    window.addEventListener("storage", checkLocalStorage)
+    return () => window.removeEventListener("storage", checkLocalStorage)
+  }, [])
+  
+  // Re-check localStorage whenever auth user changes (handles login completion)
+  useEffect(() => {
+    if (user?.id?.startsWith("demo-")) {
+      setIsLocalStorageDemo(true)
+    }
+  }, [user])
 
   const isDemoUser = Boolean(user?.id?.startsWith("demo-")) || isLocalStorageDemo
   
