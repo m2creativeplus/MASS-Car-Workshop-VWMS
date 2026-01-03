@@ -41,6 +41,7 @@ interface SidebarProps {
   activeModule: string
   onModuleChange: (module: string) => void
   userRole?: string
+  className?: string
 }
 
 const menuItems = [
@@ -70,7 +71,7 @@ const menuItems = [
   { id: "settings", label: "Settings", icon: Settings, roles: ["admin"] },
 ]
 
-export function Sidebar({ activeModule, onModuleChange, userRole }: SidebarProps) {
+export function Sidebar({ activeModule, onModuleChange, userRole, className }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const { user, hasPermission } = useConvexAuth()
   const [mounted, setMounted] = useState(false)
@@ -92,6 +93,7 @@ export function Sidebar({ activeModule, onModuleChange, userRole }: SidebarProps
       className={cn(
         "flex flex-col h-full sidebar-premium border-r border-sidebar-border transition-all duration-300 shadow-2xl z-50",
         isCollapsed ? "w-[80px]" : "w-[280px]",
+        className
       )}
     >
       {/* Header */}

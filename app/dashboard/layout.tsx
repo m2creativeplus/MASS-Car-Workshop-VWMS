@@ -83,15 +83,24 @@ function DashboardLayoutContent({
     )
   }
 
+import { MobileNav } from "@/components/layout/mobile-nav"
+
+// ... imports
+
   return (
     <div className="flex h-screen bg-background overflow-hidden font-sans antialiased text-foreground selection:bg-orange-500/30 selection:text-orange-900 dark:selection:text-orange-100">
-      {/* Sidebar now controls navigation via Links, but we pass activeModule for highlighting */}
-      <Sidebar activeModule={activeModule} onModuleChange={() => {}} userRole={user.role} />
+      {/* Desktop Sidebar: Hidden on mobile (md:hidden) */}
+      <div className="hidden md:flex h-full"> 
+        <Sidebar activeModule={activeModule} onModuleChange={() => {}} userRole={user.role} />
+      </div>
       
       <div className="flex-1 flex flex-col relative overflow-hidden bg-slate-50 dark:bg-slate-950/50 transition-colors duration-300">
         {/* Glass Header */}
         <header className="absolute top-0 left-0 right-0 h-16 glass-card z-10 mx-6 mt-4 rounded-xl flex items-center justify-between px-6 shadow-sm border border-white/20 dark:border-white/5">
           <div className="flex items-center gap-2">
+            {/* Mobile Nav Trigger: Visible only on mobile */}
+            <MobileNav />
+            
             <h1 className="text-lg font-bold text-foreground tracking-tight">
               {getModuleTitle(activeModule)}
             </h1>
