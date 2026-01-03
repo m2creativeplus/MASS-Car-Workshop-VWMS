@@ -162,104 +162,48 @@ export function Dashboard() {
         </motion.div>
       )}
 
+import { StatCard } from "@/components/dashboard/stat-card" 
+
+// ... inside Dashboard component
+
       {/* 2. Info Cards Row with Framer Motion Spring Physics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         
-        {/* Card 1: Parts (Cyan/Blue) */}
-        <motion.div
-          custom={0}
+        <StatCard 
+          index={0}
           variants={cardVariants}
-          initial="hidden"
-          animate="visible"
-          whileHover="hover"
-        >
-          <Card className="bg-[#00c0ef] text-white border-none shadow-md overflow-hidden relative cursor-pointer">
-            <CardContent className="p-4 relative z-10">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-4xl font-bold">{dashboardStats.partsInStock}</h3>
-                  <p className="text-sm font-medium opacity-90 mt-1">PARTS IN STOCK</p>
-                </div>
-                <Wrench className="h-16 w-16 opacity-20 absolute right-4 top-2 text-black" />
-              </div>
-            </CardContent>
-            <div className="bg-black/10 p-2 text-center text-xs font-medium cursor-pointer flex justify-center items-center hover:bg-black/20 transition-colors">
-              More info <ArrowRight className="h-3 w-3 ml-1" />
-            </div>
-          </Card>
-        </motion.div>
+          label="Parts In Stock"
+          value={dashboardStats.partsInStock}
+          icon={Wrench}
+          color="bg-[#00c0ef]"
+        />
 
-        {/* Card 2: Customers (Orange) */}
-        <motion.div
-          custom={1}
+        <StatCard 
+          index={1}
           variants={cardVariants}
-          initial="hidden"
-          animate="visible"
-          whileHover="hover"
-        >
-          <Card className="bg-[#F39C12] text-white border-none shadow-md overflow-hidden relative cursor-pointer">
-            <CardContent className="p-4 relative z-10">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-4xl font-bold">{dashboardStats.totalCustomers}</h3>
-                  <p className="text-sm font-medium opacity-90 mt-1">CUSTOMERS</p>
-                </div>
-                <Users className="h-16 w-16 opacity-20 absolute right-4 top-2 text-black" />
-              </div>
-            </CardContent>
-            <div className="bg-black/10 p-2 text-center text-xs font-medium cursor-pointer flex justify-center items-center hover:bg-black/20 transition-colors">
-              More info <ArrowRight className="h-3 w-3 ml-1" />
-            </div>
-          </Card>
-        </motion.div>
+          label="Customers"
+          value={dashboardStats.totalCustomers}
+          icon={Users}
+          color="bg-[#F39C12]"
+        />
 
-        {/* Card 3: Cars (Green) */}
-        <motion.div
-          custom={2}
+        <StatCard 
+          index={2}
           variants={cardVariants}
-          initial="hidden"
-          animate="visible"
-          whileHover="hover"
-        >
-          <Card className="bg-[#00A65A] text-white border-none shadow-md overflow-hidden relative cursor-pointer">
-            <CardContent className="p-4 relative z-10">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-4xl font-bold">{dashboardStats.carsInStock}</h3>
-                  <p className="text-sm font-medium opacity-90 mt-1">CARS IN STOCK</p>
-                </div>
-                <Car className="h-16 w-16 opacity-20 absolute right-4 top-2 text-black" />
-              </div>
-            </CardContent>
-            <div className="bg-black/10 p-2 text-center text-xs font-medium cursor-pointer flex justify-center items-center hover:bg-black/20 transition-colors">
-              More info <ArrowRight className="h-3 w-3 ml-1" />
-            </div>
-          </Card>
-        </motion.div>
+          label="Cars In Stock"
+          value={dashboardStats.carsInStock}
+          icon={Car}
+          color="bg-[#00A65A]"
+        />
 
-        {/* Card 4: Mechanics (Red) */}
-        <motion.div
-          custom={3}
+        <StatCard 
+          index={3}
           variants={cardVariants}
-          initial="hidden"
-          animate="visible"
-          whileHover="hover"
-        >
-          <Card className="bg-[#DD4B39] text-white border-none shadow-md overflow-hidden relative cursor-pointer">
-            <CardContent className="p-4 relative z-10">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-4xl font-bold">{dashboardStats.mechanics}</h3>
-                  <p className="text-sm font-medium opacity-90 mt-1">MECHANICS</p>
-                </div>
-                <Settings className="h-16 w-16 opacity-20 absolute right-4 top-2 text-black" />
-              </div>
-            </CardContent>
-            <div className="bg-black/10 p-2 text-center text-xs font-medium cursor-pointer flex justify-center items-center hover:bg-black/20 transition-colors">
-              More info <ArrowRight className="h-3 w-3 ml-1" />
-            </div>
-          </Card>
-        </motion.div>
+          label="Mechanics"
+          value={dashboardStats.mechanics}
+          icon={Settings}
+          color="bg-[#DD4B39]"
+        />
 
       </div>
 
