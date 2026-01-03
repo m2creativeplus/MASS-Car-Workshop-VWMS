@@ -118,36 +118,47 @@ export function Sidebar({ activeModule, onModuleChange, userRole }: SidebarProps
       {/* Navigation */}
       <ScrollArea className="flex-1 px-4">
         <nav className="space-y-1.5">
+import Link from "next/link"
+
+// ... imports
+
+// ... inside Sidebar component render loop
           {filteredMenuItems.map((item, index) => {
             const Icon = item.icon
             const isActive = activeModule === item.id
+            const href = item.id === "dashboard" ? "/dashboard" : `/dashboard/${item.id}`
 
             return (
-              <button
+              <Link
                 key={item.id}
-                onClick={() => onModuleChange(item.id)}
+                href={href}
                 className={cn(
-                  "sidebar-item w-full group relative",
+                  "sidebar-item w-full group relative block", // Added block for Link
                   isActive && "sidebar-item-active",
-                  isCollapsed && "justify-center px-0 py-4"
+                  isCollapsed && "flex justify-center px-0 py-4" // adjusted spacing
                 )}
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div className={cn(
-                  "flex items-center justify-center transition-colors duration-200",
-                  isActive ? "text-orange-500" : "text-slate-400 group-hover:text-white"
+                  "flex items-center transition-colors duration-200 w-full h-full px-3 py-2", // Inner container
+                   isCollapsed ? "justify-center px-0" : ""
                 )}>
-                  <Icon className="h-5 w-5" />
-                </div>
-                
-                {!isCollapsed && (
-                  <span className={cn(
-                    "font-medium text-sm ml-3 transition-colors duration-200",
-                    isActive ? "text-white" : "text-slate-400 group-hover:text-white"
+                  <div className={cn(
+                    "flex items-center justify-center shrink-0",
+                    isActive ? "text-orange-500" : "text-slate-400 group-hover:text-white"
                   )}>
-                    {item.label}
-                  </span>
-                )}
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  
+                  {!isCollapsed && (
+                    <span className={cn(
+                      "font-medium text-sm ml-3 transition-colors duration-200 truncate",
+                      isActive ? "text-white" : "text-slate-400 group-hover:text-white"
+                    )}>
+                      {item.label}
+                    </span>
+                  )}
+                </div>
 
                 {/* Hover Glow Effect */}
                 {!isActive && (
@@ -158,7 +169,7 @@ export function Sidebar({ activeModule, onModuleChange, userRole }: SidebarProps
                 {isCollapsed && isActive && (
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-orange-500 rounded-r-full" />
                 )}
-              </button>
+              </Link>
             )
           })}
         </nav>

@@ -1,14 +1,14 @@
 "use client"
 
-import { Dashboard } from "@/components/dashboard/dashboard"
+import { Customers } from "@/components/customers/customers"
 import { useOrganization } from "@/components/providers/organization-provider"
 
-export default function DashboardPage() {
+export default function CustomersPage() {
   const { organization } = useOrganization()
 
   if (!organization) return null
 
   return (
-    <Dashboard orgId={organization._id} />
+    <Customers orgId={organization._id} />
   )
 }

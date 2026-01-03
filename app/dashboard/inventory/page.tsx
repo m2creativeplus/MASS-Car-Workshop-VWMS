@@ -1,14 +1,14 @@
 "use client"
 
-import { Dashboard } from "@/components/dashboard/dashboard"
+import { InventoryManagement } from "@/components/inventory/inventory-management"
 import { useOrganization } from "@/components/providers/organization-provider"
 
-export default function DashboardPage() {
+export default function InventoryPage() {
   const { organization } = useOrganization()
 
   if (!organization) return null
 
   return (
-    <Dashboard orgId={organization._id} />
+    <InventoryManagement orgId={organization._id} />
   )
 }

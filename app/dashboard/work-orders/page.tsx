@@ -1,14 +1,14 @@
 "use client"
 
-import { Dashboard } from "@/components/dashboard/dashboard"
+import { WorkOrdersKanban } from "@/components/work-orders/work-orders-kanban"
 import { useOrganization } from "@/components/providers/organization-provider"
 
-export default function DashboardPage() {
+export default function WorkOrdersPage() {
   const { organization } = useOrganization()
 
   if (!organization) return null
 
   return (
-    <Dashboard orgId={organization._id} />
+    <WorkOrdersKanban orgId={organization._id} />
   )
 }
