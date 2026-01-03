@@ -33,10 +33,19 @@ export function OrganizationProvider({ children }: { children: React.ReactNode }
   const { user, isLoading: authLoading } = useConvexAuth()
   const [activeOrgId, setActiveOrgId] = useState<string | null>(null)
   
-  // ROBUSTNESS FIX: Check localStorage directly for demo flag to avoid React Context race conditions
-  // This ensures we detect demo mode even if useConvexAuth is slightly delayed
+  // ROBUSTNESS FIX: Check the ACTUAL localStorage key used by convex-auth-provider
+  // The auth provider stores user in "mass_workshop_auth" (line 139 of convex-auth-provider.tsx)
   const isLocalStorageDemo = typeof window !== 'undefined' ? 
-    window.localStorage.getItem("mass_demo_mode") === "true" || window.localStorage.getItem("convex_demo_user") !== null
+    (() => {
+      try {
+        const storedUser = window.localStorage.getItem("mass_workshop_auth")
+        if (storedUser) {
+          const parsed = JSON.parse(storedUser)
+          return parsed?.id?.startsWith("demo-") ?? false
+        }
+        return false
+      } catch { return false }
+    })()
     : false
 
   const isDemoUser = Boolean(user?.id?.startsWith("demo-")) || isLocalStorageDemo

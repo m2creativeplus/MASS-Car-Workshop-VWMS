@@ -102,12 +102,6 @@ const emptyCustomer = {
   address: "",
 }
 
-import { useQuery, useMutation } from "convex/react"
-import { api } from "@/convex/_generated/api"
-import { Id } from "@/convex/_generated/dataModel"
-
-// ... imports remain the same
-
 export function Customers({ orgId }: { orgId: string }) {
   const [searchQuery, setSearchQuery] = useState("")
   
