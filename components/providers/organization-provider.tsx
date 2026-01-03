@@ -21,7 +21,7 @@ interface OrganizationContextType {
 
 const OrganizationContext = createContext<OrganizationContextType | undefined>(undefined)
 
-// Demo organization for demo users
+// Demo organization for demo users - instant access, no backend query needed
 const DEMO_ORGANIZATION: Organization = {
   _id: "demo-org-001",
   name: "MASS Car Workshop",
@@ -33,30 +33,61 @@ export function OrganizationProvider({ children }: { children: React.ReactNode }
   const { user, isLoading: authLoading } = useConvexAuth()
   const [activeOrgId, setActiveOrgId] = useState<string | null>(null)
   
-  // Check if this is a demo user (ID starts with "demo-")
-  const isDemoUser = user?.id?.startsWith("demo-") ?? false
+  // Demo user detection: check user.id (from convex-auth-provider demo users)
+  const isDemoUser = Boolean(user?.id?.startsWith("demo-"))
   
-  // Only query Convex for real users who are logged in and not demo users
-  const shouldQueryConvex = !authLoading && user && !isDemoUser
+  // For real users only: query Convex backend for their organizations
+  // Demo users skip this query entirely - they get DEMO_ORGANIZATION instantly
+  // Note: Real users would have _id from Convex, demo users have id from local mock
+  const shouldQueryConvex = Boolean(!authLoading && user && !isDemoUser)
+  
+  // Skip query for demo users and when not authenticated
   const userOrgs = useQuery(
     api.functions.getUserOrgs, 
-    shouldQueryConvex && user?._id ? { userId: user._id as any } : "skip"
+    shouldQueryConvex ? { userId: user?.id as any } : "skip"
   )
 
-  // For demo users, provide mock organization; for real users, use Convex data
+  // Compute organizations list
   const organizations = useMemo(() => {
-    if (isDemoUser && user) {
+    // Demo users get instant mock organization
+    if (isDemoUser) {
       return [DEMO_ORGANIZATION]
     }
-    return userOrgs || []
-  }, [isDemoUser, user, userOrgs])
+    // Real users get their orgs from Convex (or empty array if query returned empty)
+    return userOrgs ?? []
+  }, [isDemoUser, userOrgs])
   
-  // Loading states:
-  // 1. Auth is still loading -> we're loading
-  // 2. Demo user -> NOT loading (instant mock data available)  
-  // 3. Real user waiting for Convex query to return -> loading
-  // NOTE: userOrgs === undefined means query hasn't returned yet; [] means no orgs
-  const isLoading = authLoading || (!!user && !isDemoUser && userOrgs === undefined)
+  // Compute loading state - BE VERY CAREFUL HERE
+  // Loading = TRUE only when:
+  // 1. Auth is still initializing, OR
+  // 2. User is logged in AND is NOT a demo user AND Convex query hasn't returned yet
+  const isLoading = useMemo(() => {
+    // Still checking auth state
+    if (authLoading) return true
+    
+    // No user = not loading (will redirect to login)  
+    if (!user) return false
+    
+    // Demo user = NEVER loading (instant mock data)
+    if (isDemoUser) return false
+    
+    // Real user waiting for Convex = loading until query returns
+    return userOrgs === undefined
+  }, [authLoading, user, isDemoUser, userOrgs])
+
+  // Debug logging (can be removed in production)
+  useEffect(() => {
+    console.log("[OrgProvider] State:", { 
+      authLoading, 
+      hasUser: !!user,
+      userId: user?.id,
+      isDemoUser, 
+      shouldQueryConvex,
+      userOrgsStatus: userOrgs === undefined ? "pending" : userOrgs === null ? "null" : `${userOrgs.length} orgs`,
+      isLoading,
+      organizations: organizations.map(o => o.name)
+    })
+  }, [authLoading, user, isDemoUser, shouldQueryConvex, userOrgs, isLoading, organizations])
 
   // Set default active org when organizations change
   useEffect(() => {
@@ -65,7 +96,8 @@ export function OrganizationProvider({ children }: { children: React.ReactNode }
     }
   }, [organizations, activeOrgId])
 
-  const activeOrg = organizations.find(o => o._id === activeOrgId) || (organizations.length > 0 ? organizations[0] : null)
+  const activeOrg = organizations.find(o => o._id === activeOrgId) || 
+                   (organizations.length > 0 ? organizations[0] : null)
 
   const setOrganization = (org: Organization) => {
     setActiveOrgId(org._id)
@@ -90,4 +122,3 @@ export function useOrganization() {
   }
   return context
 }
-
