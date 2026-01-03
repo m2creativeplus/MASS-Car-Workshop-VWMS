@@ -70,7 +70,7 @@ function DashboardLayoutContent({
   }
 
   if (orgLoading) {
-    return <div className="flex h-screen items-center justify-center">Loading organization...</div>
+    return <div className="flex h-screen items-center justify-center">Loading organization (DEBUG CHECK)...</div>
   }
 
 
