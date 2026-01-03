@@ -8,7 +8,9 @@
  * @module
  */
 
+import type * as cms from "../cms.js";
 import type * as functions from "../functions.js";
+import type * as helpers from "../helpers.js";
 import type * as ingestion from "../ingestion.js";
 
 import type {
@@ -18,7 +20,9 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  cms: typeof cms;
   functions: typeof functions;
+  helpers: typeof helpers;
   ingestion: typeof ingestion;
 }>;
 

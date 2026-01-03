@@ -199,9 +199,6 @@ export const addVehicle = mutation({
       v.literal("delivered"),
       v.literal("inactive")
     ),
-      v.literal("delivered"),
-      v.literal("inactive")
-    ),
     orgId: v.string(),
   },
   handler: async (ctx, args) => {
@@ -390,6 +387,7 @@ export const getAppointmentsByDate = query({
 });
 
 export const createAppointment = mutation({
+  args: {
     customerId: v.id("customers"),
     vehicleId: v.id("vehicles"),
     technicianId: v.optional(v.id("users")),
