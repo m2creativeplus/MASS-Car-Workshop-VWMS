@@ -33,45 +33,42 @@ export function OrganizationProvider({ children }: { children: React.ReactNode }
   const { user, isLoading: authLoading } = useConvexAuth()
   const [activeOrgId, setActiveOrgId] = useState<string | null>(null)
   
-  // Demo user detection: check user.id (from convex-auth-provider demo users)
-  const isDemoUser = Boolean(user?.id?.startsWith("demo-"))
+  // ROBUSTNESS FIX: Check localStorage directly for demo flag to avoid React Context race conditions
+  // This ensures we detect demo mode even if useConvexAuth is slightly delayed
+  const isLocalStorageDemo = typeof window !== 'undefined' ? 
+    window.localStorage.getItem("mass_demo_mode") === "true" || window.localStorage.getItem("convex_demo_user") !== null
+    : false
+
+  const isDemoUser = Boolean(user?.id?.startsWith("demo-")) || isLocalStorageDemo
   
-  // For real users only: query Convex backend for their organizations
-  // Demo users skip this query entirely - they get DEMO_ORGANIZATION instantly
-  // Note: Real users would have _id from Convex, demo users have id from local mock
+  // Query convex only if NOT a demo user (double check)
   const shouldQueryConvex = Boolean(!authLoading && user && !isDemoUser)
   
-  // Skip query for demo users and when not authenticated
   const userOrgs = useQuery(
     api.functions.getUserOrgs, 
-    shouldQueryConvex ? { userId: user?.id as any } : "skip"
+    shouldQueryConvex ? { userId: user?.id as any } : "skip" // Cast user.id to any to satisfy Convex type
   )
 
-  // Compute organizations list
   const organizations = useMemo(() => {
-    // Demo users get instant mock organization
     if (isDemoUser) {
       return [DEMO_ORGANIZATION]
     }
-    // Real users get their orgs from Convex (or empty array if query returned empty)
-    return userOrgs ?? []
+    return userOrgs || []
   }, [isDemoUser, userOrgs])
   
-  // Compute loading state - BE VERY CAREFUL HERE
-  // Loading = TRUE only when:
-  // 1. Auth is still initializing, OR
-  // 2. User is logged in AND is NOT a demo user AND Convex query hasn't returned yet
+  // Loading state with absolute priority for Demo mode
   const isLoading = useMemo(() => {
-    // Still checking auth state
+    // 1. If we know it's a demo user (via Context or LocalStorage), WE ARE NEVER LOADING.
+    // This is the critical fix. Instant access.
+    if (isDemoUser) return false
+
+    // 2. If Auth is loading, we are loading
     if (authLoading) return true
     
-    // No user = not loading (will redirect to login)  
+    // 3. If no user, we aren't "loading orgs", we are just unauthenticated (handled by AuthGuard)
     if (!user) return false
     
-    // Demo user = NEVER loading (instant mock data)
-    if (isDemoUser) return false
-    
-    // Real user waiting for Convex = loading until query returns
+    // 4. Real user state: Loading only if userOrgs is undefined
     return userOrgs === undefined
   }, [authLoading, user, isDemoUser, userOrgs])
 
