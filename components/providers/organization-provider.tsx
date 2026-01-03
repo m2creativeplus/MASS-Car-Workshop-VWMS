@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect } from "react"
+import { createContext, useContext, useState, useEffect, useMemo } from "react"
 import { useQuery } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { useConvexAuth } from "@/components/auth/convex-auth-provider"
@@ -21,17 +21,37 @@ interface OrganizationContextType {
 
 const OrganizationContext = createContext<OrganizationContextType | undefined>(undefined)
 
+// Demo organization for demo users
+const DEMO_ORGANIZATION: Organization = {
+  _id: "demo-org-001",
+  name: "MASS Car Workshop",
+  slug: "mass-hargeisa",
+  role: "admin"
+}
+
 export function OrganizationProvider({ children }: { children: React.ReactNode }) {
   const { user } = useConvexAuth()
   const [activeOrgId, setActiveOrgId] = useState<string | null>(null)
   
-  // Fetch user's organizations
-  const userOrgs = useQuery(api.functions.getUserOrgs, 
-    user?._id ? { userId: user._id as any } : "skip"
+  // Check if this is a demo user (ID starts with "demo-")
+  const isDemoUser = user?.id?.startsWith("demo-") || false
+  
+  // Only query Convex for real users, not demo users
+  const userOrgs = useQuery(
+    api.functions.getUserOrgs, 
+    !isDemoUser && user?._id ? { userId: user._id as any } : "skip"
   )
 
-  const organizations = userOrgs || []
-  const isLoading = userOrgs === undefined
+  // For demo users, provide mock organization; for real users, use Convex data
+  const organizations = useMemo(() => {
+    if (isDemoUser) {
+      return [DEMO_ORGANIZATION]
+    }
+    return userOrgs || []
+  }, [isDemoUser, userOrgs])
+  
+  // Demo users are never "loading" - they get instant mock data
+  const isLoading = isDemoUser ? false : userOrgs === undefined
 
   // Set default active org
   useEffect(() => {

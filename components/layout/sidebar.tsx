@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -118,11 +119,6 @@ export function Sidebar({ activeModule, onModuleChange, userRole }: SidebarProps
       {/* Navigation */}
       <ScrollArea className="flex-1 px-4">
         <nav className="space-y-1.5">
-import Link from "next/link"
-
-// ... imports
-
-// ... inside Sidebar component render loop
           {filteredMenuItems.map((item, index) => {
             const Icon = item.icon
             const isActive = activeModule === item.id
