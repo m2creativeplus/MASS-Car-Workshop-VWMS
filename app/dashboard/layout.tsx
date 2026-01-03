@@ -6,6 +6,7 @@ import { Sidebar } from "@/components/layout/sidebar"
 import { UserMenu } from "@/components/layout/user-menu"
 import { OrganizationProvider, useOrganization } from "@/components/providers/organization-provider"
 import { usePathname, useRouter } from "next/navigation"
+import { MobileNav } from "@/components/layout/mobile-nav"
 
 function DashboardLayoutContent({
   children,
@@ -83,9 +84,6 @@ function DashboardLayoutContent({
     )
   }
 
-import { MobileNav } from "@/components/layout/mobile-nav"
-
-// ... imports
 
   return (
     <div className="flex h-screen bg-background overflow-hidden font-sans antialiased text-foreground selection:bg-orange-500/30 selection:text-orange-900 dark:selection:text-orange-100">
