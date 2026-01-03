@@ -911,4 +911,32 @@ export default defineSchema({
   }).index("by_section", ["section"])
     .index("by_key", ["section", "key"])
     .index("by_org", ["orgId"]),
+
+  // ============ 30. SETTINGS (SaaS Configuration) ============
+  // Stores organization-specific settings for branding, SEO, integrations
+  settings: defineTable({
+    orgId: v.string(),
+    siteName: v.optional(v.string()), // "My Workshop"
+    timezone: v.optional(v.string()), // "Africa/Nairobi"
+    currency: v.optional(v.string()), // "USD", "SLSH"
+    
+    // Branding
+    logoUrl: v.optional(v.string()),
+    faviconUrl: v.optional(v.string()),
+    primaryColor: v.optional(v.string()), // "#00A65A"
+    secondaryColor: v.optional(v.string()),
+    
+    // SEO
+    seoTitle: v.optional(v.string()),
+    seoDescription: v.optional(v.string()),
+    seoKeywords: v.optional(v.string()),
+    
+    // Integrations
+    googleAnalyticsId: v.optional(v.string()),
+    facebookPixelId: v.optional(v.string()),
+    
+    // System
+    invoicePrefix: v.optional(v.string()), // "INV-"
+    jobPrefix: v.optional(v.string()), // "JOB-"
+  }).index("by_org", ["orgId"]),
 });
