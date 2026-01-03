@@ -141,13 +141,13 @@ interface WorkOrdersKanbanProps {
 export function WorkOrdersKanban({ orgId = "demo" }: WorkOrdersKanbanProps) {
   const isDemo = orgId.startsWith("demo-")
   
-  // Convex Hooks (conditionally used)
+  // Convex Hooks
   const convexWorkOrders = useQuery(api.functions.getWorkOrders, isDemo ? "skip" : { orgId })
   const createWorkOrder = useMutation(api.functions.createWorkOrder)
   const updateWorkOrderStatus = useMutation(api.functions.updateWorkOrderStatus)
   const deleteWorkOrder = useMutation(api.functions.deleteWorkOrder)
   
-  // Local State
+  // Local State (for Demo Mode)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [localWorkOrders, setLocalWorkOrders] = useState(mockWorkOrders)
@@ -163,18 +163,19 @@ export function WorkOrdersKanban({ orgId = "demo" }: WorkOrdersKanbanProps) {
   const [formData, setFormData] = useState(emptyForm)
   const [selectedServices, setSelectedServices] = useState<string[]>([])
 
-  // Derived State (Active Work Orders)
+  // Effective Work Orders (Merge Demo + Real)
   const activeWorkOrders = isDemo ? localWorkOrders : (convexWorkOrders || []).map((wo: any) => ({
     id: wo.jobNumber || wo._id,
     _id: wo._id,
     status: wo.status,
-    vehicle: { make: "Unknown", model: "Unknown", year: 0, plate: "Unknown" }, // Placeholder as backend data structure differs slightly
-    customer: { name: "Unknown", phone: "Unknown" }, // Placeholder
+    priority: wo.priority,
     checkinDate: wo.checkinDate,
     services: wo.services || [],
-    assignedTech: wo.technicianId || "Unassigned",
-    priority: wo.priority,
-    estimate: 0
+    assignedTech: wo.technicianId || "Unassigned", // TODO: Fetch User Name
+    // Placeholder data until joins are implemented
+    vehicle: { make: "Vehicle", model: "Info", year: 0, plate: "PLATE-123" }, 
+    customer: { name: "Customer", phone: "555-0123" },
+    estimate: wo.totalAmount || 0
   }))
 
   // NOTE: In a real implementation, we would need to join with Vehicle and Customer tables

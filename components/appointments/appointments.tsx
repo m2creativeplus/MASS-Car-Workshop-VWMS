@@ -385,6 +385,22 @@ export function Appointments({ orgId = "demo" }: AppointmentsProps) {
                         <Button size="sm" variant="outline">
                           Details
                         </Button>
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                          onClick={async () => {
+                            if (isDemo) {
+                              setLocalAppointments(localAppointments.filter(a => a.id !== appointment.id))
+                            } else {
+                              if ((appointment as any)._id) {
+                                await deleteAppointment({ id: (appointment as any)._id })
+                              }
+                            }
+                          }}
+                        >
+                          <XCircle className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
