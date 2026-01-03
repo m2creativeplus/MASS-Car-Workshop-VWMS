@@ -155,6 +155,13 @@ export const updateCustomer = mutation({
   },
 });
 
+export const deleteCustomer = mutation({
+  args: { id: v.id("customers") },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id);
+  },
+});
+
 // ============ VEHICLES ============
 export const getVehicles = query({
   args: { orgId: v.string() },
@@ -217,6 +224,13 @@ export const updateVehicle = mutation({
   handler: async (ctx, args) => {
     const { id, ...updates } = args;
     await ctx.db.patch(id, updates);
+  },
+});
+
+export const deleteVehicle = mutation({
+  args: { id: v.id("vehicles") },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id);
   },
 });
 
