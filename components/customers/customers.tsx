@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { DataTableExport } from "@/components/ui/data-table-export"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -247,6 +248,7 @@ export function Customers({ orgId }: { orgId: string }) {
         </h2>
         
         <div className="flex gap-2 w-full md:w-auto">
+          <DataTableExport data={filteredCustomers} filename="mass_customers" />
           <Button 
             className="bg-[#00A65A] hover:bg-[#008d4c] text-white"
             onClick={handleCreate}
@@ -371,7 +373,7 @@ export function Customers({ orgId }: { orgId: string }) {
         {/* Pagination Footer */}
         <div className="bg-slate-50 dark:bg-slate-800 px-4 py-3 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center sm:px-6">
            <div className="text-xs text-slate-500">
-             Showing 1 to {filteredCustomers.length} of {customers.length} entries
+             Showing 1 to {filteredCustomers.length} of {activeCustomers.length} entries
            </div>
            <div className="flex gap-1">
              <Button variant="outline" size="sm" className="h-7 text-xs" disabled>Previous</Button>

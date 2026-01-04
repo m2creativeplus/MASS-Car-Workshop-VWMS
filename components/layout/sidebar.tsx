@@ -67,6 +67,7 @@ const menuItems = [
   { id: "estimates", label: "Estimates & Invoices", icon: FileText, roles: ["admin", "staff", "technician"] },
   { id: "reports", label: "Reports", icon: BarChart3, roles: ["admin", "staff"] },
   { id: "ai-tools", label: "AI Assistant", icon: Bot, roles: ["admin", "staff", "technician"] },
+  { id: "knowledge-base", label: "Knowledge Base", icon: BookOpen, roles: ["admin", "staff", "technician", "customer"] },
   { id: "contact", label: "Contact", icon: Phone, roles: ["admin", "staff"] },
   { id: "settings", label: "Settings", icon: Settings, roles: ["admin"] },
 ]
@@ -99,12 +100,12 @@ export function Sidebar({ activeModule, onModuleChange, userRole, className }: S
       {/* Header */}
       <div className="flex items-center p-6 mb-2">
         <div className={cn("flex items-center gap-3 transition-opacity duration-200", isCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 flex-1")}>
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
-            <Car className="h-6 w-6 text-white" />
+          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+            <Car className="h-6 w-6 text-primary-foreground" />
           </div>
           <div className="flex flex-col">
             <span className="font-bold text-lg text-white tracking-tight">MASS</span>
-            <span className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">Automotive</span>
+            <span className="text-[10px] uppercase font-semibold text-sidebar-foreground/60 tracking-wider font-mono">Workshop</span>
           </div>
         </div>
         
@@ -143,7 +144,7 @@ export function Sidebar({ activeModule, onModuleChange, userRole, className }: S
                 )}>
                   <div className={cn(
                     "flex items-center justify-center shrink-0",
-                    isActive ? "text-orange-500" : "text-slate-400 group-hover:text-white"
+                    isActive ? "text-primary" : "text-sidebar-foreground group-hover:text-white"
                   )}>
                     <Icon className="h-5 w-5" />
                   </div>
@@ -165,7 +166,7 @@ export function Sidebar({ activeModule, onModuleChange, userRole, className }: S
                 
                 {/* Active Indicator for Collapsed Mode */}
                 {isCollapsed && isActive && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-orange-500 rounded-r-full" />
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-r-full" />
                 )}
               </Link>
             )
@@ -192,8 +193,8 @@ export function Sidebar({ activeModule, onModuleChange, userRole, className }: S
           isCollapsed ? "items-center justify-center flex" : ""
         )}>
           <div className="flex items-center gap-3">
-             <Avatar className="h-9 w-9 border-2 border-orange-500/20">
-              <AvatarFallback className="bg-orange-500 text-white font-bold">
+             <Avatar className="h-9 w-9 border-2 border-primary/20">
+              <AvatarFallback className="bg-primary text-primary-foreground font-bold">
                 {user?.role?.charAt(0).toUpperCase() || "A"}
               </AvatarFallback>
             </Avatar>

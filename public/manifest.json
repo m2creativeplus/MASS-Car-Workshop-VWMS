@@ -4,8 +4,8 @@
   "description": "Vehicle Workshop Management System for Somaliland",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#f97316",
+  "background_color": "#1E1205",
+  "theme_color": "#B68A35",
   "orientation": "portrait-primary",
   "icons": [
     {

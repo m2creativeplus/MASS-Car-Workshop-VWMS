@@ -1,5 +1,6 @@
 import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { requirePermission } from "./permissions";
 
 // ============================================================
 // MASS Car Workshop - Convex Functions
@@ -93,6 +94,48 @@ export const getUserOrgs = query({
   },
 });
 
+export const getCurrentUserRole = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", identity.email!))
+      .first();
+
+    if (!user) return null;
+
+    // Get role from userOrgRoles
+    // Assuming single org context for now, or picking the first valid one
+    const userRole = await ctx.db
+      .query("userOrgRoles")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .first();
+
+    if (!userRole) return null;
+
+    // If custom role, fetch definition permissions
+    let permissions: string[] | undefined = userRole.permissions;
+    
+    if (userRole.role === "custom" && userRole.customRoleId) {
+      const customRole = await ctx.db.get(userRole.customRoleId);
+      if (customRole) {
+        // Merge or replace? For now, let's use custom role permissions
+        permissions = customRole.permissions;
+      }
+    }
+
+    return {
+      role: userRole.role,
+      permissions: permissions,
+      userId: user._id,
+      orgId: userRole.orgId
+    };
+  },
+});
+
 // ============ CUSTOMERS ============
 export const getCustomers = query({
   args: { orgId: v.string() },
@@ -111,6 +154,8 @@ export const getCustomerById = query({
   },
 });
 
+// ... (existing code)
+
 export const addCustomer = mutation({
   args: {
     firstName: v.string(),
@@ -120,10 +165,12 @@ export const addCustomer = mutation({
     address: v.optional(v.string()),
     city: v.optional(v.string()),
     country: v.optional(v.string()),
-    country: v.optional(v.string()),
     orgId: v.string(),
   },
   handler: async (ctx, args) => {
+    // 🔒 RBAC Check
+    await requirePermission(ctx, "customers.manage");
+
     const count = await ctx.db
       .query("customers")
       .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
@@ -150,6 +197,9 @@ export const updateCustomer = mutation({
     isActive: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
+    // 🔒 RBAC Check
+    await requirePermission(ctx, "customers.manage");
+
     const { id, ...updates } = args;
     await ctx.db.patch(id, updates);
   },
@@ -158,6 +208,8 @@ export const updateCustomer = mutation({
 export const deleteCustomer = mutation({
   args: { id: v.id("customers") },
   handler: async (ctx, args) => {
+    // 🔒 RBAC Check
+    await requirePermission(ctx, "customers.manage");
     await ctx.db.delete(args.id);
   },
 });
@@ -202,6 +254,8 @@ export const addVehicle = mutation({
     orgId: v.string(),
   },
   handler: async (ctx, args) => {
+    // 🔒 RBAC Check
+    await requirePermission(ctx, "customers.manage");
     return await ctx.db.insert("vehicles", args);
   },
 });
@@ -318,6 +372,9 @@ export const addInventoryItem = mutation({
     orgId: v.string(),
   },
   handler: async (ctx, args) => {
+    // 🔒 RBAC Check
+    await requirePermission(ctx, "inventory.manage");
+
     return await ctx.db.insert("inventory", {
       ...args,
       isActive: true,
@@ -474,6 +531,9 @@ export const createWorkOrder = mutation({
     orgId: v.string(),
   },
   handler: async (ctx, args) => {
+    // 🔒 RBAC Check
+    await requirePermission(ctx, "work_orders.create");
+
     const count = await ctx.db
       .query("workOrders")
       .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
@@ -622,6 +682,9 @@ export const createEstimate = mutation({
     orgId: v.string(),
   },
   handler: async (ctx, args) => {
+    // 🔒 RBAC Check
+    await requirePermission(ctx, "estimates.create");
+
     const count = await ctx.db
       .query("estimates")
       .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
@@ -774,6 +837,154 @@ export const createReminder = mutation({
       ...args,
       status: "pending",
     });
+  },
+});
+
+// ============ MARKETING / CRM ============
+export const getCampaigns = query({
+  args: { orgId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("campaigns")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .collect();
+  },
+});
+
+export const createCampaign = mutation({
+  args: {
+    name: v.string(),
+    type: v.union(v.literal("email"), v.literal("sms")),
+    targetAudience: v.union(
+      v.literal("all_customers"),
+      v.literal("overdue_service"),
+      v.literal("returning_customers"),
+      v.literal("inactive_customers")
+    ),
+    subject: v.optional(v.string()),
+    message: v.string(),
+    scheduledDate: v.optional(v.string()), // If null, send immediately
+    orgId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // 🔒 RBAC Check
+    await requirePermission(ctx, "customers.manage"); // Repurpose for marketing for now
+
+    return await ctx.db.insert("campaigns", {
+      ...args,
+      status: args.scheduledDate ? "scheduled" : "draft", // Default to draft/scheduled
+      sentCount: 0,
+      openRate: 0,
+    });
+  },
+});
+
+// ============ TIME TRACKING & EFFICIENCY ============
+export const clockIn = mutation({
+  args: {
+    workOrderId: v.id("workOrders"),
+    serviceId: v.optional(v.string()),
+    orgId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+    
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", identity.email!))
+      .first();
+    if (!user) throw new Error("User not found");
+
+    // Check if already clocked in
+    const activeEntry = await ctx.db
+      .query("timeEntries")
+      .withIndex("by_tech", (q) => q.eq("technicianId", user._id))
+      .filter((q) => q.eq(q.field("endTime"), undefined))
+      .first();
+      
+    if (activeEntry) throw new Error("Already clocked in to a job");
+
+    return await ctx.db.insert("timeEntries", {
+      technicianId: user._id,
+      workOrderId: args.workOrderId,
+      serviceId: args.serviceId,
+      startTime: new Date().toISOString(),
+      orgId: args.orgId,
+    });
+  },
+});
+
+export const clockOut = mutation({
+  args: {
+    timeEntryId: v.id("timeEntries"),
+    billableHours: v.optional(v.number()), // e.g., 1.5 hours booked
+  },
+  handler: async (ctx, args) => {
+    const entry = await ctx.db.get(args.timeEntryId);
+    if (!entry) throw new Error("Entry not found");
+    
+    const endTime = new Date().toISOString();
+    const startTime = new Date(entry.startTime);
+    const end = new Date(endTime);
+    const durationMinutes = Math.round((end.getTime() - startTime.getTime()) / 60000);
+    
+    // Calculate efficiency if billable provided
+    // Efficiency = Billable Hours / Actual Hours
+    // e.g. Booked 2.0 hrs (120 min) / Took 60 min = 200% efficiency
+    let efficiencyRatio;
+    if (args.billableHours) {
+        const actualHours = durationMinutes / 60;
+        efficiencyRatio = actualHours > 0 ? (args.billableHours / actualHours) * 100 : 0;
+    }
+
+    await ctx.db.patch(args.timeEntryId, {
+      endTime,
+      durationMinutes,
+      billableHours: args.billableHours,
+      efficiencyRatio: efficiencyRatio ? Math.round(efficiencyRatio) : undefined,
+    });
+  },
+});
+
+export const getTechnicianPerformance = query({
+  args: { orgId: v.string() },
+  handler: async (ctx, args) => {
+    const entries = await ctx.db
+      .query("timeEntries")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .collect();
+      
+    // Group by technician
+    const techStats: Record<string, any> = {};
+    
+    for (const entry of entries) {
+        if (!entry.endTime || !entry.technicianId) continue;
+        
+        if (!techStats[entry.technicianId]) {
+            const tech = await ctx.db.get(entry.technicianId);
+            techStats[entry.technicianId] = {
+                name: tech ? `${tech.firstName} ${tech.lastName}` : "Unknown",
+                totalJobs: 0,
+                totalActualHours: 0,
+                totalBillableHours: 0,
+                avgEfficiency: 0
+            };
+        }
+        
+        const stats = techStats[entry.technicianId];
+        stats.totalJobs++;
+        stats.totalActualHours += (entry.durationMinutes || 0) / 60;
+        stats.totalBillableHours += entry.billableHours || 0;
+    }
+    
+    // Calculate averages
+    return Object.values(techStats).map((stat: any) => ({
+        ...stat,
+        avgEfficiency: stat.totalActualHours > 0 
+            ? Math.round((stat.totalBillableHours / stat.totalActualHours) * 100) 
+            : 0
+    }));
   },
 });
 
@@ -1371,57 +1582,8 @@ export const createServicePackage = mutation({
   },
 });
 
-// --- TIME ENTRIES (Technician Clock-in/out) ---
-export const getTechnicianTimes = query({
-  args: { technicianId: v.id("users") },
-  handler: async (ctx, args) => {
-    return await ctx.db
-      .query("timeEntries")
-      .withIndex("by_tech", (q) => q.eq("technicianId", args.technicianId))
-      .collect();
-  },
-});
-
-export const clockIn = mutation({
-  args: {
-    technicianId: v.id("users"),
-    workOrderId: v.id("workOrders"),
-    serviceId: v.optional(v.string()), // e.g. "Oil Change" line item ID
-    notes: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    // Check if already clocked in? Implementation simplified for now.
-    return await ctx.db.insert("timeEntries", {
-      ...args,
-      startTime: new Date().toISOString(),
-    });
-  },
-});
-
-export const clockOut = mutation({
-  args: {
-    entryId: v.id("timeEntries"),
-    notes: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const entry = await ctx.db.get(args.entryId);
-    if (!entry) throw new Error("Time entry not found");
-    if (entry.endTime) throw new Error("Already clocked out");
-
-    const endTime = new Date().toISOString();
-    const start = new Date(entry.startTime).getTime();
-    const end = new Date(endTime).getTime();
-    const durationMinutes = Math.round((end - start) / 1000 / 60);
-
-    await ctx.db.patch(args.entryId, {
-      endTime,
-      durationMinutes,
-      notes: args.notes ? (entry.notes ? entry.notes + "\n" + args.notes : args.notes) : entry.notes,
-    });
-
-    return durationMinutes;
-  },
-});
+// --- TIME ENTRIES (Older version removed - replaced by Efficiency module) ---
+// See getTechnicianPerformance, clockIn, clockOut above
 
 // ============ INSPECTION TEMPLATES (Tekmetric-style DVI) ============
 export const getInspectionTemplates = query({
@@ -1839,5 +2001,114 @@ export const updateOrgSettings = mutation({
         ...updates
       });
     }
+  },
+});
+
+// ============ SEEDING ============
+export const seedDemoUsers = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const demoUsers = [
+      {
+        email: "admin@masscar.com",
+        firstName: "Admin",
+        lastName: "User",
+        role: "admin",
+      },
+      {
+        email: "staff@masscar.com",
+        firstName: "Staff",
+        lastName: "Member",
+        role: "staff",
+      },
+      {
+        email: "tech@masscar.com",
+        firstName: "Tech",
+        lastName: "Worker",
+        role: "technician",
+      },
+      {
+        email: "customer@masscar.com",
+        firstName: "Customer",
+        lastName: "User",
+        role: "customer",
+      },
+      {
+        email: "owner@masscar.com",
+        firstName: "Owner",
+        lastName: "Executive",
+        role: "admin",
+      }
+    ];
+
+    // 1. Create Organization if it doesn't exist
+    let orgId;
+    const existingOrg = await ctx.db
+      .query("organizations")
+      .withIndex("by_slug", (q) => q.eq("slug", "mass-hargeisa"))
+      .first();
+
+    if (existingOrg) {
+      orgId = existingOrg._id;
+    }
+
+    const createdUserIds: Record<string, any> = {};
+
+    for (const u of demoUsers) {
+      const existingUser = await ctx.db
+        .query("users")
+        .withIndex("by_email", (q) => q.eq("email", u.email))
+        .first();
+
+      if (!existingUser) {
+        const newUserId = await ctx.db.insert("users", {
+          email: u.email,
+          firstName: u.firstName,
+          lastName: u.lastName,
+          role: u.role as any,
+          isActive: true,
+        });
+        createdUserIds[u.email] = newUserId;
+        console.log(`Created user: ${u.email}`);
+      } else {
+        createdUserIds[u.email] = existingUser._id;
+        console.log(`User already exists: ${u.email}`);
+      }
+    }
+
+    // Now ensuring Org Exists
+    if (!existingOrg) {
+      const ownerId = createdUserIds["owner@masscar.com"];
+        if (ownerId) {
+            orgId = await ctx.db.insert("organizations", {
+                name: "MASS Car Workshop",
+                slug: "mass-hargeisa",
+                ownerId: ownerId,
+                plan: "enterprise",
+                isActive: true,
+            });
+            console.log("Created Organization: MASS Car Workshop");
+        } else {
+            console.error("Could not create org, owner not found");
+        }
+    } else {
+         // handle case where org exists but orgId variable wasn't set (though logic above handles it)
+         if (!orgId) orgId = existingOrg?._id;
+    }
+    
+    // Assign Users to permissions if org exists
+    if (orgId) {
+        // Ensure UserOrgRoles
+        const ownerId = createdUserIds["owner@masscar.com"];
+        if (ownerId && !(await ctx.db.query("userOrgRoles").withIndex("by_user_org", q => q.eq("userId", ownerId).eq("orgId", orgId!)).first())) {
+             await ctx.db.insert("userOrgRoles", { userId: ownerId, orgId: orgId, role: "admin", isActive: true });
+        }
+         const adminId = createdUserIds["admin@masscar.com"];
+        if (adminId && !(await ctx.db.query("userOrgRoles").withIndex("by_user_org", q => q.eq("userId", adminId).eq("orgId", orgId!)).first())) {
+             await ctx.db.insert("userOrgRoles", { userId: adminId, orgId: orgId, role: "admin", isActive: true });
+        }
+    }
+
+    return "Seeding Completed";
   },
 });

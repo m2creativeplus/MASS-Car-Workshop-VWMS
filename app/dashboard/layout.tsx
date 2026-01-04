@@ -54,6 +54,7 @@ function DashboardLayoutContent({
       "inspection-templates": "DVI Templates",
       "declined-jobs": "Declined Jobs Tracker",
       "catalog": "Parts Catalog",
+      "knowledge-base": "Knowledge Base",
       "contact": "Contact Support"
     }
     // Handle dynamic ID matching if needed, for now exact match

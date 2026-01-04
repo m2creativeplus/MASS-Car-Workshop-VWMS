@@ -4,6 +4,12 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { 
   Plus, 
   Eye,
@@ -65,8 +71,12 @@ const mockDeliveries: Delivery[] = [
 export function DeliveryModule() {
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [deliveries, setDeliveries] = useState<Delivery[]>(mockDeliveries)
+  const [isScheduleOpen, setIsScheduleOpen] = useState(false)
+  const [isViewOpen, setIsViewOpen] = useState(false)
+  const [selectedDelivery, setSelectedDelivery] = useState<Delivery | null>(null)
 
-  const filteredDeliveries = mockDeliveries.filter(delivery => {
+  const filteredDeliveries = deliveries.filter(delivery => {
     const matchesSearch = 
       delivery.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
       delivery.customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -76,6 +86,23 @@ export function DeliveryModule() {
     
     return matchesSearch && matchesStatus
   })
+
+  const handleMarkDelivered = (id: string) => {
+    setDeliveries(prev => prev.map(d => 
+      d.id === id ? { ...d, status: "delivered" as const } : d
+    ))
+  }
+
+  const handleDelete = (id: string) => {
+    if (confirm("Are you sure you want to cancel this delivery?")) {
+      setDeliveries(prev => prev.filter(d => d.id !== id))
+    }
+  }
+
+  const handleView = (delivery: Delivery) => {
+    setSelectedDelivery(delivery)
+    setIsViewOpen(true)
+  }
 
   const getStatusBadge = (status: Delivery["status"]) => {
     switch (status) {
@@ -100,12 +127,16 @@ export function DeliveryModule() {
         </h2>
         
         <div className="flex gap-2 w-full md:w-auto">
-          <Button className="bg-[#00A65A] hover:bg-[#008d4c] text-white">
+          <Button 
+            className="bg-[#00A65A] hover:bg-[#008d4c] text-white"
+            onClick={() => setIsScheduleOpen(true)}
+          >
             <Plus className="h-4 w-4 mr-2" />
             Schedule Delivery
           </Button>
         </div>
       </div>
+
 
       {/* Status Tabs */}
       <div className="flex gap-2 mb-4 flex-wrap">
@@ -246,23 +277,43 @@ export function DeliveryModule() {
                   <div className="flex justify-center gap-1">
                     {/* Green: Mark Delivered */}
                     {delivery.status !== "delivered" && (
-                      <Button size="icon" className="h-7 w-7 bg-[#00A65A] hover:bg-[#008d4c] text-white rounded shadow-sm">
+                      <Button 
+                        size="icon" 
+                        className="h-7 w-7 bg-[#00A65A] hover:bg-[#008d4c] text-white rounded shadow-sm"
+                        onClick={() => handleMarkDelivered(delivery.id)}
+                        title="Mark as Delivered"
+                      >
                         <CheckCircle2 className="h-3 w-3" />
                       </Button>
                     )}
                     
                     {/* Yellow: View */}
-                    <Button size="icon" className="h-7 w-7 bg-[#f39c12] hover:bg-[#d58512] text-white rounded shadow-sm">
+                    <Button 
+                      size="icon" 
+                      className="h-7 w-7 bg-[#f39c12] hover:bg-[#d58512] text-white rounded shadow-sm"
+                      onClick={() => handleView(delivery)}
+                      title="View Details"
+                    >
                       <Eye className="h-3 w-3" />
                     </Button>
 
                     {/* Light Blue: Edit */}
-                    <Button size="icon" className="h-7 w-7 bg-[#3c8dbc] hover:bg-[#367fa9] text-white rounded shadow-sm">
+                    <Button 
+                      size="icon" 
+                      className="h-7 w-7 bg-[#3c8dbc] hover:bg-[#367fa9] text-white rounded shadow-sm"
+                      onClick={() => handleView(delivery)}
+                      title="Edit Delivery"
+                    >
                       <Pencil className="h-3 w-3" />
                     </Button>
 
                     {/* Red: Cancel/Delete */}
-                    <Button size="icon" className="h-7 w-7 bg-[#dd4b39] hover:bg-[#d73925] text-white rounded shadow-sm">
+                    <Button 
+                      size="icon" 
+                      className="h-7 w-7 bg-[#dd4b39] hover:bg-[#d73925] text-white rounded shadow-sm"
+                      onClick={() => handleDelete(delivery.id)}
+                      title="Cancel Delivery"
+                    >
                       <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
@@ -284,6 +335,82 @@ export function DeliveryModule() {
            </div>
         </div>
       </div>
+
+      {/* View Details Dialog */}
+      <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delivery Details</DialogTitle>
+          </DialogHeader>
+          {selectedDelivery && (
+            <div className="space-y-4 pt-4">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-lg">{selectedDelivery.id}</span>
+                {getStatusBadge(selectedDelivery.status)}
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Car className="h-4 w-4 text-slate-400" />
+                  <span>{selectedDelivery.vehicle.year} {selectedDelivery.vehicle.make} {selectedDelivery.vehicle.model}</span>
+                </div>
+                <div className="text-sm text-orange-600 font-mono">{selectedDelivery.vehicle.plate}</div>
+              </div>
+              <div className="border-t pt-4 space-y-2">
+                <div className="font-medium">{selectedDelivery.customer.name}</div>
+                <div className="flex items-center gap-2 text-sm text-slate-500">
+                  <Phone className="h-3 w-3" />
+                  {selectedDelivery.customer.phone}
+                </div>
+                <div className="flex items-center gap-2 text-sm text-slate-500">
+                  <MapPin className="h-3 w-3" />
+                  {selectedDelivery.customer.address}
+                </div>
+              </div>
+              <div className="border-t pt-4 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-slate-400" />
+                  <span>{new Date(selectedDelivery.scheduledDate).toLocaleDateString()} at {selectedDelivery.scheduledTime}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Truck className="h-4 w-4 text-slate-400" />
+                  <span>Driver: {selectedDelivery.driver}</span>
+                </div>
+              </div>
+              {selectedDelivery.status !== "delivered" && (
+                <Button 
+                  className="w-full bg-[#00A65A] hover:bg-[#008d4c] text-white"
+                  onClick={() => {
+                    handleMarkDelivered(selectedDelivery.id)
+                    setIsViewOpen(false)
+                  }}
+                >
+                  <CheckCircle2 className="h-4 w-4 mr-2" />
+                  Mark as Delivered
+                </Button>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Schedule Delivery Dialog */}
+      <Dialog open={isScheduleOpen} onOpenChange={setIsScheduleOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Schedule New Delivery</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="text-center py-8 text-slate-500">
+              <Truck className="h-12 w-12 mx-auto mb-4 opacity-30" />
+              <p>Delivery scheduling is integrated with completed work orders.</p>
+              <p className="text-sm mt-2">Go to Work Orders → Mark Complete → Schedule Delivery</p>
+            </div>
+            <Button variant="outline" className="w-full" onClick={() => setIsScheduleOpen(false)}>
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
