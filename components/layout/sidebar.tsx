@@ -32,6 +32,9 @@ import {
   BookOpen,
   CarFront,
   Network,
+  MapPin,
+  Users2,
+  ClipboardPen,
 } from "lucide-react"
 import { useConvexAuth } from "@/components/auth/convex-auth-provider"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -51,6 +54,7 @@ const menuItems = [
   { id: "vehicles", label: "Vehicles", icon: Car, roles: ["admin", "staff", "technician", "customer"] },
   { id: "appointments", label: "Appointments", icon: Calendar, roles: ["admin", "staff", "technician", "customer"] },
   { id: "car-request", label: "Car Request", icon: CarFront, roles: ["admin", "staff", "customer"] },
+  { id: "check-in", label: "Check-In", icon: ClipboardPen, roles: ["admin", "staff", "technician"] },
   { id: "inventory", label: "Parts Stock", icon: Package, roles: ["admin", "staff"] },
   { id: "pos", label: "Part Sells", icon: ShoppingCart, roles: ["admin", "staff"] },
   { id: "canned-jobs", label: "Canned Jobs", icon: ClipboardList, roles: ["admin", "staff"] },
@@ -69,6 +73,8 @@ const menuItems = [
   { id: "ai-tools", label: "AI Assistant", icon: Bot, roles: ["admin", "staff", "technician"] },
   { id: "knowledge-base", label: "Knowledge Base", icon: BookOpen, roles: ["admin", "staff", "technician", "customer"] },
   { id: "contact", label: "Contact", icon: Phone, roles: ["admin", "staff"] },
+  { id: "locations", label: "Locations", icon: MapPin, roles: ["admin"] },
+  { id: "affiliates", label: "Affiliates", icon: Users2, roles: ["admin"] },
   { id: "settings", label: "Settings", icon: Settings, roles: ["admin"] },
 ]
 

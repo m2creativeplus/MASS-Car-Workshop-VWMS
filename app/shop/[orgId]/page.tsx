@@ -1,14 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
-import { useParams } from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { ShoppingCart, Search, Filter, CheckCircle, Car } from "lucide-react"
+import { ShoppingCart, Search, Filter, CheckCircle, Car, Gift } from "lucide-react"
 import {
   Sheet,
   SheetContent,
@@ -21,10 +21,12 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
+import { YMMFilter } from "@/components/shop/ymm-filter"
+import { captureReferralCode, getReferralCode, getReferralData } from "@/lib/affiliate-tracking"
 
 export default function PublicStorePage() {
   const params = useParams()
-  // In a real app we'd resolve orgId from slug, here we assume ID passed directly or handle mapping
+  const searchParams = useSearchParams()
   const orgId = params.orgId as string 
   
   const inventory = useQuery(api.store.getPublicInventory, { orgId })
@@ -35,6 +37,21 @@ export default function PublicStorePage() {
   const [cart, setCart] = useState<{item: any, quantity: number}[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [ymmFilter, setYMMFilter] = useState<{ year?: number; make?: string; model?: string } | null>(null)
+  const [referralCode, setReferralCode] = useState<string | null>(null)
+  
+  // Capture referral code from URL on mount
+  useEffect(() => {
+    const ref = searchParams.get("ref")
+    if (ref) {
+      captureReferralCode(ref)
+      setReferralCode(ref)
+      toast({ title: "Referral Applied!", description: `Code: ${ref}` })
+    } else {
+      // Check if we have an existing referral
+      setReferralCode(getReferralCode())
+    }
+  }, [searchParams, toast])
   
   // Checkout Form
   const [checkoutData, setCheckoutData] = useState({
@@ -44,11 +61,22 @@ export default function PublicStorePage() {
     paymentMethod: "zaad"
   })
 
-  // Filter items
-  const filteredItems = inventory?.filter((item: any) => 
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    item.partNumber.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || []
+  // Handle YMM filter changes
+  const handleYMMFilterChange = useCallback((filter: { year?: number; make?: string; model?: string } | null) => {
+    setYMMFilter(filter)
+  }, [])
+
+  // Filter items by search AND YMM
+  const filteredItems = inventory?.filter((item: any) => {
+    const matchesSearch = 
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      item.partNumber.toLowerCase().includes(searchQuery.toLowerCase())
+    
+    // YMM filtering would check vehicleCompatibility field when implemented
+    // For now, just filter by search
+    return matchesSearch
+  }) || []
+
 
   // Cart Logic
   const addToCart = (item: any) => {
@@ -262,6 +290,23 @@ export default function PublicStorePage() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        {/* Referral Banner */}
+        {referralCode && (
+          <div className="bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-lg p-4 mb-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Gift className="h-6 w-6" />
+              <div>
+                <p className="font-semibold">Referral Active!</p>
+                <p className="text-sm opacity-90">Code: {referralCode} • Your referrer will earn commission on your order</p>
+              </div>
+            </div>
+            <Badge className="bg-white/20 text-white border-white/30">Partner Discount</Badge>
+          </div>
+        )}
+
+        {/* YMM Filter */}
+        <YMMFilter onFilterChange={handleYMMFilterChange} className="mb-6" />
+
         {/* Search & Filter */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="relative flex-1">
@@ -272,13 +317,6 @@ export default function PublicStorePage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-          </div>
-          <div className="w-full md:w-64">
-             {/* Year Make Model Selector Placeholder */}
-             <Button variant="outline" className="w-full justify-between">
-                <span>All Categories</span>
-                <Filter className="h-4 w-4 opacity-50" />
-             </Button>
           </div>
         </div>
 
