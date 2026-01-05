@@ -94,7 +94,11 @@ const jobStatuses = [
   { id: 'invoiced', label: 'Invoiced', count: 2, color: 'bg-purple-500', icon: DollarSign },
 ]
 
-export function Dashboard() {
+interface DashboardProps {
+  orgId?: string
+}
+
+export function Dashboard({ orgId }: DashboardProps) {
   const [timeRange, setTimeRange] = useState("year")
   const { user } = useConvexAuth()
   const isOwner = user?.email === "owner@masscar.com"
