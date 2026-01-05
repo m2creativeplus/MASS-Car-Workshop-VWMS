@@ -35,6 +35,7 @@ import {
   MapPin,
   Users2,
   ClipboardPen,
+  Globe,
 } from "lucide-react"
 import { useConvexAuth } from "@/components/auth/convex-auth-provider"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -75,6 +76,7 @@ const menuItems = [
   { id: "contact", label: "Contact", icon: Phone, roles: ["admin", "staff"] },
   { id: "locations", label: "Locations", icon: MapPin, roles: ["admin"] },
   { id: "affiliates", label: "Affiliates", icon: Users2, roles: ["admin"] },
+  { id: "japan-imports", label: "Japan Imports", icon: Globe, roles: ["admin", "staff"] },
   { id: "settings", label: "Settings", icon: Settings, roles: ["admin"] },
 ]
 

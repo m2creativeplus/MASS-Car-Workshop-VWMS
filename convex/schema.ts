@@ -1328,6 +1328,39 @@ export default defineSchema({
     createdAt: v.string(),
   }).index("by_org", ["orgId"])
     .index("by_status", ["status"]),
+    
+  // ============ 30. IMPORT REQUESTS (BE FORWARD) ============
+  importRequests: defineTable({
+    make: v.string(),
+    model: v.string(),
+    yearRange: v.optional(v.string()),
+    budget: v.optional(v.number()),
+    requirements: v.optional(v.string()),
+    customerName: v.optional(v.string()),
+    customerPhone: v.string(),
+    customerEmail: v.optional(v.string()),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("searching"),
+      v.literal("found"),
+      v.literal("ordered"),
+      v.literal("delivered"),
+      v.literal("cancelled")
+    ),
+    notes: v.optional(v.string()),
+    orgId: v.string(),
+  }).index("by_status", ["status"])
+    .index("by_org", ["orgId"]),
+
+  // ============ 31. BE FORWARD ANALYTICS ============
+  beforwardClicks: defineTable({
+    type: v.union(v.literal("vehicle"), v.literal("part")),
+    itemId: v.optional(v.string()), // ID on BE FORWARD
+    searchTerm: v.optional(v.string()),
+    userId: v.optional(v.id("users")),
+    clickedAt: v.string(),
+    orgId: v.string(),
+  }).index("by_org", ["orgId"]),
 
 });
 

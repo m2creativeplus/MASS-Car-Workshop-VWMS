@@ -10,7 +10,14 @@ import {
   Settings,
   ShoppingCart,
   ArrowRight,
-  MoreHorizontal
+  MoreHorizontal,
+  DollarSign, 
+  TrendingUp, 
+  CreditCard,
+  ClipboardList,
+  CheckCircle,
+  Clock,
+  AlertCircle
 } from "lucide-react"
 import { useState } from "react"
 import { dashboardStats } from "@/lib/data"
@@ -27,6 +34,7 @@ import {
   Cell
 } from 'recharts'
 import { StatCard } from "@/components/dashboard/stat-card"
+import { useConvexAuth } from "@/components/auth/convex-auth-provider"
 
 const repairData = [
   { name: 'Jan', repairs: 1 },
@@ -77,8 +85,14 @@ const cardVariants = {
   }
 }
 
-import { useConvexAuth } from "@/components/auth/convex-auth-provider"
-import { DollarSign, TrendingUp, CreditCard } from "lucide-react"
+// Job Workflow Status Data
+const jobStatuses = [
+  { id: 'estimates', label: 'Estimates', count: 8, color: 'bg-blue-500', icon: ClipboardList },
+  { id: 'dropped-off', label: 'Dropped Off', count: 3, color: 'bg-indigo-500', icon: Car },
+  { id: 'in-progress', label: 'In Progress', count: 5, color: 'bg-amber-500', icon: Wrench },
+  { id: 'completed', label: 'Completed', count: 4, color: 'bg-green-500', icon: CheckCircle },
+  { id: 'invoiced', label: 'Invoiced', count: 2, color: 'bg-purple-500', icon: DollarSign },
+]
 
 export function Dashboard() {
   const [timeRange, setTimeRange] = useState("year")
@@ -106,6 +120,97 @@ export function Dashboard() {
           </span>
         </div>
       </motion.div>
+
+      {/* NEW: Shop Pulse (Tekmetric Style Header KPIs) */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6"
+      >
+        <Card className="border-l-4 border-l-blue-500 shadow-sm">
+          <CardContent className="p-4">
+            <p className="text-xs text-muted-foreground font-semibold uppercase">Car Count</p>
+            <div className="flex items-end justify-between mt-1">
+              <h3 className="text-2xl font-bold">12</h3>
+              <span className="text-xs text-green-600 flex items-center bg-green-50 px-1 py-0.5 rounded">
+                <TrendingUp className="w-3 h-3 mr-1" /> +2
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-l-4 border-l-purple-500 shadow-sm">
+          <CardContent className="p-4">
+            <p className="text-xs text-muted-foreground font-semibold uppercase">ARO</p>
+            <div className="flex items-end justify-between mt-1">
+              <h3 className="text-2xl font-bold">$654</h3>
+              <span className="text-xs text-red-600 flex items-center bg-red-50 px-1 py-0.5 rounded">
+                <TrendingUp className="w-3 h-3 mr-1" /> -5%
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-green-500 shadow-sm">
+          <CardContent className="p-4">
+            <p className="text-xs text-muted-foreground font-semibold uppercase">Gross Sales</p>
+            <div className="flex items-end justify-between mt-1">
+              <h3 className="text-2xl font-bold">$8,450</h3>
+              <span className="text-xs text-green-600 flex items-center bg-green-50 px-1 py-0.5 rounded">
+                <TrendingUp className="w-3 h-3 mr-1" /> +12%
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-amber-500 shadow-sm">
+          <CardContent className="p-4">
+            <p className="text-xs text-muted-foreground font-semibold uppercase">Labor Sales</p>
+            <div className="flex items-end justify-between mt-1">
+              <h3 className="text-2xl font-bold">$4,100</h3>
+              <span className="text-xs text-muted-foreground">48% of total</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-indigo-500 shadow-sm">
+          <CardContent className="p-4">
+            <p className="text-xs text-muted-foreground font-semibold uppercase">Parts Sales</p>
+            <div className="flex items-end justify-between mt-1">
+              <h3 className="text-2xl font-bold">$3,200</h3>
+              <span className="text-xs text-muted-foreground">38% of total</span>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* NEW: Job Status Board (Tekmetric Style) */}
+      <div className="mb-6">
+        <h3 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wider">Active Job Workflow</h3>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          {jobStatuses.map((status, i) => (
+            <motion.div
+              key={status.id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.05 }}
+            >
+              <Card className="hover:shadow-md transition-shadow cursor-pointer overflow-hidden relative">
+                <div className={`absolute top-0 left-0 w-1 h-full ${status.color}`} />
+                <CardContent className="p-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-muted-foreground font-medium">{status.label}</p>
+                    <h3 className="text-2xl font-bold mt-1">{status.count}</h3>
+                  </div>
+                  <div className={`h-8 w-8 rounded-full ${status.color.replace('bg-', 'bg-opacity-10 bg-')} flex items-center justify-center`}>
+                    <status.icon className={`h-4 w-4 ${status.color.replace('bg-', 'text-')}`} />
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+      </div>
 
       {/* OWNER ONLY: Financial Overview */}
       {isOwner && (
@@ -160,8 +265,6 @@ export function Dashboard() {
           </Card>
         </motion.div>
       )}
-
- 
 
       {/* 2. Info Cards Row with Framer Motion Spring Physics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

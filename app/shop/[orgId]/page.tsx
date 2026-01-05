@@ -290,6 +290,36 @@ export default function PublicStorePage() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        {/* BE FORWARD JDM Imports Banner */}
+        <div className="bg-gradient-to-r from-blue-900 to-indigo-900 rounded-xl overflow-hidden shadow-lg mb-8 text-white relative">
+          <div className="absolute top-0 right-0 p-4 opacity-10">
+            <Car className="h-64 w-64" />
+          </div>
+          <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between relative z-10 gap-6">
+            <div className="space-y-2 max-w-2xl">
+              <div className="flex items-center gap-2 mb-1">
+                <Badge className="bg-yellow-500 text-black hover:bg-yellow-400 border-none">JDM IMPORTS</Badge>
+                <span className="text-sm font-medium text-blue-200">Processing by BE FORWARD</span>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-bold">Import Used Engines & Parts from Japan</h2>
+              <p className="text-blue-100">
+                Access over 3.5 million quality used parts and 200,000+ vehicles. 
+                Direct shipping to Berbera with complete customs clearing services.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3">
+               <a href="/dashboard/japan-imports" className="inline-block">
+                 <Button className="bg-white text-blue-900 hover:bg-blue-50 w-full sm:w-auto font-bold h-12 px-6">
+                   <Search className="h-5 w-5 mr-2" /> Search Stock
+                 </Button>
+               </a>
+               <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 w-full sm:w-auto h-12 px-6">
+                 Contact for Code
+               </Button>
+            </div>
+          </div>
+        </div>
+
         {/* Referral Banner */}
         {referralCode && (
           <div className="bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-lg p-4 mb-6 flex items-center justify-between">
