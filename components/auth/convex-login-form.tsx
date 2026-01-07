@@ -79,9 +79,13 @@ export function ConvexLoginForm() {
     }
   }
 
+  const [socialMessage, setSocialMessage] = useState<string | null>(null)
+
   const handleSocialLogin = (provider: string) => {
     // TODO: Implement OAuth with Convex Auth
-    setError(`${provider} login coming soon! Use demo accounts for now.`)
+    setSocialMessage(`${provider} login coming soon! Please use email or demo accounts below.`)
+    // Clear message after 3 seconds
+    setTimeout(() => setSocialMessage(null), 3000)
   }
 
   const demoAccounts = [
@@ -124,6 +128,15 @@ export function ConvexLoginForm() {
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>{error}</AlertDescription>
             </Alert>
+          )}
+
+          {socialMessage && (
+            <div className="bg-blue-500/10 border border-blue-500/30 text-blue-400 text-sm px-4 py-3 rounded-lg flex items-center gap-2">
+              <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+              {socialMessage}
+            </div>
           )}
 
           {/* Social Login Buttons */}
