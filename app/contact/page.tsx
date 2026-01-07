@@ -1,120 +1,196 @@
+"use client"
+
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Mail, Phone, MapPin, Clock } from "lucide-react"
+import { 
+  Car, 
+  Phone, 
+  Mail, 
+  MapPin,
+  Clock,
+  Send,
+  MessageSquare,
+  ArrowLeft
+} from "lucide-react"
 
 export default function ContactPage() {
   return (
-    <div className="flex flex-col">
-      <section className="py-20 bg-slate-950 border-b border-white/5">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Get in <span className="text-orange-500">Touch</span></h1>
-          <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-            Have questions? Our team is here to help you get the most out of MASS.
+    <div className="min-h-screen bg-slate-950 text-white">
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-20">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+                <Car className="h-7 w-7 text-white" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-bold text-xl text-white">MASS Workshop</span>
+                <span className="text-[10px] uppercase font-semibold text-slate-400">Hargeisa, Somaliland</span>
+              </div>
+            </Link>
+            <div className="hidden md:flex items-center gap-8">
+              <Link href="/" className="text-slate-400 hover:text-white transition-colors">Home</Link>
+              <Link href="/services" className="text-slate-400 hover:text-white transition-colors">Services</Link>
+              <Link href="/about" className="text-slate-400 hover:text-white transition-colors">About</Link>
+              <Link href="/contact" className="text-white font-medium">Contact</Link>
+            </div>
+            <Link href="/book">
+              <Button className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700">
+                Book Service
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <section className="pt-32 pb-16 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-red-500/10" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-8">
+            <ArrowLeft className="w-4 h-4" /> Back to Home
+          </Link>
+          <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 mb-4">Contact Us</Badge>
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            Get In Touch
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-500">
+              We're Here to Help
+            </span>
+          </h1>
+          <p className="text-xl text-slate-400 max-w-2xl">
+            Have questions about our services? Need a quote? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
           </p>
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24">
-            {/* Contact Info */}
-            <div className="space-y-12">
-              <div>
-                <h2 className="text-2xl font-bold text-white mb-6">Contact Information</h2>
-                <div className="space-y-6">
-                  <div className="flex items-start gap-4">
-                    <div className="h-10 w-10 rounded bg-white/5 flex items-center justify-center flex-shrink-0">
-                      <Mail className="h-5 w-5 text-orange-500" />
-                    </div>
-                    <div>
-                      <h3 className="text-white font-medium mb-1">Email Us</h3>
-                      <p className="text-slate-400">support@mass-system.com</p>
-                      <p className="text-slate-400">sales@mass-system.com</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-4">
-                    <div className="h-10 w-10 rounded bg-white/5 flex items-center justify-center flex-shrink-0">
-                      <Phone className="h-5 w-5 text-orange-500" />
-                    </div>
-                    <div>
-                      <h3 className="text-white font-medium mb-1">Call Us</h3>
-                      <p className="text-slate-400">+1 (555) 123-4567</p>
-                      <p className="text-slate-400">Mon-Fri, 9am - 6pm EST</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="h-10 w-10 rounded bg-white/5 flex items-center justify-center flex-shrink-0">
-                      <MapPin className="h-5 w-5 text-orange-500" />
-                    </div>
-                    <div>
-                      <h3 className="text-white font-medium mb-1">Visit Us</h3>
-                      <p className="text-slate-400">123 Tech Avenue</p>
-                      <p className="text-slate-400">Innovation District, NY 10001</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h2 className="text-2xl font-bold text-white mb-6">Support Hours</h2>
-                <div className="flex items-start gap-4">
-                    <div className="h-10 w-10 rounded bg-white/5 flex items-center justify-center flex-shrink-0">
-                      <Clock className="h-5 w-5 text-orange-500" />
-                    </div>
-                    <div>
-                      <p className="text-slate-400">Monday - Friday: 9am - 6pm</p>
-                      <p className="text-slate-400">Saturday: 10am - 4pm</p>
-                      <p className="text-slate-400">Sunday: Closed (Emergency support only)</p>
-                    </div>
-                  </div>
-              </div>
-            </div>
-
+      {/* Contact Section */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Form */}
-            <div className="bg-white/5 p-8 rounded-2xl border border-white/10">
-              <h2 className="text-2xl font-bold text-white mb-6">Send us a message</h2>
-              <form className="space-y-6">
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="first-name" className="text-slate-300">First name</Label>
-                    <Input id="first-name" placeholder="John" className="bg-white/5 border-white/10 text-white" />
+            <Card className="bg-slate-900 border-white/10">
+              <CardContent className="p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <MessageSquare className="w-6 h-6 text-orange-500" />
+                  <h2 className="text-2xl font-bold">Send us a Message</h2>
+                </div>
+                <form className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name" className="text-slate-200">Full Name</Label>
+                      <Input 
+                        id="name" 
+                        placeholder="John Doe" 
+                        className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone" className="text-slate-200">Phone Number</Label>
+                      <Input 
+                        id="phone" 
+                        placeholder="+252 63 4 123456" 
+                        className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
+                      />
+                    </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="last-name" className="text-slate-300">Last name</Label>
-                    <Input id="last-name" placeholder="Doe" className="bg-white/5 border-white/10 text-white" />
+                    <Label htmlFor="email" className="text-slate-200">Email Address</Label>
+                    <Input 
+                      id="email" 
+                      type="email"
+                      placeholder="you@example.com" 
+                      className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="subject" className="text-slate-200">Subject</Label>
+                    <Input 
+                      id="subject" 
+                      placeholder="How can we help?" 
+                      className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="message" className="text-slate-200">Message</Label>
+                    <Textarea 
+                      id="message" 
+                      placeholder="Tell us about your vehicle and what service you need..." 
+                      rows={5}
+                      className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
+                    />
+                  </div>
+                  <Button className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 gap-2">
+                    <Send className="w-4 h-4" /> Send Message
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+
+            {/* Contact Info */}
+            <div className="space-y-8">
+              {/* Contact Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card className="bg-slate-900 border-white/10">
+                  <CardContent className="p-6">
+                    <Phone className="w-10 h-10 text-orange-500 mb-4" />
+                    <h3 className="font-semibold text-lg mb-2">Phone</h3>
+                    <p className="text-slate-400">+252 63 4 123456</p>
+                    <p className="text-slate-400">+252 63 4 789012</p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-slate-900 border-white/10">
+                  <CardContent className="p-6">
+                    <Mail className="w-10 h-10 text-orange-500 mb-4" />
+                    <h3 className="font-semibold text-lg mb-2">Email</h3>
+                    <p className="text-slate-400">info@massworkshop.so</p>
+                    <p className="text-slate-400">support@massworkshop.so</p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-slate-900 border-white/10">
+                  <CardContent className="p-6">
+                    <MapPin className="w-10 h-10 text-orange-500 mb-4" />
+                    <h3 className="font-semibold text-lg mb-2">Location</h3>
+                    <p className="text-slate-400">26th June Road</p>
+                    <p className="text-slate-400">Hargeisa, Somaliland</p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-slate-900 border-white/10">
+                  <CardContent className="p-6">
+                    <Clock className="w-10 h-10 text-orange-500 mb-4" />
+                    <h3 className="font-semibold text-lg mb-2">Hours</h3>
+                    <p className="text-slate-400">Sat-Thu: 8AM - 6PM</p>
+                    <p className="text-slate-400">Friday: Closed</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Map Placeholder */}
+              <Card className="bg-slate-900 border-white/10 overflow-hidden">
+                <div className="h-64 bg-slate-800 flex items-center justify-center">
+                  <div className="text-center">
+                    <MapPin className="w-12 h-12 text-orange-500 mx-auto mb-2" />
+                    <p className="text-slate-400">Map: 26th June Road, Hargeisa</p>
+                    <p className="text-sm text-slate-500">Interactive map coming soon</p>
                   </div>
                 </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-slate-300">Email</Label>
-                  <Input id="email" type="email" placeholder="john@example.com" className="bg-white/5 border-white/10 text-white" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="subject" className="text-slate-300">Subject</Label>
-                  <select id="subject" className="w-full h-10 rounded-md bg-white/5 border border-white/10 text-white px-3 text-sm">
-                    <option>General Inquiry</option>
-                    <option>Sales Question</option>
-                    <option>Technical Support</option>
-                    <option>Partnership</option>
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="message" className="text-slate-300">Message</Label>
-                  <Textarea id="message" placeholder="How can we help you?" className="min-h-[150px] bg-white/5 border-white/10 text-white" />
-                </div>
-
-                <Button className="w-full bg-orange-500 hover:bg-orange-600 text-white h-12 text-base">Send Message</Button>
-              </form>
+              </Card>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="bg-slate-900 border-t border-white/10 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-slate-400">
+          <p>© 2026 MASS Workshop. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
   )
 }
