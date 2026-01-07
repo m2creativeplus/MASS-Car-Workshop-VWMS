@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { DataTableExport } from "@/components/ui/data-table-export"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -333,7 +332,6 @@ export function WorkOrdersKanban({ orgId = "demo" }: WorkOrdersKanbanProps) {
         </div>
         
         <div className="flex gap-2 w-full md:w-auto">
-          <DataTableExport data={filteredOrders} filename="mass_work_orders" />
           <Button 
             className="bg-[#00A65A] hover:bg-[#008d4c] text-white"
             onClick={handleCreate}

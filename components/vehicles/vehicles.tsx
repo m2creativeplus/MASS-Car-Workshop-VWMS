@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { DataTableExport } from "@/components/ui/data-table-export"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -247,7 +246,9 @@ export function Vehicles({ orgId }: { orgId: string }) {
         </h2>
         
         <div className="flex gap-2 w-full md:w-auto">
-          <DataTableExport data={filteredVehicles} filename="mass_vehicles" />
+          <Button variant="outline" size="sm" onClick={fetchVehicles} disabled={loading}>
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+          </Button>
           <Button className="bg-[#00A65A] hover:bg-[#008d4c] text-white" onClick={handleCreate}>
             <Plus className="h-4 w-4 mr-2" />
             Add Vehicle

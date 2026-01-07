@@ -1,30 +1,51 @@
-# New Project
+# MASS OSS
+## Mobility & Automotive Services – Operating Software System
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+*Unified Modular & Scalable Vehicle Workshop Management System*
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/m2-creatives-projects/v0-new-project-neorwrjhbxp)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/NeORwrjHBxp)
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://mass-workshop-v2.vercel.app)
 
 ## Overview
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+MASS OSS (formerly MASS Car Workshop) is an enterprise-grade, Multi-Tenant SaaS platform designed for the Somaliland and East African automotive market. It provides a comprehensive solution for managing workshops, fleets (Somaliland Transportation), and spare parts inventory with "Hargeisa Market" intelligence.
+
+**Architecture:**
+- **Frontend:** Next.js 15 (App Router) + React 19
+- **Backend:** Convex (Real-time Database & Functions)
+- **Styling:** Tailwind CSS + shadcn/ui
+- **Tenancy:** Strict Organization-based isolation (`orgId`)
+
+## Key Modules
+1. **Fleet Management:** DVI Inspections, Vehicle Registry, History.
+2. **Somaliland Transportation:** Market Price Intelligence (Toyota/Suzuki focus), Spare Parts Master.
+3. **Operations:** Work Orders (Kanban), Appointments, Time Tracking.
+4. **Financials:** Estimates, Invoices, Split Payments (ZAAD/eDahab).
 
 ## Deployment
 
 Your project is live at:
+**[https://mass-workshop-v2.vercel.app](https://mass-workshop-v2.vercel.app)**
 
-**[https://vercel.com/m2-creatives-projects/v0-new-project-neorwrjhbxp](https://vercel.com/m2-creatives-projects/v0-new-project-neorwrjhbxp)**
+## Getting Started
 
-## Build your app
+1.  Clone the repository:
+    ```bash
+    git clone https://github.com/m2creativeplus/MASS-Car-Workshop-VWMS.git
+    cd MASS-Car-Workshop-VWMS
+    ```
+    *(Note: We recommend renaming the folder to `MASS OSS` locally)*
 
-Continue building your app on:
+2.  Install dependencies:
+    ```bash
+    npm install
+    ```
 
-**[https://v0.dev/chat/projects/NeORwrjHBxp](https://v0.dev/chat/projects/NeORwrjHBxp)**
+3.  Start Convex Dev:
+    ```bash
+    npx convex dev
+    ```
 
-## How It Works
-
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+4.  Run the App:
+    ```bash
+    npm run dev
+    ```

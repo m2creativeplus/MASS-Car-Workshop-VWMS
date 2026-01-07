@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { DataTableExport } from "@/components/ui/data-table-export"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -147,7 +146,6 @@ export function InventoryManagement() {
         </h2>
         
         <div className="flex gap-2 w-full md:w-auto">
-          <DataTableExport data={filteredInventory} filename="mass_inventory" />
           <Button className="bg-red-500 hover:bg-red-600 text-white" onClick={handleCreate}>
             <Plus className="h-4 w-4 mr-2" />
             Add Parts

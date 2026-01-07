@@ -1,12 +1,15 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from "next/font/google";
 import './globals.css'
+// Convex provider disabled until NEXT_PUBLIC_CONVEX_URL is set
 import { ConvexClientProvider } from '@/components/providers/convex-provider'
 import { PHProvider } from "@/components/providers/posthog-provider";
-import { ThemeProvider } from '@/components/theme-provider'
-import { Toaster } from "@/components/ui/sonner"
 
 const inter = Inter({ subsets: ["latin"] });
+
+export const viewport: Viewport = {
+  themeColor: '#f97316',
+}
 
 export const metadata: Metadata = {
   title: 'MASS Car Workshop - Vehicle Workshop Management System',
@@ -21,35 +24,17 @@ export const metadata: Metadata = {
   },
 }
 
-export const viewport = {
-  themeColor: '#B68A35',
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false, // Native app feel
-}
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body className={inter.className}>
         <PHProvider>
           <ConvexClientProvider>
-            <ThemeProvider
-              attribute="data-theme"
-              defaultTheme="golden"
-              enableSystem={false}
-              themes={['golden', 'silver', 'green', 'red']}
-            >
-              <div className="flex flex-col min-h-screen">
-                {children}
-              </div>
-              <Toaster />
-            </ThemeProvider>
+            {children}
           </ConvexClientProvider>
         </PHProvider>
       </body>

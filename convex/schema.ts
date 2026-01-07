@@ -44,25 +44,12 @@ export default defineSchema({
     role: v.union(
       v.literal("admin"),
       v.literal("staff"),
-      v.literal("technician"),
-      v.literal("custom") // Added custom role type
+      v.literal("technician")
     ),
-    customRoleId: v.optional(v.id("roleDefinitions")), // Link to custom role definition
-    // Optional overrides for specific users
-    permissions: v.optional(v.array(v.string())), 
     isActive: v.boolean(),
   }).index("by_user", ["userId"])
     .index("by_org", ["orgId"])
     .index("by_user_org", ["userId", "orgId"]),
-
-  // ============ 1.3 ROLE DEFINITIONS (RBAC) ============
-  roleDefinitions: defineTable({
-    name: v.string(), // "Junior Service Advisor"
-    description: v.optional(v.string()),
-    permissions: v.array(v.string()), // ["estimates.create", "inventory.view"]
-    isSystem: v.boolean(), // If true, cannot be deleted (e.g., built-in Admin)
-    orgId: v.string(),
-  }).index("by_org", ["orgId"]),
 
   // ============ 2. CUSTOMERS (CRM) ============
   customers: defineTable({
@@ -768,9 +755,7 @@ export default defineSchema({
     serviceId: v.optional(v.string()), // Which specific job on the ticket
     startTime: v.string(),
     endTime: v.optional(v.string()),
-    durationMinutes: v.optional(v.number()), // Actual time
-    billableHours: v.optional(v.number()), // Flagged time (from labor guide)
-    efficiencyRatio: v.optional(v.number()), // Billable / Actual (e.g., 1.2 = 120%)
+    durationMinutes: v.optional(v.number()),
     notes: v.optional(v.string()),
     orgId: v.string(),
   }).index("by_tech", ["technicianId"])
@@ -804,36 +789,7 @@ export default defineSchema({
     .index("by_default", ["isDefault"])
     .index("by_org", ["orgId"]),
 
-  // ============ 26. MARKETING CAMPAIGNS (CRM) ============
-  campaigns: defineTable({
-    name: v.string(), // "Winter Service Special"
-    type: v.union(
-      v.literal("email"),
-      v.literal("sms")
-    ),
-    targetAudience: v.union(
-      v.literal("all_customers"),
-      v.literal("overdue_service"),
-      v.literal("returning_customers"),
-      v.literal("inactive_customers") // Haven't visited in 6 months
-    ),
-    subject: v.optional(v.string()), // For email
-    message: v.string(),
-    scheduledDate: v.optional(v.string()),
-    status: v.union(
-      v.literal("draft"),
-      v.literal("scheduled"),
-      v.literal("sending"),
-      v.literal("completed"),
-      v.literal("cancelled")
-    ),
-    sentCount: v.optional(v.number()),
-    openRate: v.optional(v.number()), // Analytics
-    orgId: v.string(),
-  }).index("by_status", ["status"])
-    .index("by_org", ["orgId"]),
-
-  // ============ 27. CANNED JOBS (Pre-Built Service Packages) ============
+  // ============ 26. CANNED JOBS (Pre-Built Service Packages) ============
   // Like Tekmetric's canned jobs - pre-configured labor + parts bundles
   cannedJobs: defineTable({
     name: v.string(), // "Oil Change - Synthetic"
@@ -1121,246 +1077,5 @@ export default defineSchema({
   }).index("by_date", ["date"])
     .index("by_city", ["city"])
     .index("by_date_city", ["date", "city"]),
-
-  // ============ 35. BLOG POSTS (CMS) ============
-  blogPosts: defineTable({
-    title: v.string(),
-    slug: v.string(),
-    content: v.string(), // Markdown content
-    excerpt: v.optional(v.string()),
-    featuredImage: v.optional(v.string()),
-    author: v.optional(v.id("users")),
-    status: v.union(v.literal("draft"), v.literal("published"), v.literal("archived")),
-    publishedAt: v.optional(v.string()),
-    tags: v.array(v.string()),
-    metaTitle: v.optional(v.string()),
-    metaDescription: v.optional(v.string()),
-    viewCount: v.optional(v.number()),
-    orgId: v.string(),
-  }).index("by_slug", ["slug"])
-    .index("by_status", ["status"])
-    .index("by_org", ["orgId"])
-    .index("by_published", ["publishedAt"]),
-
-  // ============ 36. FAQS (CMS) ============
-  faqs: defineTable({
-    question: v.string(),
-    answer: v.string(),
-    category: v.optional(v.string()),
-    order: v.number(),
-    isActive: v.boolean(),
-    orgId: v.string(),
-  }).index("by_category", ["category"])
-    .index("by_order", ["order"])
-    .index("by_org", ["orgId"]),
-
-  // ============ 37. DYNAMIC PAGES (CMS) ============
-  dynamicPages: defineTable({
-    title: v.string(),
-    slug: v.string(),
-    content: v.string(), // Markdown or HTML
-    metaTitle: v.optional(v.string()),
-    metaDescription: v.optional(v.string()),
-    template: v.optional(v.string()), // "default", "landing", "contact"
-    isPublished: v.boolean(),
-    publishedAt: v.optional(v.string()),
-    orgId: v.string(),
-  }).index("by_slug", ["slug"])
-    .index("by_published", ["isPublished"])
-    .index("by_org", ["orgId"]),
-
-  // ============ 38. NOTIFICATION TEMPLATES ============
-  notificationTemplates: defineTable({
-    name: v.string(),
-    type: v.union(v.literal("email"), v.literal("sms"), v.literal("whatsapp")),
-    subject: v.optional(v.string()), // For emails
-    body: v.string(),
-    variables: v.array(v.string()), // ["customer_name", "vehicle", "amount"]
-    triggerEvent: v.optional(v.string()), // "appointment_reminder", "invoice_sent"
-    isActive: v.boolean(),
-    orgId: v.string(),
-  }).index("by_type", ["type"])
-    .index("by_event", ["triggerEvent"])
-    .index("by_org", ["orgId"]),
-
-  // ============ 39. LOCATIONS (Multi-branch) ============
-  locations: defineTable({
-    name: v.string(),
-    code: v.string(), // "HRG-01", "MGD-01"
-    address: v.string(),
-    city: v.string(),
-    country: v.optional(v.string()),
-    phone: v.optional(v.string()),
-    email: v.optional(v.string()),
-    managerId: v.optional(v.id("users")),
-    timezone: v.optional(v.string()),
-    isHeadquarters: v.boolean(),
-    isActive: v.boolean(),
-    operatingHours: v.optional(v.string()), // JSON string of hours
-    orgId: v.id("organizations"),
-  }).index("by_code", ["code"])
-    .index("by_city", ["city"])
-    .index("by_org", ["orgId"]),
-
-  // ============ 40. SUPPORT TICKETS (Customer Portal) ============
-  supportTickets: defineTable({
-    ticketNumber: v.string(),
-    customerId: v.id("customers"),
-    subject: v.string(),
-    description: v.string(),
-    priority: v.union(v.literal("low"), v.literal("normal"), v.literal("high"), v.literal("urgent")),
-    status: v.union(
-      v.literal("open"),
-      v.literal("in_progress"),
-      v.literal("waiting_customer"),
-      v.literal("resolved"),
-      v.literal("closed")
-    ),
-    category: v.optional(v.string()), // "billing", "repair", "general"
-    assignedTo: v.optional(v.id("users")),
-    workOrderId: v.optional(v.id("workOrders")),
-    messages: v.array(v.object({
-      senderId: v.string(),
-      senderType: v.union(v.literal("customer"), v.literal("staff")),
-      message: v.string(),
-      timestamp: v.string(),
-      attachments: v.optional(v.array(v.string())),
-    })),
-    createdAt: v.string(),
-    updatedAt: v.string(),
-    resolvedAt: v.optional(v.string()),
-    orgId: v.string(),
-  }).index("by_customer", ["customerId"])
-    .index("by_status", ["status"])
-    .index("by_assigned", ["assignedTo"])
-    .index("by_org", ["orgId"]),
-  // ============ 24. CMS CONTENT (Website Data) ============
-  cmsContent: defineTable({
-    page: v.string(),        /* home, about, services, etc. */
-    section: v.string(),     /* hero, features, footer, etc. */
-    content: v.any(),        /* JSON content blob */
-    orgId: v.string(),
-  }).index("by_page", ["page"])
-    .index("by_org", ["orgId"]),
-
-  // ============ 25. KNOWLEDGE BASE (Tekmetric Scrape) ============
-  knowledgeBase: defineTable({
-    title: v.string(),
-    content: v.optional(v.object({
-      html: v.string(),
-      text: v.string(),
-      images: v.array(v.string()),
-      links: v.array(v.string()),
-    })),
-    category: v.optional(v.string()),
-    section: v.optional(v.string()),
-    url: v.string(),
-    scrapedAt: v.string(),
-    orgId: v.string(),
-  }).index("by_category", ["category"])
-    .index("by_url", ["url"])
-    .index("by_org", ["orgId"]),
-
-  // ============ 26. AFFILIATE SYSTEM (MASS Growth Suite) ============
-  affiliates: defineTable({
-    orgId: v.string(),
-    name: v.string(),
-    email: v.string(),
-    phone: v.optional(v.string()), // Essential for mobile money
-    code: v.string(), // Unique referral code e.g. "MOHAMED20"
-    commissionRate: v.number(), // e.g. 5.0 for 5%
-    totalEarnings: v.number(),
-    balance: v.number(),
-    status: v.union(v.literal("active"), v.literal("pending"), v.literal("suspended")),
-    paymentMethod: v.optional(v.string()), // "zaad", "edahab"
-    paymentDetails: v.optional(v.string()), // Phone number for payouts
-  }).index("by_org", ["orgId"])
-    .index("by_code", ["code"]),
-
-  referrals: defineTable({
-    affiliateId: v.id("affiliates"),
-    orgId: v.string(),
-    sourceType: v.union(v.literal("job"), v.literal("order")), 
-    sourceId: v.string(), // workOrderId or orderId
-    amount: v.number(), // Commission amount earned
-    status: v.union(v.literal("pending"), v.literal("paid"), v.literal("cancelled")),
-    createdAt: v.string(),
-  }).index("by_affiliate", ["affiliateId"])
-    .index("by_org", ["orgId"]),
-
-  // ============ 27. E-COMMERCE STOREFRONT (Shopify Lite) ============
-  storeSettings: defineTable({
-    orgId: v.string(),
-    subdomain: v.string(), // e.g. "my-shop" - used for store URL
-    isActive: v.boolean(),
-    bannerImage: v.optional(v.string()),
-    accentColor: v.optional(v.string()),
-    currency: v.optional(v.string()), // "USD", "SLSH"
-    contactEmail: v.optional(v.string()),
-    contactPhone: v.optional(v.string()),
-  }).index("by_org", ["orgId"])
-    .index("by_subdomain", ["subdomain"]),
-
-  storeOrders: defineTable({
-    orgId: v.string(),
-    orderNumber: v.string(),
-    customerName: v.string(),
-    customerPhone: v.string(),
-    customerEmail: v.optional(v.string()),
-    items: v.array(v.object({
-      itemId: v.string(), // Inventory ID
-      name: v.string(),
-      quantity: v.number(),
-      price: v.number(),
-    })),
-    subtotal: v.number(),
-    tax: v.number(),
-    total: v.number(),
-    status: v.union(
-      v.literal("new"),
-      v.literal("processing"),
-      v.literal("ready"),
-      v.literal("completed"),
-      v.literal("cancelled")
-    ),
-    paymentMethod: v.string(), // "zaad", "edahab", "cash_on_pickup"
-    paymentStatus: v.union(v.literal("pending"), v.literal("paid")),
-    createdAt: v.string(),
-  }).index("by_org", ["orgId"])
-    .index("by_status", ["status"]),
-    
-  // ============ 30. IMPORT REQUESTS (BE FORWARD) ============
-  importRequests: defineTable({
-    make: v.string(),
-    model: v.string(),
-    yearRange: v.optional(v.string()),
-    budget: v.optional(v.number()),
-    requirements: v.optional(v.string()),
-    customerName: v.optional(v.string()),
-    customerPhone: v.string(),
-    customerEmail: v.optional(v.string()),
-    status: v.union(
-      v.literal("pending"),
-      v.literal("searching"),
-      v.literal("found"),
-      v.literal("ordered"),
-      v.literal("delivered"),
-      v.literal("cancelled")
-    ),
-    notes: v.optional(v.string()),
-    orgId: v.string(),
-  }).index("by_status", ["status"])
-    .index("by_org", ["orgId"]),
-
-  // ============ 31. BE FORWARD ANALYTICS ============
-  beforwardClicks: defineTable({
-    type: v.union(v.literal("vehicle"), v.literal("part")),
-    itemId: v.optional(v.string()), // ID on BE FORWARD
-    searchTerm: v.optional(v.string()),
-    userId: v.optional(v.id("users")),
-    clickedAt: v.string(),
-    orgId: v.string(),
-  }).index("by_org", ["orgId"]),
-
 });
 

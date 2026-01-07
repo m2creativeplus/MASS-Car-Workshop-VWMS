@@ -52,15 +52,14 @@ export default function LocationsManagementPage() {
   // Note: In production, get orgId from auth context
   const orgIdString = "demo-org-001";
   
-  // Location state management
-  const [locations, setLocations] = useState([
+  // For now, mock data since we need organization ID as Id type
+  const mockLocations = [
     {
       _id: "loc1",
       name: "MASS Hargeisa - Main",
       code: "HRG-01",
       address: "26 June Road, Hargeisa",
       city: "Hargeisa",
-      country: "Somaliland",
       phone: "+252 63 123 4567",
       email: "hargeisa@massworkshop.com",
       isHeadquarters: true,
@@ -72,35 +71,19 @@ export default function LocationsManagementPage() {
       code: "BUR-01",
       address: "Main Street, Burao",
       city: "Burao",
-      country: "Somaliland",
       phone: "+252 63 234 5678",
       email: "burao@massworkshop.com",
       isHeadquarters: false,
       isActive: true,
     },
-  ]);
+  ];
 
   const handleSubmit = async () => {
-    if (editingLocation) {
-      // Update existing location
-      setLocations(prev => prev.map(loc => 
-        loc._id === editingLocation._id
-          ? { ...loc, ...formData }
-          : loc
-      ));
-    } else {
-      // Create new location
-      const newLocation = {
-        _id: `loc-${Date.now()}`,
-        ...formData,
-        isActive: true,
-      };
-      setLocations(prev => [...prev, newLocation]);
-    }
+    // In production, call Convex mutation
+    console.log("Saving location:", formData);
     setIsDialogOpen(false);
     resetForm();
   };
-
 
   const handleEdit = (location: any) => {
     setEditingLocation(location);
@@ -255,7 +238,7 @@ export default function LocationsManagementPage() {
               <Building2 className="w-6 h-6 text-emerald-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold">{locations.length}</p>
+              <p className="text-2xl font-bold">{mockLocations.length}</p>
               <p className="text-sm text-gray-500">Total Locations</p>
             </div>
           </CardContent>
@@ -267,7 +250,7 @@ export default function LocationsManagementPage() {
             </div>
             <div>
               <p className="text-2xl font-bold">
-                {[...new Set(locations.map((l) => l.city))].length}
+                {[...new Set(mockLocations.map((l) => l.city))].length}
               </p>
               <p className="text-sm text-gray-500">Cities Covered</p>
             </div>
@@ -301,7 +284,7 @@ export default function LocationsManagementPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {locations.map((location) => (
+              {mockLocations.map((location) => (
                 <TableRow key={location._id}>
                   <TableCell>
                     <div className="flex items-center gap-2">
