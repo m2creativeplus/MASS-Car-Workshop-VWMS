@@ -32,10 +32,11 @@ import {
   BookOpen,
   CarFront,
   Network,
-  MapPin,
-  Users2,
-  ClipboardPen,
-  Globe,
+  Share2,
+  Layers,
+  Calculator,
+  Store,
+  Smartphone,
 } from "lucide-react"
 import { useConvexAuth } from "@/components/auth/convex-auth-provider"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -55,9 +56,9 @@ const menuItems = [
   { id: "vehicles", label: "Vehicles", icon: Car, roles: ["admin", "staff", "technician", "customer"] },
   { id: "appointments", label: "Appointments", icon: Calendar, roles: ["admin", "staff", "technician", "customer"] },
   { id: "car-request", label: "Car Request", icon: CarFront, roles: ["admin", "staff", "customer"] },
-  { id: "check-in", label: "Check-In", icon: ClipboardPen, roles: ["admin", "staff", "technician"] },
   { id: "inventory", label: "Parts Stock", icon: Package, roles: ["admin", "staff"] },
   { id: "pos", label: "Part Sells", icon: ShoppingCart, roles: ["admin", "staff"] },
+  { id: "market", label: "Marketplace", icon: Store, roles: ["admin", "staff"] },
   { id: "canned-jobs", label: "Canned Jobs", icon: ClipboardList, roles: ["admin", "staff"] },
   { id: "inspection-templates", label: "DVI Templates", icon: ClipboardCheck, roles: ["admin", "staff"] },
   { id: "declined-jobs", label: "Declined Jobs", icon: FileText, roles: ["admin", "staff"] },
@@ -72,13 +73,12 @@ const menuItems = [
   { id: "estimates", label: "Estimates & Invoices", icon: FileText, roles: ["admin", "staff", "technician"] },
   { id: "reports", label: "Reports", icon: BarChart3, roles: ["admin", "staff"] },
   { id: "ai-tools", label: "AI Assistant", icon: Bot, roles: ["admin", "staff", "technician"] },
-  { id: "knowledge-base", label: "Knowledge Base", icon: BookOpen, roles: ["admin", "staff", "technician", "customer"] },
+  { id: "cms", label: "CMS Control", icon: Layers, roles: ["admin"] },
   { id: "contact", label: "Contact", icon: Phone, roles: ["admin", "staff"] },
-  { id: "locations", label: "Locations", icon: MapPin, roles: ["admin"] },
-  { id: "affiliates", label: "Affiliates", icon: Users2, roles: ["admin"] },
-  { id: "japan-imports", label: "Japan Imports", icon: Globe, roles: ["admin", "staff"] },
   { id: "settings", label: "Settings", icon: Settings, roles: ["admin"] },
+  { id: "export", label: "Export Center", icon: Share2, roles: ["admin", "staff"] },
 ]
+
 
 export function Sidebar({ activeModule, onModuleChange, userRole, className }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
@@ -108,12 +108,12 @@ export function Sidebar({ activeModule, onModuleChange, userRole, className }: S
       {/* Header */}
       <div className="flex items-center p-6 mb-2">
         <div className={cn("flex items-center gap-3 transition-opacity duration-200", isCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 flex-1")}>
-          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-            <Car className="h-6 w-6 text-primary-foreground" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
+            <Car className="h-6 w-6 text-white" />
           </div>
           <div className="flex flex-col">
-            <span className="font-bold text-lg text-white tracking-tight">MASS</span>
-            <span className="text-[10px] uppercase font-semibold text-sidebar-foreground/60 tracking-wider font-mono">Workshop</span>
+            <span className="font-bold text-lg text-white tracking-tight">MASS OSS</span>
+            <span className="text-[10px] uppercase font-semibold text-slate-400 tracking-wider">Mobility & Automotive</span>
           </div>
         </div>
         
@@ -152,7 +152,7 @@ export function Sidebar({ activeModule, onModuleChange, userRole, className }: S
                 )}>
                   <div className={cn(
                     "flex items-center justify-center shrink-0",
-                    isActive ? "text-primary" : "text-sidebar-foreground group-hover:text-white"
+                    isActive ? "text-orange-500" : "text-slate-400 group-hover:text-white"
                   )}>
                     <Icon className="h-5 w-5" />
                   </div>
@@ -174,7 +174,7 @@ export function Sidebar({ activeModule, onModuleChange, userRole, className }: S
                 
                 {/* Active Indicator for Collapsed Mode */}
                 {isCollapsed && isActive && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-r-full" />
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-orange-500 rounded-r-full" />
                 )}
               </Link>
             )
@@ -201,8 +201,8 @@ export function Sidebar({ activeModule, onModuleChange, userRole, className }: S
           isCollapsed ? "items-center justify-center flex" : ""
         )}>
           <div className="flex items-center gap-3">
-             <Avatar className="h-9 w-9 border-2 border-primary/20">
-              <AvatarFallback className="bg-primary text-primary-foreground font-bold">
+             <Avatar className="h-9 w-9 border-2 border-orange-500/20">
+              <AvatarFallback className="bg-orange-500 text-white font-bold">
                 {user?.role?.charAt(0).toUpperCase() || "A"}
               </AvatarFallback>
             </Avatar>
