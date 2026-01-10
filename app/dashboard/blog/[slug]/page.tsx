@@ -1,140 +1,42 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useQuery, useMutation } from "convex/react"
+import { api } from "@/convex/_generated/api"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Calendar, User, Clock, Share2, BookOpen, Wrench } from "lucide-react"
+import { ArrowLeft, Calendar, User, Clock, Share2, BookOpen, Wrench, Loader2, Eye } from "lucide-react"
 import Link from "next/link"
-
-// Sample posts (will be replaced by Convex query when deployed)
-const samplePosts = [
-  {
-    _id: "1",
-    title: "5 Signs Your Car Needs Immediate Brake Service",
-    slug: "signs-car-needs-brake-service",
-    excerpt: "Don't wait until it's too late. Learn the warning signs that indicate your brakes need professional attention.",
-    content: `
-## Warning Signs You Shouldn't Ignore
-
-Your vehicle's braking system is one of the most critical safety features. Here are the key warning signs:
-
-### 1. Squealing or Grinding Sounds
-If you hear a high-pitched squeal when braking, your brake pads may be worn down. A grinding noise indicates metal-on-metal contact – this requires immediate attention.
-
-### 2. Vibration When Braking
-A vibrating brake pedal often indicates warped rotors. This can be caused by excessive heat from heavy braking.
-
-### 3. Soft or Spongy Brake Pedal
-If your brake pedal feels soft or goes to the floor, you may have air in the brake lines or a brake fluid leak.
-
-### 4. Vehicle Pulling to One Side
-Uneven brake wear or a stuck caliper can cause your car to pull when braking.
-
-### 5. Warning Light on Dashboard
-Modern vehicles have brake warning lights. If this light comes on, get your brakes inspected immediately.
-
-## Schedule Your Brake Inspection Today
-
-At MASS-certified workshops, our technicians use Digital Vehicle Inspection (DVI) to provide photo and video evidence of your brake condition. You'll see exactly what we see.
-
-**Special Offer:** Book a free brake inspection this month at participating Hargeisa workshops.
-    `,
-    category: "Maintenance Tips",
-    featuredImage: "/blog/brakes.jpg",
-    publishedAt: "2026-01-08",
-    author: "Mohamed Ahmed",
-    authorRole: "Master Technician",
-    views: 1250,
-    readingTimeMinutes: 5,
-    relatedService: "brake-inspection",
-  },
-  {
-    _id: "2",
-    title: "Complete Guide to Vehicle Inspections in Somaliland",
-    slug: "vehicle-inspection-guide-somaliland",
-    excerpt: "Everything you need to know about getting your vehicle inspected, from documentation to common issues.",
-    content: `
-## Vehicle Inspection Requirements in Somaliland
-
-Understanding the inspection process helps you prepare and avoid delays.
-
-### What Documents Do You Need?
-- Vehicle registration
-- Insurance certificate
-- Previous inspection report (if applicable)
-
-### Common Inspection Points
-1. Lights and signals
-2. Brakes and tires
-3. Steering and suspension
-4. Engine and emissions
-5. Body condition
-
-### Tips for Passing Inspection
-- Check all lights before your appointment
-- Ensure wipers and washers work
-- Top up all fluids
-- Address any dashboard warning lights
-    `,
-    category: "Guides",
-    featuredImage: "/blog/inspection.jpg",
-    publishedAt: "2026-01-05",
-    author: "Fatima Omar",
-    authorRole: "Service Advisor",
-    views: 890,
-    readingTimeMinutes: 7,
-    relatedService: "vehicle-inspection",
-  },
-  {
-    _id: "3",
-    title: "Why ZAAD & eDahab Payments Are Transforming Auto Workshops",
-    slug: "mobile-money-auto-workshops",
-    excerpt: "How mobile payments are making car repairs more accessible and convenient for Somaliland customers.",
-    content: `
-## The Mobile Money Revolution in Automotive
-
-Somaliland's mobile money ecosystem is changing how workshops operate.
-
-### Benefits for Customers
-- No need to carry cash for expensive repairs
-- Instant payment receipts via SMS
-- Split payment options for large repairs
-
-### Benefits for Workshops
-- Reduced cash handling risks
-- Faster payment processing
-- Better financial tracking
-
-### How MASS Integrates ZAAD & eDahab
-Our platform automatically generates payment links and records transactions, making your workshop operations smoother.
-    `,
-    category: "Industry News",
-    featuredImage: "/blog/payments.jpg",
-    publishedAt: "2026-01-02",
-    author: "Ahmed Ali",
-    authorRole: "Business Development",
-    views: 2100,
-    readingTimeMinutes: 4,
-    relatedService: null,
-  },
-]
 
 export default function BlogArticlePage() {
   const params = useParams()
   const router = useRouter()
-  const [post, setPost] = useState<typeof samplePosts[0] | null>(null)
+  const slug = params.slug as string
+  
+  // Fetch post from Convex
+  const post = useQuery(api.blog.getBySlug, { slug })
+  const incrementViews = useMutation(api.blog.incrementViews)
 
+  // Increment view count on page load
   useEffect(() => {
-    // Find the post by slug (will be replaced by Convex query)
-    const foundPost = samplePosts.find(p => p.slug === params.slug)
-    if (foundPost) {
-      setPost(foundPost)
+    if (post?._id) {
+      incrementViews({ id: post._id })
     }
-  }, [params.slug])
+  }, [post?._id, incrementViews])
 
-  if (!post) {
+  // Loading state
+  if (post === undefined) {
+    return (
+      <div className="flex-1 flex items-center justify-center p-8">
+        <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+      </div>
+    )
+  }
+
+  // Not found state
+  if (post === null) {
     return (
       <div className="flex-1 flex items-center justify-center p-8">
         <Card className="max-w-md text-center p-8">
@@ -150,6 +52,21 @@ export default function BlogArticlePage() {
       </div>
     )
   }
+
+  // Calculate reading time if not set
+  const readingTime = post.readingTimeMinutes || Math.ceil(post.content.split(' ').length / 200)
+
+  // Determine related service based on category
+  const getRelatedService = (category: string) => {
+    const serviceMap: Record<string, { name: string; route: string }> = {
+      "Maintenance Tips": { name: "Maintenance Service", route: "/dashboard/appointments" },
+      "Brakes": { name: "Brake Inspection", route: "/dashboard/appointments" },
+      "Guides": { name: "Vehicle Inspection", route: "/dashboard/inspections" },
+    }
+    return serviceMap[category]
+  }
+  
+  const relatedService = getRelatedService(post.category)
 
   return (
     <div className="flex-1 space-y-6 p-4 md:p-8 pt-6 max-w-4xl mx-auto">
@@ -168,16 +85,19 @@ export default function BlogArticlePage() {
         <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
           <span className="flex items-center gap-1">
             <User className="h-4 w-4" />
-            {post.author}
-            {post.authorRole && <span className="text-amber-500">• {post.authorRole}</span>}
+            {post.author || "MASS Team"}
           </span>
           <span className="flex items-center gap-1">
             <Calendar className="h-4 w-4" />
-            {post.publishedAt}
+            {post.publishedAt || "Recent"}
           </span>
           <span className="flex items-center gap-1">
             <Clock className="h-4 w-4" />
-            {post.readingTimeMinutes} min read
+            {readingTime} min read
+          </span>
+          <span className="flex items-center gap-1">
+            <Eye className="h-4 w-4" />
+            {post.views} views
           </span>
         </div>
       </div>
@@ -186,6 +106,11 @@ export default function BlogArticlePage() {
       <div className="h-64 bg-slate-800 rounded-xl flex items-center justify-center">
         <BookOpen className="h-20 w-20 text-slate-600" />
       </div>
+
+      {/* Excerpt */}
+      <p className="text-lg text-muted-foreground italic border-l-4 border-amber-500 pl-4">
+        {post.excerpt}
+      </p>
 
       {/* Article Content */}
       <Card>
@@ -196,18 +121,29 @@ export default function BlogArticlePage() {
         </CardContent>
       </Card>
 
+      {/* Tags */}
+      {post.tags && post.tags.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {post.tags.map((tag) => (
+            <Badge key={tag} variant="outline" className="text-xs">
+              #{tag}
+            </Badge>
+          ))}
+        </div>
+      )}
+
       {/* Related Service CTA */}
-      {post.relatedService && (
+      {relatedService && (
         <Card className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/20">
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div>
                 <h3 className="text-xl font-bold">Need This Service?</h3>
-                <p className="text-muted-foreground">Book a {post.category.toLowerCase()} appointment at a MASS-certified workshop</p>
+                <p className="text-muted-foreground">Book a {relatedService.name.toLowerCase()} appointment at a MASS-certified workshop</p>
               </div>
-              <Link href="/dashboard/appointments">
+              <Link href={relatedService.route}>
                 <Button className="bg-amber-500 hover:bg-amber-600 gap-2">
-                  <Wrench className="h-4 w-4" /> Book Service Now
+                  <Wrench className="h-4 w-4" /> Book {relatedService.name}
                 </Button>
               </Link>
             </div>
@@ -221,10 +157,23 @@ export default function BlogArticlePage() {
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Share this article</span>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  const url = `https://wa.me/?text=${encodeURIComponent(post.title + ' - ' + window.location.href)}`
+                  window.open(url, '_blank')
+                }}
+              >
                 <Share2 className="h-4 w-4 mr-2" /> WhatsApp
               </Button>
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href)
+                }}
+              >
                 Copy Link
               </Button>
             </div>

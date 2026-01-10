@@ -496,29 +496,168 @@
     {
       "id": "garage_001",
       "name": "Garage Aw Ali",
-      "location": {
-        "city": "Hargeisa"
-      },
+      "location": { "city": "Hargeisa" },
       "source": "cybo.com"
     },
     {
       "id": "garage_002",
       "name": "Shabac Motors (Workshop)",
-      "location": {
-        "city": "Hargeisa"
-      },
+      "location": { "city": "Hargeisa" },
       "source": "cybo.com"
     },
     {
       "id": "garage_003",
       "name": "Berbera Technical College (BTC)",
       "type": "Training Institute",
-      "location": {
-        "city": "Berbera"
-      },
+      "location": { "city": "Berbera" },
       "programs": ["Automotive Mechanics Training"],
       "source": "berberatechnicalcollege.com"
+    },
+    {
+      "id": "garage_004",
+      "name": "Dualleh Computerized Workshop",
+      "location": { "city": "Hargeisa" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "garage_005",
+      "name": "Gufure Motors Service Center",
+      "location": { "city": "Hargeisa" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "garage_006",
+      "name": "China ZhongXing Garage",
+      "location": { "city": "Hargeisa" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "garage_007",
+      "name": "Daruuri Tech Solutions",
+      "location": { "city": "Hargeisa" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "garage_008",
+      "name": "Omar Torno Mechinary",
+      "location": { "city": "Hargeisa" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "garage_009",
+      "name": "Indhacase and Sons Shop",
+      "location": { "city": "Hargeisa" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "garage_010",
+      "name": "Geedi General Motors",
+      "location": { "city": "Hargeisa" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "garage_011",
+      "name": "Al-Sharaf Motors",
+      "location": { "city": "Hargeisa" },
+      "services": ["Car Repair", "Spare Parts"],
+      "source": "cybo.com"
     }
+  ],
+  "digital_directories": [
+    {
+      "id": "directory_001",
+      "name": "Kulmie Business Directory",
+      "url": "https://kulmie.com",
+      "type": "Business Directory",
+      "automotive_listings": 289,
+      "subcategories": {
+        "car_dealerships": 100,
+        "spare_parts_shops": 136,
+        "car_rentals": 37,
+        "fuel_stations": 8,
+        "motorcycle_dealers": 15,
+        "auto_repair": 1,
+        "vehicle_inspection": 1
+      },
+      "coverage": ["Mogadishu", "Hargeisa", "Somaliland"],
+      "features": ["Free and paid listings", "Contact info", "Categories"],
+      "source": "kulmie.com"
+    },
+    {
+      "id": "directory_002",
+      "name": "Somali Yellow Page",
+      "url": "https://yellowpage.so",
+      "type": "Yellow Pages Directory",
+      "categories": ["Automobiles"],
+      "coverage": ["Somalia", "Somaliland"],
+      "source": "yellowpage.so"
+    },
+    {
+      "id": "directory_003",
+      "name": "Cybo Business Directory",
+      "url": "https://cybo.com",
+      "type": "International Business Directory",
+      "coverage": ["Hargeisa", "Borama", "Berbera", "Burco"],
+      "automotive_categories": ["Car Dealers", "Spare Parts", "Garages", "Tire Shops"],
+      "source": "cybo.com"
+    },
+    {
+      "id": "directory_004",
+      "name": "Gaadhi.com",
+      "url": "https://gaadhi.com",
+      "type": "Dedicated Auto Marketplace",
+      "features": ["Car listings", "Motorbikes", "Trucks", "Reviews"],
+      "source": "gaadhi.com"
+    },
+    {
+      "id": "directory_005",
+      "name": "Dilaal.com",
+      "url": "https://dilaal.com",
+      "type": "Classifieds Marketplace",
+      "features": ["Cars", "Property", "Electronics", "Jobs"],
+      "source": "dilaal.com"
+    },
+    {
+      "id": "directory_006",
+      "name": "Riqiis.com",
+      "url": "https://riqiis.com",
+      "type": "Classifieds Marketplace",
+      "features": ["Vehicles", "Real Estate", "Electronics"],
+      "source": "riqiis.com"
+    },
+    {
+      "id": "directory_007",
+      "name": "All Ads Somalia",
+      "url": "https://diasporalist.com",
+      "type": "Classifieds",
+      "coverage": ["Somalia", "Somaliland"],
+      "source": "diasporalist.com"
+    }
+  ],
+  "additional_spare_parts_hargeisa": [
+    { "name": "Abco Auto Spare Parts", "city": "Hargeisa", "source": "cybo.com" },
+    { "name": "Jameeco Wayn Spare Parts", "city": "Hargeisa", "source": "cybo.com" },
+    { "name": "Giirre Spare Parts", "city": "Hargeisa", "source": "cybo.com" },
+    { "name": "Nuur Used Spare Parts", "city": "Hargeisa", "source": "cybo.com" },
+    { "name": "Daryeel Spare Parts 2 (DSP)", "city": "Hargeisa", "source": "cybo.com" },
+    { "name": "Esco Auto Spare Parts", "city": "Hargeisa", "source": "cybo.com" },
+    { "name": "Xcc Spare Parts And Home Of Engines", "city": "Hargeisa", "source": "cybo.com" },
+    { "name": "Daryeel Spare Parts HQ", "city": "Hargeisa", "source": "cybo.com" },
+    { "name": "Rooble Battery And Metal Exchange", "city": "Hargeisa", "source": "cybo.com" },
+    { "name": "Shire Spare Parts", "city": "Hargeisa", "source": "cybo.com" },
+    { "name": "Alnoor Autospare Parts", "city": "Hargeisa", "source": "cybo.com" },
+    { "name": "Geeska Africa Spare Parts", "city": "Hargeisa", "source": "cybo.com" },
+    { "name": "Ali Baarjeex Car Accessories and Car Wash", "city": "Hargeisa", "source": "cybo.com" },
+    { "name": "Wehliye Spare Parts", "city": "Hargeisa", "source": "kulmie.com" }
+  ],
+  "additional_car_dealers": [
+    { "name": "Sanwaraabe Motors", "city": "Hargeisa", "source": "cybo.com" },
+    { "name": "Abdikadir Motors and Car Seller", "city": "Hargeisa", "source": "kulmie.com" },
+    { "name": "Saban Motor's", "city": "Hargeisa", "source": "kulmie.com" },
+    { "name": "Ahmednor Girgire", "city": "Hargeisa", "source": "cybo.com" },
+    { "name": "Dj Hamze Shop", "city": "Hargeisa", "source": "cybo.com" },
+    { "name": "Xasan Xuseen", "city": "Hargeisa", "source": "cybo.com" },
+    { "name": "Toyota Maril", "city": "Hargeisa", "source": "cybo.com" }
   ],
   "import_regulations": {
     "primary_port": "Berbera",
@@ -550,8 +689,213 @@
         "benefit": "Duty and tax free for one vehicle"
       }
     ],
-    "notes": "Older vehicles or those not meeting emission standards may face higher tariffs"
+    "notes": "Older vehicles or those not meeting emission standards may face higher tariffs",
+    "right_hand_drive_ban": "Banned since November 2020 for road safety"
   },
+  "borama_spare_parts": [
+    {
+      "id": "borama_parts_001",
+      "name": "Dirsooc Spare Parts",
+      "location": { "city": "Borama" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "borama_parts_002",
+      "name": "Seeman Spare Parts",
+      "location": { "city": "Borama" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "borama_parts_003",
+      "name": "CROWN Super Sperparts",
+      "location": { "city": "Borama" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "borama_parts_004",
+      "name": "AL-BAYAAN Sperparts Store Borama",
+      "location": { "city": "Borama" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "borama_parts_005",
+      "name": "Cali Used Sperparts",
+      "location": { "city": "Borama" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "borama_parts_006",
+      "name": "Maagtire Business & Shope Cantar",
+      "location": { "city": "Borama" },
+      "type": "Tire Shop",
+      "source": "cybo.com"
+    },
+    {
+      "id": "borama_parts_007",
+      "name": "Xiinfiniin Auto Spare",
+      "location": { "city": "Borama" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "borama_parts_008",
+      "name": "Umalkhadira Tyre Shop",
+      "location": { "city": "Borama" },
+      "type": "Tire Shop",
+      "source": "cybo.com"
+    }
+  ],
+  "tire_alignment_services": [
+    {
+      "id": "tire_001",
+      "name": "Mobile Fuundi",
+      "location": { "city": "Hargeisa" },
+      "contact": {
+        "phone_primary": "+252 637218888",
+        "email": "info@mobilefuundi.com",
+        "short_code": "2009",
+        "website": "https://mobilefuundi.com"
+      },
+      "services": ["Wheel Alignment", "Tire Replacement", "Wheel Balance", "Brake Services", "General Maintenance"],
+      "features": ["State-of-the-art facility", "Vehicle pickup service", "Licensed mechanics"],
+      "source": "mobilefuundi.com"
+    }
+  ],
+  "car_wash_detailing": [
+    {
+      "id": "carwash_001",
+      "name": "Horn Petroleum Car Wash",
+      "location": { "city": "Hargeisa" },
+      "contact": {
+        "phone_primary": "+252 65 390 0373",
+        "phone_secondary": "+252 63 390 0373"
+      },
+      "services": ["Professional Car Wash"],
+      "source": "hornpetroleum.com"
+    }
+  ],
+  "dubai_car_exporters": [
+    {
+      "id": "exporter_001",
+      "name": "ABAAL Shipping and Logistics Agency",
+      "type": "Shipping & Logistics",
+      "headquarters": "Dubai",
+      "office_in_berbera": true,
+      "services": ["Vehicle Shipping", "Customs Clearance"],
+      "contact": { "website": "https://abaalshipping.com" },
+      "source": "abaalshipping.com"
+    },
+    {
+      "id": "exporter_002",
+      "name": "Jim (Somalia Somaliland Car Exporter)",
+      "type": "Car Dealer/Exporter",
+      "location": "Dubai",
+      "export_sources": ["Dubai", "Thailand", "Australia", "UK"],
+      "vehicles": "LHD vehicles for Somalia/Somaliland",
+      "contact": { "website": "https://dubai-car-dealer.com" },
+      "source": "dubai-car-dealer.com"
+    },
+    {
+      "id": "exporter_003",
+      "name": "Al Hamd Motors",
+      "type": "Car Exporter",
+      "location": "Dubai",
+      "experience_years": 21,
+      "services": ["Car Export to Africa"],
+      "contact": { "website": "https://alhamdmotors.com" },
+      "source": "alhamdmotors.com"
+    },
+    {
+      "id": "exporter_004",
+      "name": "Alliance Shipping",
+      "type": "Freight Forwarder",
+      "location": "Jebel Ali Port, Dubai",
+      "services": ["Sea Freight", "Air Freight", "Customs Clearance", "Door-to-Door"],
+      "destination": "Berbera",
+      "contact": { "website": "https://theallianceshipping.com" },
+      "source": "theallianceshipping.com"
+    },
+    {
+      "id": "exporter_005",
+      "name": "Forward Air Cargo Service and Clearance LLC",
+      "type": "Freight Forwarder",
+      "location": "Dubai",
+      "services": ["Air Freight", "Sea Freight", "Car Shipping"],
+      "destination": "Berbera Port",
+      "contact": { "website": "https://forwardair-cargo.com" },
+      "source": "forwardair-cargo.com"
+    },
+    {
+      "id": "exporter_006",
+      "name": "Mursalin Motors FZCO",
+      "type": "Car Exporter",
+      "location": "Dubai",
+      "exports_to": ["Africa", "Asia", "Western Europe"],
+      "contact": { "website": "https://mursalinmotors.com" },
+      "source": "mursalinmotors.com"
+    },
+    {
+      "id": "exporter_007",
+      "name": "Planitium FZE",
+      "type": "Car Exporter",
+      "location": "Dubai",
+      "specialization": "Toyota vehicles for Somalia",
+      "contact": { "website": "https://planitium.com" },
+      "source": "planitium.com"
+    },
+    {
+      "id": "exporter_008",
+      "name": "Autoredo",
+      "type": "Car Export Company",
+      "locations": ["Dubai", "Antwerp"],
+      "brands": ["Toyota", "Nissan", "Hyundai"],
+      "contact": { "website": "https://autoredo.com" },
+      "source": "autoredo.com"
+    }
+  ],
+  "japan_car_exporters": [
+    {
+      "id": "japan_001",
+      "name": "BE FORWARD",
+      "type": "Japanese Used Car Exporter",
+      "has_local_office": true,
+      "local_office_city": "Hargeisa",
+      "services": ["Car Export", "Customs Clearance", "Transportation"],
+      "shipping_time": "6-10 weeks",
+      "shipping_method": "Container (not RORO)",
+      "contact": { "website": "https://beforward.jp" },
+      "source": "beforward.jp"
+    },
+    {
+      "id": "japan_002",
+      "name": "SBT Japan",
+      "type": "Japanese Used Car Exporter",
+      "ships_to": ["Somalia", "Somaliland"],
+      "contact": { "website": "https://sbtjapan.com" },
+      "source": "sbtjapan.com"
+    },
+    {
+      "id": "japan_003",
+      "name": "SAT Japan",
+      "type": "Japanese Used Car Exporter",
+      "contact": { "website": "https://satjapan.com" },
+      "source": "satjapan.com"
+    },
+    {
+      "id": "japan_004",
+      "name": "Nikkyo Cars",
+      "type": "Japanese Used Car Exporter",
+      "contact": { "website": "https://nikkyocars.com" },
+      "source": "nikkyocars.com"
+    }
+  ],
+  "sample_vehicle_prices": [
+    { "model": "Toyota Hilux 2011", "price_usd": 9000, "location": "Hargeisa", "source": "riqiis.com" },
+    { "model": "Toyota Hilux 2017", "price_usd": 23000, "location": "Hargeisa", "source": "dilaal.com" },
+    { "model": "Toyota Hilux 2016", "price_usd": 3500, "location": "Mogadishu", "source": "gaadhi.com" },
+    { "model": "Toyota Hilux 2011", "price_usd": 7950, "location": "Berbera", "source": "gaadhi.com" },
+    { "model": "Toyota Hilux 2014 (Dubai Import)", "price_usd": 12534, "source": "gaadhi.com" },
+    { "model": "Toyota Hilux (New)", "price_usd": 27000, "location": "Hargeisa", "source": "gaadhi.com", "condition": "New" }
+  ],
   "popular_vehicles": {
     "makes": ["Toyota", "Nissan", "Mitsubishi", "Honda", "Suzuki", "Hyundai", "ISUZU"],
     "top_models": [

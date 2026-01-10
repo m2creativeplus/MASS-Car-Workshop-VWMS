@@ -1,17 +1,17 @@
 "use client"
 
 import { useState } from "react"
-import { useQuery } from "convex/react"
+import { useQuery, useMutation } from "convex/react"
 import { api } from "@/convex/_generated/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Search, Calendar, User, ArrowRight, BookOpen } from "lucide-react"
+import { Search, Calendar, User, ArrowRight, BookOpen, Loader2, RefreshCw } from "lucide-react"
 import Link from "next/link"
 
-// Sample blog data (will be replaced by Convex query when table is deployed)
-const samplePosts = [
+// Fallback sample data (used while Convex loads or if empty)
+const fallbackPosts = [
   {
     _id: "1",
     title: "5 Signs Your Car Needs Immediate Brake Service",
@@ -45,17 +45,6 @@ const samplePosts = [
     author: "Ahmed Ali",
     views: 2100,
   },
-  {
-    _id: "4", 
-    title: "Top 10 Common Car Problems in Hot Climates",
-    slug: "common-car-problems-hot-climates",
-    excerpt: "Living in Somaliland means dealing with extreme heat. Here's how it affects your vehicle.",
-    category: "Maintenance Tips",
-    featuredImage: "/blog/heat.jpg",
-    publishedAt: "2025-12-28",
-    author: "Hassan Yusuf",
-    views: 1800,
-  },
 ]
 
 const categories = ["All", "Maintenance Tips", "Guides", "Industry News", "Announcements"]
@@ -63,13 +52,42 @@ const categories = ["All", "Maintenance Tips", "Guides", "Industry News", "Annou
 export default function BlogPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("All")
+  
+  // Fetch posts from Convex
+  const convexPosts = useQuery(api.blog.list, { 
+    category: selectedCategory === "All" ? undefined : selectedCategory 
+  })
+  
+  // Seed mutation (for initial setup)
+  const seedPosts = useMutation(api.blog.seedBlogPosts)
+  const [seeding, setSeeding] = useState(false)
+  
+  // Use Convex posts if available, otherwise fallback
+  const posts = convexPosts && convexPosts.length > 0 
+    ? convexPosts.map(p => ({
+        ...p,
+        _id: p._id.toString(),
+        publishedAt: p.publishedAt || new Date().toISOString().split('T')[0],
+        author: p.author || "MASS Team",
+      }))
+    : fallbackPosts
 
-  const filteredPosts = samplePosts.filter(post => {
+  const filteredPosts = posts.filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          post.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesCategory = selectedCategory === "All" || post.category === selectedCategory
-    return matchesSearch && matchesCategory
+    return matchesSearch
   })
+
+  const handleSeedPosts = async () => {
+    setSeeding(true)
+    try {
+      await seedPosts()
+      // Posts will auto-refresh via Convex subscription
+    } catch (error) {
+      console.error("Failed to seed posts:", error)
+    }
+    setSeeding(false)
+  }
 
   return (
     <div className="flex-1 space-y-6 p-4 md:p-8 pt-6">
@@ -77,21 +95,35 @@ export default function BlogPage() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <BookOpen className="h-8 w-8 text-orange-500" />
+            <BookOpen className="h-8 w-8 text-amber-500" />
             Blog & News
           </h1>
           <p className="text-muted-foreground">
             Industry insights, maintenance tips, and workshop updates
           </p>
         </div>
-        <div className="relative w-full md:w-80">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search articles..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
-          />
+        <div className="flex gap-2">
+          <div className="relative w-full md:w-80">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search articles..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          {/* Seed button (for admin setup) */}
+          {(!convexPosts || convexPosts.length === 0) && (
+            <Button 
+              variant="outline" 
+              size="icon"
+              onClick={handleSeedPosts}
+              disabled={seeding}
+              title="Seed sample blog posts"
+            >
+              {seeding ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -103,12 +135,19 @@ export default function BlogPage() {
             variant={selectedCategory === cat ? "default" : "outline"}
             size="sm"
             onClick={() => setSelectedCategory(cat)}
-            className={selectedCategory === cat ? "bg-orange-500 hover:bg-orange-600" : ""}
+            className={selectedCategory === cat ? "bg-amber-500 hover:bg-amber-600" : ""}
           >
             {cat}
           </Button>
         ))}
       </div>
+
+      {/* Loading State */}
+      {convexPosts === undefined && (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+        </div>
+      )}
 
       {/* Featured Post */}
       {filteredPosts[0] && (
@@ -144,29 +183,47 @@ export default function BlogPage() {
       {/* Posts Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredPosts.slice(1).map((post) => (
-          <Card key={post._id} className="overflow-hidden hover:border-orange-500/50 transition-colors cursor-pointer group">
-            <div className="h-40 bg-slate-800 flex items-center justify-center">
-              <BookOpen className="h-12 w-12 text-slate-600 group-hover:text-orange-500 transition-colors" />
-            </div>
-            <CardHeader>
-              <div className="flex items-center justify-between mb-2">
-                <Badge variant="outline">{post.category}</Badge>
-                <span className="text-xs text-muted-foreground">{post.views} views</span>
+          <Link key={post._id} href={`/dashboard/blog/${post.slug}`}>
+            <Card className="overflow-hidden hover:border-amber-500/50 transition-colors cursor-pointer group h-full">
+              <div className="h-40 bg-slate-800 flex items-center justify-center">
+                <BookOpen className="h-12 w-12 text-slate-600 group-hover:text-amber-500 transition-colors" />
               </div>
-              <CardTitle className="text-lg group-hover:text-orange-500 transition-colors">
-                {post.title}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground line-clamp-2">{post.excerpt}</p>
-              <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
-                <Calendar className="h-3 w-3" />
-                {post.publishedAt}
-              </div>
-            </CardContent>
-          </Card>
+              <CardHeader>
+                <div className="flex items-center justify-between mb-2">
+                  <Badge variant="outline">{post.category}</Badge>
+                  <span className="text-xs text-muted-foreground">{post.views} views</span>
+                </div>
+                <CardTitle className="text-lg group-hover:text-amber-500 transition-colors">
+                  {post.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground line-clamp-2">{post.excerpt}</p>
+                <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
+                  <Calendar className="h-3 w-3" />
+                  {post.publishedAt}
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </div>
+
+      {/* Empty State */}
+      {filteredPosts.length === 0 && convexPosts !== undefined && (
+        <Card className="p-8 text-center">
+          <BookOpen className="h-12 w-12 mx-auto text-slate-400 mb-4" />
+          <h3 className="text-lg font-bold mb-2">No articles found</h3>
+          <p className="text-muted-foreground mb-4">
+            {searchQuery ? "Try a different search term" : "No articles in this category yet"}
+          </p>
+          {searchQuery && (
+            <Button variant="outline" onClick={() => setSearchQuery("")}>
+              Clear Search
+            </Button>
+          )}
+        </Card>
+      )}
 
       {/* Newsletter Signup */}
       <Card className="bg-gradient-to-r from-slate-900 to-slate-800 border-slate-700">
@@ -177,7 +234,7 @@ export default function BlogPage() {
           </div>
           <div className="flex gap-2 w-full md:w-auto">
             <Input placeholder="Enter your email" className="md:w-64" />
-            <Button className="bg-orange-500 hover:bg-orange-600">Subscribe</Button>
+            <Button className="bg-amber-500 hover:bg-amber-600">Subscribe</Button>
           </div>
         </CardContent>
       </Card>
