@@ -73,8 +73,14 @@ const menuItems = [
   
   // Knowledge (NEW)
   { id: "knowledge-base", label: "Knowledge Base", icon: BookOpen, roles: ["admin", "staff", "technician"], isNew: true },
+  { id: "blog", label: "Blog & News", icon: BookOpen, roles: ["admin", "staff"], isNew: true },
   { id: "ai-tools", label: "AI Assistant", icon: Bot, roles: ["admin", "staff", "technician"] },
   { id: "diagnostics", label: "AI Diagnostics", icon: Bot, roles: ["admin", "staff", "technician"] },
+  
+  // Portals (NEW)
+  { id: "portal", label: "Customer Portal", icon: Users, roles: ["admin", "staff", "customer"], isNew: true },
+  { id: "vendor", label: "Vendor Dashboard", icon: Store, roles: ["admin", "staff"], isNew: true },
+  { id: "support", label: "Support Center", icon: Phone, roles: ["admin", "staff", "technician", "customer"], isNew: true },
   
   // Operations Extended
   { id: "car-request", label: "Car Request", icon: CarFront, roles: ["admin", "staff", "customer"] },
