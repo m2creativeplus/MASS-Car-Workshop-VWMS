@@ -26,7 +26,7 @@ export default function ContactPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <Link href="/" className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
                 <Car className="h-7 w-7 text-white" />
               </div>
               <div className="flex flex-col">
@@ -41,7 +41,7 @@ export default function ContactPage() {
               <Link href="/contact" className="text-white font-medium">Contact</Link>
             </div>
             <Link href="/book">
-              <Button className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700">
+              <Button className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
                 Book Service
               </Button>
             </Link>
@@ -125,7 +125,7 @@ export default function ContactPage() {
                       className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
                     />
                   </div>
-                  <Button className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 gap-2">
+                  <Button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 gap-2">
                     <Send className="w-4 h-4" /> Send Message
                   </Button>
                 </form>

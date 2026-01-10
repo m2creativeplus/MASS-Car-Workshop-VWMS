@@ -29,7 +29,7 @@ const SERVICES = [
     title: "Engine Repair & Rebuild", 
     description: "Complete engine diagnostics, repair, and rebuild services. We handle everything from minor fixes to complete engine overhauls for all vehicle makes.",
     features: ["Full engine diagnostics", "Cylinder head repair", "Engine rebuild", "Performance tuning"],
-    color: "from-orange-500 to-red-500",
+    color: "from-amber-500 to-orange-500",
     price: "From $150"
   },
   { 
@@ -98,7 +98,7 @@ export default function ServicesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <Link href="/" className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
                 <Car className="h-7 w-7 text-white" />
               </div>
               <div className="flex flex-col">
@@ -113,7 +113,7 @@ export default function ServicesPage() {
               <Link href="/contact" className="text-slate-400 hover:text-white transition-colors">Contact</Link>
             </div>
             <Link href="/book">
-              <Button className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700">
+              <Button className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
                 Book Service
               </Button>
             </Link>
@@ -212,7 +212,7 @@ export default function ServicesPage() {
           <p className="text-slate-400 mb-8">Book your appointment today or call us for a free consultation.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/book">
-              <Button size="lg" className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 gap-2">
+              <Button size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 gap-2">
                 Book Appointment <ArrowRight className="w-5 h-5" />
               </Button>
             </Link>

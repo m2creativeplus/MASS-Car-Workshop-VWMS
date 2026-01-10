@@ -93,7 +93,7 @@ const FEATURES = [
     icon: Building2, 
     title: "MASS Authority Bridge", 
     description: "Direct integration for vehicle registration and safety compliance reporting for government stakeholders.",
-    color: "from-orange-500 to-red-500"
+    color: "from-amber-500 to-orange-500"
   },
 ]
 
@@ -121,7 +121,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <Link href="/" className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
                 <Layers className="h-7 w-7 text-white" />
               </div>
               <div className="flex flex-col">
@@ -144,7 +144,7 @@ export default function HomePage() {
                 </Button>
               </Link>
               <Link href="/contact">
-                <Button className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white">
+                <Button className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white">
                   Partner with MASS
                 </Button>
               </Link>
@@ -193,7 +193,7 @@ export default function HomePage() {
             
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <Link href="/login">
-                <Button size="lg" className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-8 py-6 text-lg gap-2 w-full sm:w-auto shadow-lg shadow-orange-500/25">
+                <Button size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-8 py-6 text-lg gap-2 w-full sm:w-auto shadow-lg shadow-orange-500/25">
                   Explore the Platform
                   <ArrowRight className="w-5 h-5" />
                 </Button>
@@ -273,7 +273,7 @@ export default function HomePage() {
                 <Card key={pillar.number} className="bg-slate-900 border-white/10 overflow-hidden">
                   <CardContent className="p-0">
                     <div className="flex flex-col md:flex-row">
-                      <div className="w-full md:w-48 bg-gradient-to-br from-orange-500 to-red-600 p-8 flex items-center justify-center">
+                      <div className="w-full md:w-48 bg-gradient-to-br from-amber-500 to-orange-500 p-8 flex items-center justify-center">
                         <span className="text-6xl font-bold text-white/20">{pillar.number}</span>
                       </div>
                       <div className="p-8 flex-1">
@@ -383,7 +383,7 @@ export default function HomePage() {
       {/* CTA */}
       <section className="py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="relative bg-gradient-to-r from-orange-500 to-red-600 rounded-3xl p-12 md:p-16 overflow-hidden">
+          <div className="relative bg-gradient-to-r from-amber-500 to-orange-500 rounded-3xl p-12 md:p-16 overflow-hidden">
             <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
             <div className="relative z-10">
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -414,7 +414,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
                 <Layers className="h-5 w-5 text-white" />
               </div>
               <div>

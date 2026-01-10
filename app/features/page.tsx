@@ -110,7 +110,7 @@ const AI_FEATURES = [
     icon: Building2,
     title: "Authority Bridge API",
     description: "Direct integration for vehicle registration, safety compliance, and government reporting.",
-    color: "from-orange-500 to-red-500"
+    color: "from-amber-500 to-orange-500"
   },
 ]
 
@@ -158,7 +158,7 @@ export default function FeaturesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <Link href="/" className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
                 <Layers className="h-7 w-7 text-white" />
               </div>
               <div className="flex flex-col">
@@ -171,7 +171,7 @@ export default function FeaturesPage() {
               <Link href="/about" className="text-slate-400 hover:text-white text-sm">About</Link>
               <Link href="/features" className="text-white text-sm font-medium">Features</Link>
               <Link href="/login">
-                <Button className="bg-gradient-to-r from-orange-500 to-red-600 text-white">
+                <Button className="bg-gradient-to-r from-amber-500 to-orange-500 text-white">
                   Get Started
                 </Button>
               </Link>
@@ -201,7 +201,7 @@ export default function FeaturesPage() {
 
           <div className="flex flex-wrap justify-center gap-4">
             <Link href="/login">
-              <Button size="lg" className="bg-gradient-to-r from-orange-500 to-red-600 text-white gap-2">
+              <Button size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 text-white gap-2">
                 Try Demo <ArrowRight className="w-5 h-5" />
               </Button>
             </Link>
@@ -385,7 +385,7 @@ export default function FeaturesPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/login">
-              <Button size="lg" className="bg-gradient-to-r from-orange-500 to-red-600 text-white px-8 gap-2">
+              <Button size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 gap-2">
                 Start Free Demo <ArrowRight className="w-5 h-5" />
               </Button>
             </Link>
@@ -403,7 +403,7 @@ export default function FeaturesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
                 <Layers className="h-5 w-5 text-white" />
               </div>
               <span className="font-bold text-white">MASS OSS</span>

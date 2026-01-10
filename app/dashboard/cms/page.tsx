@@ -49,7 +49,7 @@ export default function CMSControlCenterPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0">
+            <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0">
               CMS CONTROL CENTER
             </Badge>
             <Badge variant="outline" className="text-slate-500">v2.0 Enterprise</Badge>

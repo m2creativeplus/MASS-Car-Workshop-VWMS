@@ -127,7 +127,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <Link href="/" className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
                 <Layers className="h-7 w-7 text-white" />
               </div>
               <div className="flex flex-col">
@@ -140,7 +140,7 @@ export default function AboutPage() {
               <Link href="/about" className="text-white text-sm font-medium">About</Link>
               <Link href="/features" className="text-slate-400 hover:text-white transition-colors text-sm">Features</Link>
               <Link href="/login">
-                <Button className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white">
+                <Button className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white">
                   Get Started
                 </Button>
               </Link>
@@ -283,7 +283,7 @@ export default function AboutPage() {
               <Card key={i} className="bg-slate-900 border-white/10">
                 <CardContent className="p-8">
                   <div className="flex items-start gap-6">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shrink-0">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shrink-0">
                       <span className="text-2xl font-bold text-white">0{i + 1}</span>
                     </div>
                     <div>
@@ -374,7 +374,7 @@ export default function AboutPage() {
       </section>
 
       {/* One Line */}
-      <section className="py-20 bg-gradient-to-r from-orange-500 to-red-600">
+      <section className="py-20 bg-gradient-to-r from-amber-500 to-orange-500">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-sm uppercase tracking-widest text-white/70 mb-4">MASS OSS in One Line</h2>
           <p className="text-2xl md:text-3xl font-bold text-white leading-relaxed">
@@ -394,7 +394,7 @@ export default function AboutPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/login">
-              <Button size="lg" className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-8 gap-2">
+              <Button size="lg" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-8 gap-2">
                 Explore the Platform <ArrowRight className="w-5 h-5" />
               </Button>
             </Link>
@@ -412,7 +412,7 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
                 <Layers className="h-5 w-5 text-white" />
               </div>
               <div>
