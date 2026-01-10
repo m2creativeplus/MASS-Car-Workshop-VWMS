@@ -93,7 +93,7 @@ export function PremiumLogin({ onLogin, onDemoLogin, isLoading = false }: Premiu
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg shadow-orange-500/30">
+            <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/30">
               <Car className="h-7 w-7 text-white" />
             </div>
             <div>
@@ -155,7 +155,7 @@ export function PremiumLogin({ onLogin, onDemoLogin, isLoading = false }: Premiu
         <div className="w-full max-w-md space-y-8">
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
               <Car className="h-6 w-6 text-white" />
             </div>
             <h1 className="text-xl font-bold">MASS Workshop</h1>
@@ -284,7 +284,7 @@ export function PremiumLogin({ onLogin, onDemoLogin, isLoading = false }: Premiu
               <Button 
                 onClick={() => onLogin("staff", email, password)}
                 disabled={isLoading || !email || !password}
-                className="w-full h-12 rounded-xl bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-semibold shadow-lg shadow-orange-500/30 transition-all hover:shadow-xl hover:shadow-orange-500/40"
+                className="w-full h-12 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow-lg shadow-orange-500/30 transition-all hover:shadow-xl hover:shadow-orange-500/40"
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">

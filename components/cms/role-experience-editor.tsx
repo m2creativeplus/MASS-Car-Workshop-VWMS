@@ -119,7 +119,7 @@ export function RoleExperienceEditor() {
                 <div className="flex items-center gap-3">
                   <div className={cn(
                     "w-10 h-10 rounded-full flex items-center justify-center text-white font-bold",
-                    role.name === "Owner" && "bg-gradient-to-br from-orange-500 to-red-500",
+                    role.name === "Owner" && "bg-gradient-to-br from-amber-500 to-orange-500",
                     role.name === "Service Advisor" && "bg-gradient-to-br from-blue-500 to-cyan-500",
                     role.name === "Technician" && "bg-gradient-to-br from-slate-500 to-slate-600",
                   )}>

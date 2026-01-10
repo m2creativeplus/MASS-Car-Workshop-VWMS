@@ -109,7 +109,7 @@ export function ConvexLoginForm() {
 
       <Card className="w-full max-w-md bg-slate-800/50 border-slate-700 backdrop-blur-xl">
         <CardHeader className="space-y-4 text-center">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/25">
+          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/25">
             <Car className="w-8 h-8 text-white" />
           </div>
           <div>
@@ -260,7 +260,7 @@ export function ConvexLoginForm() {
 
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-semibold shadow-lg shadow-orange-500/25 h-11"
+              className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold shadow-lg shadow-orange-500/25 h-11"
               disabled={isLoading}
             >
               {isLoading ? (

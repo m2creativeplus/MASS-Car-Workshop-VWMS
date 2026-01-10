@@ -1,0 +1,588 @@
+{
+  "metadata": {
+    "title": "Somaliland Automotive Market Directory",
+    "description": "Comprehensive database of car dealers, spare parts shops, garages, and marketplaces in Somaliland",
+    "last_updated": "2026-01-10",
+    "source": "MASS Market Intelligence Research",
+    "version": "1.0"
+  },
+  "car_dealers": [
+    {
+      "id": "dealer_001",
+      "name": "Dahabshiil Motors",
+      "type": "Authorized Dealer",
+      "brands": ["Hyundai", "Toyota", "IVECO", "SinoTruck"],
+      "location": {
+        "city": "Hargeisa",
+        "address": "Road #1, opposite Kaah Fuel Station",
+        "plus_code": null
+      },
+      "contact": {
+        "phone_primary": "+252 65 987 8885",
+        "phone_secondary": "+252 63 3280611",
+        "whatsapp": "+252 63 3280611",
+        "website": "https://dahabshiilmotors.com",
+        "facebook": "dahabshiilmotors"
+      },
+      "services": ["New Vehicle Sales", "After-Sales Service", "Parts"],
+      "source": "Web Research"
+    },
+    {
+      "id": "dealer_002",
+      "name": "Hargeisa Automotive Company",
+      "type": "Authorized Toyota Dealer",
+      "brands": ["Toyota"],
+      "partner": "Groupe Marill / Marill Somalia",
+      "location": {
+        "city": "Hargeisa",
+        "address": "Suld M. Farah Road, next to UNDP Hargeisa office",
+        "plus_code": null
+      },
+      "contact": {
+        "phone_primary": "+252 63 3333905",
+        "website": "https://marill-automotive.com"
+      },
+      "models_available": ["Land Cruiser 300", "Land Cruiser 70 Series (76, 78, 79)", "Hilux", "Fortuner"],
+      "services": ["New 4x4 Sales", "After-Sales Service", "Spare Parts", "Repairs"],
+      "source": "Web Research"
+    },
+    {
+      "id": "dealer_003",
+      "name": "WABCO General Trading",
+      "type": "Authorized ISUZU Dealer",
+      "brands": ["ISUZU"],
+      "location": {
+        "city": "Hargeisa",
+        "address": "Main Road, Burj Omaar Building, 5th Floor Room 506"
+      },
+      "contact": {
+        "phone_primary": "+252 63 6999951",
+        "website": "https://isuzu-somalia.com"
+      },
+      "source": "Web Research"
+    },
+    {
+      "id": "dealer_004",
+      "name": "Modern Automotive Technology (MATCO)",
+      "type": "Car Sales & Workshop",
+      "established": 2014,
+      "operations_started": 2018,
+      "location": {
+        "city": "Hargeisa",
+        "address": "MAT Building, Berbera Road"
+      },
+      "contact": {
+        "phone_primary": "+252 63 6390004",
+        "phone_secondary": "+252 63 6390000",
+        "website": "https://matcomotors.com"
+      },
+      "services": ["Car Sales", "Modern Workshop", "Service Center"],
+      "source": "Web Research"
+    },
+    {
+      "id": "dealer_005",
+      "name": "Autocom Japan Somaliland",
+      "type": "Japanese Import Dealer",
+      "location": {
+        "city": "Hargeisa",
+        "address": "Behind Deero Mall, opposite Gollis University"
+      },
+      "contact": {
+        "phone_primary": "+252 63 4731819"
+      },
+      "specialization": "Japanese Used Vehicles",
+      "source": "Web Research"
+    },
+    {
+      "id": "dealer_006",
+      "name": "Fahad Motors and Real Estate",
+      "type": "Car Dealer",
+      "location": {
+        "city": "Hargeisa",
+        "area": "Downtown"
+      },
+      "contact": {
+        "phone_primary": "+252 63 4422240"
+      },
+      "source": "kulmie.com"
+    },
+    {
+      "id": "dealer_007",
+      "name": "Buux Motors Online",
+      "type": "Car Dealer",
+      "location": {
+        "city": "Hargeisa",
+        "address": "150 Street"
+      },
+      "contact": {
+        "phone_primary": "+252 63 4034549"
+      },
+      "source": "kulmie.com"
+    },
+    {
+      "id": "dealer_008",
+      "name": "Muqdishaawi Online Motors",
+      "type": "Car Dealer",
+      "location": {
+        "city": "Hargeisa",
+        "address": "150 Street"
+      },
+      "contact": {
+        "phone_primary": "+252 63 4056379"
+      },
+      "source": "kulmie.com"
+    },
+    {
+      "id": "dealer_009",
+      "name": "Al Hayaat Motors",
+      "type": "Car Dealer",
+      "location": {
+        "city": "Hargeisa"
+      },
+      "contact": {
+        "phone_primary": "+252 63 4762452"
+      },
+      "source": "kulmie.com"
+    },
+    {
+      "id": "dealer_010",
+      "name": "Al Fathi Motors",
+      "type": "Car Dealer",
+      "location": {
+        "city": "Hargeisa"
+      },
+      "contact": {
+        "phone_primary": "+252 63 4882900"
+      },
+      "source": "kulmie.com"
+    },
+    {
+      "id": "dealer_011",
+      "name": "Gaadhiwadaag.com",
+      "type": "Car Dealer / Online Platform",
+      "location": {
+        "city": "Hargeisa",
+        "area": "Jigjiga Yar, Woqooyi Galbeed",
+        "postal_code": "JH 09010"
+      },
+      "contact": {
+        "phone_primary": "+252 63 3277111"
+      },
+      "source": "cybo.com"
+    },
+    {
+      "id": "dealer_012",
+      "name": "Shaybe Motors",
+      "type": "Car Dealer",
+      "location": {
+        "city": "Hargeisa",
+        "plus_code": "H27X+HWW"
+      },
+      "contact": {
+        "phone_primary": "+252 63 4426031"
+      },
+      "source": "cybo.com"
+    },
+    {
+      "id": "dealer_013",
+      "name": "Caalami Motors",
+      "type": "Car Dealer",
+      "location": {
+        "city": "Hargeisa",
+        "address": "Near Saba Restaurant, Road Number 1"
+      },
+      "contact": {
+        "phone_primary": "+252 63 4471714"
+      },
+      "source": "cybo.com"
+    },
+    {
+      "id": "dealer_014",
+      "name": "Safari Motors",
+      "type": "Car Dealer",
+      "location": {
+        "city": "Hargeisa"
+      },
+      "source": "cybo.com"
+    },
+    {
+      "id": "dealer_015",
+      "name": "Hargeisa Motors and Real Estate",
+      "type": "Car Dealer / Real Estate",
+      "location": {
+        "city": "Hargeisa",
+        "plus_code": "G3FF+FFF"
+      },
+      "source": "cybo.com"
+    },
+    {
+      "id": "dealer_016",
+      "name": "Xidig Motors",
+      "type": "Car Dealer",
+      "location": {
+        "city": "Hargeisa",
+        "plus_code": "H27W+QPH"
+      },
+      "source": "cybo.com"
+    },
+    {
+      "id": "dealer_017",
+      "name": "Gulf Online Motors",
+      "type": "Car Dealer",
+      "location": {
+        "city": "Hargeisa"
+      },
+      "contact": {
+        "facebook": "Gulfonlinemotors"
+      },
+      "source": "Facebook"
+    },
+    {
+      "id": "dealer_018",
+      "name": "Mobile Fuundi",
+      "type": "Automotive Repair & Sales",
+      "location": {
+        "city": "Hargeisa"
+      },
+      "contact": {
+        "website": "https://mobilefuundi.com"
+      },
+      "services": ["Comprehensive Repair", "Maintenance"],
+      "source": "Web Research"
+    }
+  ],
+  "spare_parts_shops": [
+    {
+      "id": "parts_001",
+      "name": "Modern Automotive Technology (MAT) Parts",
+      "location": {
+        "city": "Hargeisa",
+        "address": "MAT Building, Berbera Road"
+      },
+      "contact": {
+        "phone_primary": "+252 63 6390004",
+        "phone_secondary": "+252 63 6390000"
+      },
+      "brands": ["Suzuki"],
+      "type": "Authorized Suzuki Dealer Parts",
+      "source": "globalsuzuki.com"
+    },
+    {
+      "id": "parts_002",
+      "name": "Daryeel Spare Parts Branch 1",
+      "location": {
+        "city": "Hargeisa"
+      },
+      "contact": {
+        "phone_primary": "+252 2 523137"
+      },
+      "source": "near-place.com"
+    },
+    {
+      "id": "parts_003",
+      "name": "Daryeel Auto Spare Parts",
+      "location": {
+        "city": "Hargeisa"
+      },
+      "contact": {
+        "phone_primary": "+252 63 4425754"
+      },
+      "source": "kulmie.com"
+    },
+    {
+      "id": "parts_004",
+      "name": "Libaax Spare Parts",
+      "location": {
+        "city": "Hargeisa"
+      },
+      "contact": {
+        "phone_primary": "+252 63 3449998"
+      },
+      "source": "kulmie.com"
+    },
+    {
+      "id": "parts_005",
+      "name": "Hj Daaud Spare Parts",
+      "location": {
+        "city": "Hargeisa"
+      },
+      "contact": {
+        "phone_primary": "+252 63 4768110"
+      },
+      "source": "kulmie.com"
+    },
+    {
+      "id": "parts_006",
+      "name": "Jareeye Spare Parts and Car Decoration",
+      "location": {
+        "city": "Hargeisa"
+      },
+      "contact": {
+        "phone_primary": "+252 63 3933364"
+      },
+      "source": "kulmie.com"
+    },
+    {
+      "id": "parts_007",
+      "name": "ALBader Spare Parts",
+      "location": {
+        "city": "Hargeisa"
+      },
+      "contact": {
+        "phone_primary": "+252 63 3864068"
+      },
+      "source": "kulmie.com"
+    },
+    {
+      "id": "parts_008",
+      "name": "ABCO Spare Parts",
+      "location": {
+        "city": "Hargeisa"
+      },
+      "contact": {
+        "phone_primary": "+252 63 4053971"
+      },
+      "source": "kulmie.com"
+    },
+    {
+      "id": "parts_009",
+      "name": "Golden Star Auto Spare Parts",
+      "location": {
+        "city": "Hargeisa"
+      },
+      "contact": {
+        "phone_primary": "+252 63 6968041"
+      },
+      "source": "kulmie.com"
+    },
+    {
+      "id": "parts_010",
+      "name": "Sanyare Motors",
+      "location": {
+        "city": "Hargeisa"
+      },
+      "specialization": "OEM Parts",
+      "notes": "Sells Toyota parts including injectors",
+      "source": "MASS Market Intel"
+    },
+    {
+      "id": "parts_011",
+      "name": "Khaliij Parts",
+      "location": {
+        "city": "Hargeisa"
+      },
+      "specialization": "OEM Toyota Parts",
+      "source": "MASS Market Intel"
+    },
+    {
+      "id": "parts_012",
+      "name": "Al-Baraka Parts",
+      "location": {
+        "city": "Hargeisa"
+      },
+      "specialization": "Aftermarket Parts",
+      "source": "MASS Market Intel"
+    }
+  ],
+  "online_marketplaces": [
+    {
+      "id": "market_001",
+      "name": "Dilaal.com",
+      "url": "https://dilaal.com",
+      "type": "General Classifieds + Automotive",
+      "automotive_section": "/automotive",
+      "features": ["Car listings", "Property", "Electronics", "Jobs"],
+      "listing_format": {
+        "fields": ["Model", "Year", "Color", "Transmission", "Price", "Contact Phone"]
+      },
+      "facebook_page": "dilaalcom",
+      "source": "dilaal.com"
+    },
+    {
+      "id": "market_002",
+      "name": "Gaadhi.com",
+      "url": "https://gaadhi.com",
+      "type": "Dedicated Automotive Marketplace",
+      "coverage": ["Somalia", "Somaliland"],
+      "features": ["Cars", "Motorbikes", "Trucks", "Car Reviews"],
+      "search_filters": ["Make", "Model", "Year", "Price", "Mileage", "Fuel Type", "Transmission"],
+      "source": "gaadhi.com"
+    },
+    {
+      "id": "market_003",
+      "name": "Riqiis.com",
+      "url": "https://riqiis.com",
+      "type": "Multi-category Marketplace",
+      "categories": ["Vehicles", "Real Estate", "Electronics"],
+      "source": "Web Research"
+    }
+  ],
+  "facebook_groups": [
+    {
+      "id": "fb_001",
+      "name": "IIBI Ama IIBSO (Buy or Sell)",
+      "url": "https://www.facebook.com/groups/149621988826248/",
+      "type": "Marketplace Group",
+      "categories": ["Vehicles", "General Goods"],
+      "listing_format": {
+        "example": "FOR SALE: HARRIER Jaanis | Location: Hargeisa | Qiimaha: $6,300 | Phone: 63 XXXXXXX"
+      },
+      "source": "Facebook"
+    },
+    {
+      "id": "fb_002",
+      "name": "Dilaal.com (Page)",
+      "url": "https://www.facebook.com/dilaalcom",
+      "type": "Marketplace Page",
+      "source": "Facebook"
+    },
+    {
+      "id": "fb_003",
+      "name": "Gulf Online Motors",
+      "url": "https://www.facebook.com/Gulfonlinemotors",
+      "type": "Dealer Page",
+      "source": "Facebook"
+    },
+    {
+      "id": "fb_004",
+      "name": "Hargeisa Motors (Search)",
+      "search_url": "https://www.facebook.com/search/top/?q=hargeisa%20motors",
+      "type": "Search Results",
+      "source": "Facebook"
+    }
+  ],
+  "berbera_dealers": [
+    {
+      "id": "berbera_001",
+      "name": "Autocom Japan Somaliland (Berbera)",
+      "type": "Car Sales",
+      "location": {
+        "city": "Berbera"
+      },
+      "source": "somalilandstandard.com"
+    },
+    {
+      "id": "berbera_002",
+      "name": "Majid Car Dealer",
+      "type": "Used Car Dealer",
+      "location": {
+        "city": "Berbera"
+      },
+      "notes": "Listed 1995 Toyota Land Cruiser for sale",
+      "source": "Web Research"
+    }
+  ],
+  "burco_dealers": [
+    {
+      "id": "burco_001",
+      "name": "Geerashka Ayaanle",
+      "type": "Automotive Services",
+      "location": {
+        "city": "Burco"
+      },
+      "source": "mogadishuservices.com"
+    },
+    {
+      "id": "burco_002",
+      "name": "Sky1burco",
+      "type": "Automotive Services",
+      "location": {
+        "city": "Burco"
+      },
+      "source": "mogadishuservices.com"
+    }
+  ],
+  "garages_workshops": [
+    {
+      "id": "garage_001",
+      "name": "Garage Aw Ali",
+      "location": {
+        "city": "Hargeisa"
+      },
+      "source": "cybo.com"
+    },
+    {
+      "id": "garage_002",
+      "name": "Shabac Motors (Workshop)",
+      "location": {
+        "city": "Hargeisa"
+      },
+      "source": "cybo.com"
+    },
+    {
+      "id": "garage_003",
+      "name": "Berbera Technical College (BTC)",
+      "type": "Training Institute",
+      "location": {
+        "city": "Berbera"
+      },
+      "programs": ["Automotive Mechanics Training"],
+      "source": "berberatechnicalcollege.com"
+    }
+  ],
+  "import_regulations": {
+    "primary_port": "Berbera",
+    "import_sources": ["Dubai", "Japan", "UAE"],
+    "taxes": {
+      "import_duty": "25%",
+      "vat": "16%",
+      "excise_duty": "20%",
+      "total_burden": "Up to 61% of vehicle value"
+    },
+    "required_documents": [
+      "Roadworthiness Certificate",
+      "Commercial Invoice",
+      "Bill of Lading",
+      "Original Certificate of Registration & Ownership",
+      "Purchase Invoice",
+      "Valuation Certificate",
+      "Police Clearance Certificate (Interpol)"
+    ],
+    "exemptions": [
+      {
+        "type": "Returning Nationals",
+        "condition": "Lived abroad 2+ years, vehicle registered in their name abroad",
+        "benefit": "Duty and tax free for one vehicle"
+      },
+      {
+        "type": "Foreign Residents",
+        "condition": "Within first 6 months of arrival, vehicle registered in their name",
+        "benefit": "Duty and tax free for one vehicle"
+      }
+    ],
+    "notes": "Older vehicles or those not meeting emission standards may face higher tariffs"
+  },
+  "popular_vehicles": {
+    "makes": ["Toyota", "Nissan", "Mitsubishi", "Honda", "Suzuki", "Hyundai", "ISUZU"],
+    "top_models": [
+      "Toyota Land Cruiser 70 Series (76, 78, 79)",
+      "Toyota Land Cruiser Prado",
+      "Toyota Hilux",
+      "Toyota Harrier",
+      "Toyota Vitz",
+      "Toyota Probox/Succeed",
+      "Nissan Patrol",
+      "Honda Fit",
+      "Mitsubishi Pajero"
+    ],
+    "price_ranges_usd": {
+      "economy": { "min": 2500, "max": 5000, "examples": ["Vitz", "Probox", "Honda Fit"] },
+      "mid_range": { "min": 5000, "max": 15000, "examples": ["Harrier", "RAV4", "Hilux (older)"] },
+      "suv_4x4": { "min": 15000, "max": 50000, "examples": ["Land Cruiser Prado", "Hilux (new)", "Patrol"] },
+      "premium": { "min": 35000, "max": 100000, "examples": ["Land Cruiser 300", "Land Cruiser 79 (new)"] }
+    }
+  },
+  "somali_terms": {
+    "dilaal": "Broker/Agent",
+    "gaadhi": "Vehicle/Car",
+    "baabur": "Vehicle/Car (alternate)",
+    "iib": "Sell",
+    "iibso": "Buy",
+    "qiimaha": "Price",
+    "goob": "Location",
+    "xiriir": "Contact",
+    "qaybta": "Parts",
+    "mishiinka": "Engine",
+    "jaanis": "Model/Type variation"
+  }
+}

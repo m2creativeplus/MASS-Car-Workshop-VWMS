@@ -154,7 +154,7 @@ export function TechnicianDashboard() {
               <tr key={tech.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                 {/* Avatar */}
                 <td className="px-6 py-3">
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white font-bold text-sm shadow">
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow">
                     {tech.name.split(' ').map(n => n[0]).join('')}
                   </div>
                 </td>

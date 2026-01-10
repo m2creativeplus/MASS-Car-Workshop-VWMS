@@ -131,7 +131,7 @@ export function Sidebar({ activeModule, onModuleChange, userRole, className }: S
       {/* Header */}
       <div className="flex items-center p-6 mb-2">
         <div className={cn("flex items-center gap-3 transition-opacity duration-200", isCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 flex-1")}>
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
             <Car className="h-6 w-6 text-white" />
           </div>
           <div className="flex flex-col">

@@ -109,7 +109,7 @@ export function CarRequestModule() {
           transition={{ delay: 0.1 }}
         >
           <Card>
-            <CardHeader className="bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-t-lg">
+            <CardHeader className="bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-t-lg">
               <CardTitle className="flex items-center gap-2">
                 <Car className="h-5 w-5" />
                 Request Service

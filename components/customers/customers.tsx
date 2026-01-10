@@ -298,7 +298,7 @@ export function Customers({ orgId }: { orgId: string }) {
             {filteredCustomers.map((customer) => (
               <tr key={customer.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                 <td className="px-6 py-3">
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white font-bold text-sm shadow">
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-sm shadow">
                     {customer.firstName[0]}{customer.lastName[0]}
                   </div>
                 </td>
@@ -536,7 +536,7 @@ export function Customers({ orgId }: { orgId: string }) {
           {selectedCustomer && (
             <div className="space-y-4 py-4">
               <div className="flex items-center gap-4">
-                <div className="h-16 w-16 rounded-full bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white font-bold text-xl">
+                <div className="h-16 w-16 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white font-bold text-xl">
                   {selectedCustomer.firstName[0]}{selectedCustomer.lastName[0]}
                 </div>
                 <div>

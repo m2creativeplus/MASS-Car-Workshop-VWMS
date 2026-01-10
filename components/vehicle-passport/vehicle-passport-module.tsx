@@ -121,7 +121,7 @@ export function VehiclePassportModule() {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
               <Car className="h-6 w-6 text-white" />
             </div>
             <h1 className="text-2xl font-bold text-white">MASS Vehicle Passport</h1>
@@ -131,7 +131,7 @@ export function VehiclePassportModule() {
 
         {/* Vehicle Card */}
         <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm mb-6 overflow-hidden">
-          <div className="bg-gradient-to-r from-orange-500 to-red-600 p-6">
+          <div className="bg-gradient-to-r from-amber-500 to-orange-500 p-6">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-white">

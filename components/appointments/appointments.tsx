@@ -329,7 +329,7 @@ export function Appointments({ orgId = "demo" }: AppointmentsProps) {
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex gap-4 flex-1">
                         {/* Time Block */}
-                        <div className="flex flex-col items-center justify-center bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-lg p-3 min-w-[80px]">
+                        <div className="flex flex-col items-center justify-center bg-gradient-to-br from-amber-500 to-orange-500 text-white rounded-lg p-3 min-w-[80px]">
                           <span className="text-2xl font-bold">{appointment.time}</span>
                           <span className="text-xs opacity-90">{appointment.duration} min</span>
                         </div>

@@ -51,7 +51,7 @@ export function ContactModule() {
           className="space-y-4"
         >
           <Card>
-            <CardHeader className="bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-t-lg">
+            <CardHeader className="bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-t-lg">
               <CardTitle>MASS Car Workshop</CardTitle>
             </CardHeader>
             <CardContent className="p-6 space-y-4">
