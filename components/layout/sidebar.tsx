@@ -50,29 +50,46 @@ interface SidebarProps {
 }
 
 const menuItems = [
+  // Overview
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["admin", "staff", "technician", "customer"] },
-  { id: "work-orders", label: "Work Orders", icon: Wrench, roles: ["admin", "staff", "technician"] },
-  { id: "customers", label: "Customers", icon: Users, roles: ["admin", "staff"] },
-  { id: "vehicles", label: "Vehicles", icon: Car, roles: ["admin", "staff", "technician", "customer"] },
   { id: "appointments", label: "Appointments", icon: Calendar, roles: ["admin", "staff", "technician", "customer"] },
-  { id: "car-request", label: "Car Request", icon: CarFront, roles: ["admin", "staff", "customer"] },
+  { id: "work-orders", label: "Work Orders", icon: Wrench, roles: ["admin", "staff", "technician"] },
+  
+  // Operations
+  { id: "vehicles", label: "Vehicles", icon: Car, roles: ["admin", "staff", "technician", "customer"] },
+  { id: "customers", label: "Customers", icon: Users, roles: ["admin", "staff"] },
+  { id: "estimates", label: "Estimates", icon: FileText, roles: ["admin", "staff", "technician"] },
+  { id: "inspections", label: "DVI Inspections", icon: ClipboardCheck, roles: ["admin", "staff", "technician"] },
   { id: "inventory", label: "Parts Stock", icon: Package, roles: ["admin", "staff"] },
+  
+  // Growth (NEW)
+  { id: "affiliates", label: "Affiliates", icon: Share2, roles: ["admin", "staff"], isNew: true },
+  { id: "marketing", label: "Marketing", icon: Smartphone, roles: ["admin", "staff"], isNew: true },
+  { id: "declined-jobs", label: "Declined Jobs", icon: FileText, roles: ["admin", "staff"] },
+  
+  // Imports (NEW)
+  { id: "japan-imports", label: "Japan Imports", icon: Truck, roles: ["admin", "staff"], isNew: true },
+  { id: "suppliers", label: "Suppliers", icon: Building2, roles: ["admin", "staff"] },
+  
+  // Knowledge (NEW)
+  { id: "knowledge-base", label: "Knowledge Base", icon: BookOpen, roles: ["admin", "staff", "technician"], isNew: true },
+  { id: "ai-tools", label: "AI Assistant", icon: Bot, roles: ["admin", "staff", "technician"] },
+  { id: "diagnostics", label: "AI Diagnostics", icon: Bot, roles: ["admin", "staff", "technician"] },
+  
+  // Operations Extended
+  { id: "car-request", label: "Car Request", icon: CarFront, roles: ["admin", "staff", "customer"] },
   { id: "pos", label: "Part Sells", icon: ShoppingCart, roles: ["admin", "staff"] },
   { id: "market", label: "Marketplace", icon: Store, roles: ["admin", "staff"] },
   { id: "canned-jobs", label: "Canned Jobs", icon: ClipboardList, roles: ["admin", "staff"] },
   { id: "inspection-templates", label: "DVI Templates", icon: ClipboardCheck, roles: ["admin", "staff"] },
-  { id: "declined-jobs", label: "Declined Jobs", icon: FileText, roles: ["admin", "staff"] },
   { id: "catalog", label: "Catalog", icon: BookOpen, roles: ["admin", "staff"] },
   { id: "delivery", label: "Delivery", icon: Truck, roles: ["admin", "staff"] },
   { id: "reminders", label: "Reminders", icon: Bell, roles: ["admin", "staff"] },
   { id: "technicians", label: "Mechanics", icon: UserCheck, roles: ["admin", "staff"] },
-  { id: "suppliers", label: "Suppliers", icon: Building2, roles: ["admin", "staff"] },
   { id: "network", label: "Network", icon: Network, roles: ["admin", "staff"] },
-  { id: "inspections", label: "DVI Inspections", icon: ClipboardCheck, roles: ["admin", "staff", "technician"] },
-  { id: "diagnostics", label: "AI Diagnostics", icon: Bot, roles: ["admin", "staff", "technician"] },
-  { id: "estimates", label: "Estimates & Invoices", icon: FileText, roles: ["admin", "staff", "technician"] },
   { id: "reports", label: "Reports", icon: BarChart3, roles: ["admin", "staff"] },
-  { id: "ai-tools", label: "AI Assistant", icon: Bot, roles: ["admin", "staff", "technician"] },
+  
+  // Admin
   { id: "cms", label: "CMS Control", icon: Layers, roles: ["admin"] },
   { id: "contact", label: "Contact", icon: Phone, roles: ["admin", "staff"] },
   { id: "settings", label: "Settings", icon: Settings, roles: ["admin"] },
@@ -159,10 +176,17 @@ export function Sidebar({ activeModule, onModuleChange, userRole, className }: S
                   
                   {!isCollapsed && (
                     <span className={cn(
-                      "font-medium text-sm ml-3 transition-colors duration-200 truncate",
+                      "font-medium text-sm ml-3 transition-colors duration-200 truncate flex-1",
                       isActive ? "text-white" : "text-slate-400 group-hover:text-white"
                     )}>
                       {item.label}
+                    </span>
+                  )}
+                  
+                  {/* NEW Badge */}
+                  {!isCollapsed && (item as any).isNew && (
+                    <span className="ml-auto text-[9px] font-bold bg-orange-500 text-white px-1.5 py-0.5 rounded">
+                      NEW
                     </span>
                   )}
                 </div>
