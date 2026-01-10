@@ -3,3 +3,4 @@ _TEMP_V2_IMPORT/
 _TO_BE_DELETED/
 .next/
 .env.local
+.vercel

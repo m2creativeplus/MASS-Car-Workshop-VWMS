@@ -245,8 +245,8 @@ export function Vehicles({ orgId }: { orgId: string }) {
           Car Stock / Vehicle List
         </h2>
         
-        <div className="flex gap-2 w-full md:w-auto">
-          <Button variant="outline" size="sm" onClick={fetchVehicles} disabled={loading}>
+      <div className="flex gap-2 w-full md:w-auto">
+          <Button variant="outline" size="sm" disabled={loading}>
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
           </Button>
           <Button className="bg-[#00A65A] hover:bg-[#008d4c] text-white" onClick={handleCreate}>

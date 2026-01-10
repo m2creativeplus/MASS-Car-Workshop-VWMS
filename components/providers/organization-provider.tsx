@@ -65,7 +65,7 @@ export function OrganizationProvider({ children }: { children: React.ReactNode }
     }
   }, [user])
 
-  const isDemoUser = Boolean(user?.id?.startsWith("demo-")) || isLocalStorageDemo
+  const isDemoUser = Boolean(user?.id?.startsWith("demo-")) || isLocalStorageDemo || user?.email === "owner@masscar.com"
   
   // Query convex only if NOT a demo user (double check)
   const shouldQueryConvex = Boolean(!authLoading && user && !isDemoUser)
