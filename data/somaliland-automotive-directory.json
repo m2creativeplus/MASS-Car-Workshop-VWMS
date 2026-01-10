@@ -659,6 +659,181 @@
     { "name": "Xasan Xuseen", "city": "Hargeisa", "source": "cybo.com" },
     { "name": "Toyota Maril", "city": "Hargeisa", "source": "cybo.com" }
   ],
+  "car_rentals": [
+    {
+      "id": "rental_001",
+      "name": "Royal Car Rental",
+      "location": { "city": "Hargeisa", "address": "Downtown, opposing Central Bank" },
+      "contact": { "phone_primary": "06 33 11 4444", "website": "royalcaronline.com" },
+      "source": "gotosomaliland.com"
+    },
+    {
+      "id": "rental_002",
+      "name": "Xidig Motors Rental",
+      "location": { "city": "Hargeisa", "plus_code": "H27W+QPH" },
+      "contact": { "phone_primary": "+2634471888" },
+      "source": "gotosomaliland.com"
+    },
+    {
+      "id": "rental_003",
+      "name": "Toyota Marill Rental Department",
+      "location": { "city": "Hargeisa" },
+      "contact": { "phone_primary": "+252 634 528 424", "website": "toyotamarill.com", "email": "sales@toyotamarill.com" },
+      "source": "groupe-marill.com"
+    },
+    {
+      "id": "rental_004",
+      "name": "Garas Motors Rental",
+      "location": { "city": "Hargeisa", "address": "State House Road" },
+      "contact": { "phone_primary": "+252 63 4437626" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "rental_005",
+      "name": "Qiyaas Car Rental",
+      "location": { "city": "Hargeisa", "address": "Bader University" },
+      "contact": { "phone_primary": "+252 63 3383344" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "rental_006",
+      "name": "Ysn Carhire",
+      "location": { "city": "Hargeisa", "address": "Waheen Hwy" },
+      "contact": { "phone_primary": "+252 63 6693486" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "rental_007",
+      "name": "Kaamil Car Rental & Decoration",
+      "location": { "city": "Hargeisa", "address": "Next to Safari Hotel, Fooqa Hargeisa Towers 1" },
+      "contact": { "phone_primary": "+252 63 6122228" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "rental_008",
+      "name": "Dubai Motors Rental",
+      "location": { "city": "Hargeisa", "plus_code": "H28W+7J9" },
+      "contact": { "phone_primary": "+252 63 4455459" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "rental_009",
+      "name": "Kaafiye Car Rental & Logistics",
+      "location": { "city": "Hargeisa", "plus_code": "H348+9FG" },
+      "contact": { "phone_primary": "+252 63 7266661" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "rental_010",
+      "name": "Hargeisa Car Hires",
+      "location": { "city": "Hargeisa", "plus_code": "H36G+XM3" },
+      "contact": { "phone_primary": "+252 63 3818949" },
+      "source": "cybo.com"
+    }
+  ],
+  "driving_schools": [
+    {
+      "id": "school_001",
+      "name": "Caalami Najah Driving School",
+      "location": { "city": "Hargeisa" },
+      "contact": { "phone_primary": "+252 63 4455711" },
+      "source": "nyongesasande.com"
+    },
+    {
+      "id": "school_002",
+      "name": "Tawkal Driving School",
+      "location": { "city": "Hargeisa" },
+      "contact": { "phone_primary": "+252 63 4775421" },
+      "source": "nyongesasande.com"
+    },
+    {
+      "id": "school_003",
+      "name": "Gaataa-Uni Driving School",
+      "location": { "city": "Hargeisa" },
+      "source": "nyongesasande.com"
+    },
+    {
+      "id": "school_004",
+      "name": "Aflax Driving School",
+      "location": { "city": "Hargeisa" },
+      "source": "nyongesasande.com"
+    },
+    {
+      "id": "school_005",
+      "name": "KhaaLid Dhiico Driving School",
+      "location": { "city": "Hargeisa" },
+      "source": "nyongesasande.com"
+    },
+    {
+      "id": "school_006",
+      "name": "Ashkir Driving School",
+      "location": { "city": "Hargeisa" },
+      "source": "nyongesasande.com"
+    }
+  ],
+  "specialized_services": [
+    {
+      "id": "service_001",
+      "name": "Clear Coat Collision",
+      "type": "Body Shop",
+      "location": { "city": "Hargeisa" },
+      "services": ["Dent Repair", "Collision Repair", "Painting"],
+      "source": "bumperrepair.net"
+    },
+    {
+      "id": "service_002",
+      "name": "ISSA Auto Electrix",
+      "type": "Auto Electrician",
+      "location": { "city": "Hargeisa" },
+      "services": ["Electrical", "Air Conditioning", "Batteries"],
+      "source": "wixsite.com"
+    },
+    {
+      "id": "service_003",
+      "name": "Mobile Fuundi",
+      "type": "Specialized Repair",
+      "location": { "city": "Hargeisa" },
+      "services": ["Bodywork", "Painting", "Electrical"],
+      "contact": { "phone_primary": "+252 63 7218888" },
+      "source": "mobilefuundi.com"
+    },
+    {
+      "id": "service_004",
+      "name": "Ali Baarjeex Car Accessories",
+      "type": "Accessories",
+      "location": { "city": "Hargeisa" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "service_005",
+      "name": "Funny Car Decoration",
+      "type": "Accessories",
+      "location": { "city": "Hargeisa" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "service_006",
+      "name": "Indhacase and Sons",
+      "type": "Body Shop",
+      "location": { "city": "Hargeisa" },
+      "source": "fastbase.com"
+    },
+    {
+      "id": "service_007",
+      "name": "Goljano Tyres",
+      "type": "Tires & Batteries",
+      "location": { "city": "Hargeisa" },
+      "source": "cybo.com"
+    },
+    {
+      "id": "service_008",
+      "name": "Aljamil General Trading",
+      "type": "Batteries",
+      "location": { "city": "Hargeisa" },
+      "services": ["Car Batteries", "Oils"],
+      "source": "business-yellowpages.com"
+    }
+  ],
   "import_regulations": {
     "primary_port": "Berbera",
     "import_sources": ["Dubai", "Japan", "UAE"],

@@ -1,8 +1,38 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ============================================
+   MECHANIC-128 CLONE THEME (Public Site)
+   Colors: Black #000, Orange #FF4D24
+   ============================================ */
+
+.mechanic-theme {
+  --mechanic-black: #000000;
+  --mechanic-charcoal: #0E0E0E;
+  --mechanic-dark: #1A1A1A;
+  --mechanic-orange: #FF4D24;
+  --mechanic-orange-hover: #FF6B47;
+  --mechanic-gray: #888888;
+  --mechanic-light-gray: #BBBBBB;
+  background-color: var(--mechanic-black);
+  color: #FFFFFF;
+  font-family: 'Inter', sans-serif;
+}
+
+.mechanic-theme h1,
+.mechanic-theme h2,
+.mechanic-theme h3,
+.mechanic-theme h4,
+.mechanic-theme h5,
+.mechanic-theme h6 {
+  font-family: 'Oxanium', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
 
 /* ============================================
    MASS CAR WORKSHOP - PREMIUM DESIGN SYSTEM
