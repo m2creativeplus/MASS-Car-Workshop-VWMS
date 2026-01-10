@@ -75,33 +75,90 @@ EXTERNAL LEVEL
 | **Parts Counter Staff** | `PARTS_COUNTER` | Sells parts over counter, locates parts for technicians, handles returns. | $200-400/mo |
 | **Warranty Administrator** | `WARRANTY_ADMIN` | Processes warranty claims, tracks manufacturer coverage. | $300-500/mo |
 
-### 2.5 Technical Roles
+### 2.5 Mechanical Department Roles
 
 | Role | Code | Description | Typical Salary (SL) |
 |------|------|-------------|---------------------|
-| **Shop Foreman** | `SHOP_FOREMAN` | Lead tech, supervises technicians, quality control, work assignment. | $500-800/mo |
-| **Master Technician (A-Tech)** | `MASTER_TECH` | Highest skill level, handles complex diagnostics, mentors others. ASE-equivalent. | $400-700/mo |
-| **Journeyman Technician (B-Tech)** | `TECH_B` | Experienced tech, handles most repairs independently. | $250-450/mo |
-| **Apprentice Technician (C-Tech)** | `TECH_C` | Learning tech, assists others, handles basic tasks. | $150-250/mo |
-| **Lube Technician** | `LUBE_TECH` | Quick service: oil changes, tire rotations, inspections. | $100-200/mo |
-| **Detailer** | `DETAILER` | Vehicle cleaning, polishing, interior/exterior detailing. | $100-200/mo |
+| **Shop Foreman** | `SHOP_FOREMAN` | Lead tech, supervises all technicians, quality control, work assignment. | $500-800/mo |
+| **Master Technician (A-Tech)** | `MASTER_TECH` | Highest skill. Complex diagnostics, engine rebuilds, transmission work. ASE Master equivalent. | $400-700/mo |
+| **Diagnostic Technician** | `DIAG_TECH` | Specializes in computer diagnostics, electrical systems, check engine lights. | $350-600/mo |
+| **Journeyman Technician (B-Tech)** | `TECH_B` | Experienced. Handles brakes, suspension, A/C, general repairs independently. | $250-450/mo |
+| **Apprentice Technician (C-Tech)** | `TECH_C` | Learning. Assists senior techs, handles basic oil changes, tire rotations. | $150-250/mo |
+| **Lube Technician** | `LUBE_TECH` | Quick service: oil changes, fluid top-offs, filter replacements. | $100-200/mo |
+| **Tire Technician** | `TIRE_TECH` | Tire mounting, balancing, rotation, alignment assistance. | $100-200/mo |
+| **Alignment Technician** | `ALIGNMENT_TECH` | Wheel alignment, suspension geometry, steering system specialist. | $200-400/mo |
+| **Transmission Technician** | `TRANS_TECH` | Automatic/manual transmission repair, clutch replacement, drivetrain. | $350-600/mo |
+| **Diesel Technician** | `DIESEL_TECH` | Diesel engine specialist, injectors, turbo systems, heavy equipment. | $350-600/mo |
+| **Hybrid/Electric Technician** | `EV_TECH` | High-voltage systems, battery diagnostics, EV-specific repairs. | $400-700/mo |
+| **AC/Heating Technician** | `HVAC_TECH` | Climate control systems, refrigerant handling, heater cores. | $250-450/mo |
 
-### 2.6 Administrative Roles
+### 2.6 Body Shop Department Roles
 
 | Role | Code | Description | Typical Salary (SL) |
 |------|------|-------------|---------------------|
-| **Accounts Receivable** | `AR_CLERK` | Manages customer payments, follows up on outstanding invoices. | $200-400/mo |
-| **Accounts Payable** | `AP_CLERK` | Pays suppliers, manages expenses, reconciles accounts. | $200-400/mo |
+| **Body Shop Manager** | `BODY_SHOP_MGR` | Manages collision center, estimates, insurance claims, staff. | $500-900/mo |
+| **Body Shop Estimator** | `BODY_ESTIMATOR` | Writes collision estimates, works with insurance adjusters. | $350-600/mo |
+| **Master Body Technician** | `BODY_MASTER` | Expert panel repair, structural repair, frame straightening. | $400-700/mo |
+| **Body Technician** | `BODY_TECH` | Dent repair, panel replacement, filler work, sanding. | $250-450/mo |
+| **Frame Technician** | `FRAME_TECH` | Structural repair, frame machine operation, unibody repair. | $350-550/mo |
+| **Metal Fabricator** | `FABRICATOR` | Custom metal work, rust repair, floor pan replacement. | $300-500/mo |
+| **PDR Technician** | `PDR_TECH` | Paintless Dent Repair - removes dents without repainting. | $250-500/mo |
+| **Glass Technician** | `GLASS_TECH` | Windshield replacement, power window repair, seals. | $200-400/mo |
+
+### 2.7 Paint Shop Department Roles
+
+| Role | Code | Description | Typical Salary (SL) |
+|------|------|-------------|---------------------|
+| **Paint Shop Manager** | `PAINT_SHOP_MGR` | Oversees paint department, color matching, quality control. | $450-800/mo |
+| **Master Painter** | `PAINTER_MASTER` | Expert refinish work, custom painting, specialty finishes. | $400-700/mo |
+| **Painter** | `PAINTER` | Base coat/clear coat application, single stage paint, blending. | $300-500/mo |
+| **Prep Technician** | `PREP_TECH` | Surface preparation, masking, sanding, priming. | $200-350/mo |
+| **Paint Mixer / Colorist** | `COLORIST` | Color matching, paint mixing, variant formulation. | $250-400/mo |
+| **Buffer / Polisher** | `BUFFER` | Final finish work, buffing, polishing, wet sanding. | $150-300/mo |
+
+### 2.8 Specialty Technician Roles
+
+| Role | Code | Description | Typical Salary (SL) |
+|------|------|-------------|---------------------|
+| **Upholstery Technician** | `UPHOLSTERY_TECH` | Seat repair, headliner, carpet, leather restoration. | $200-400/mo |
+| **Audio/Electronics Installer** | `AUDIO_TECH` | Car audio, alarms, remote start, GPS, camera systems. | $200-400/mo |
+| **Tint Technician** | `TINT_TECH` | Window tinting, paint protection film (PPF) installation. | $150-350/mo |
+| **Detailer** | `DETAILER` | Interior/exterior cleaning, polishing, waxing, ceramic coating. | $100-250/mo |
+| **Wraps Installer** | `WRAP_TECH` | Vinyl wrap installation, graphics, decals, color change. | $250-450/mo |
+| **Welder** | `WELDER` | MIG/TIG welding, exhaust fabrication, structural welding. | $250-450/mo |
+| **Motorcycle Technician** | `MOTO_TECH` | Motorcycle repair, ATV, small engine specialist. | $200-400/mo |
+
+### 2.9 Support Staff Roles
+
+| Role | Code | Description | Typical Salary (SL) |
+|------|------|-------------|---------------------|
+| **Lot Attendant** | `LOT_ATTENDANT` | Moves vehicles, keeps lot organized, basic cleaning. | $80-150/mo |
+| **Stock Clerk** | `STOCK_CLERK` | Receives parts, stocks shelves, inventory organization. | $100-200/mo |
+| **Shop Helper** | `SHOP_HELPER` | General shop assistance, cleaning, tool organization. | $80-150/mo |
+| **Driver / Porter** | `DRIVER` | Shuttle driver, parts runner, customer transport. | $100-200/mo |
+| **Tow Truck Operator** | `TOW_OPERATOR` | Vehicle recovery, roadside assistance, flatbed operation. | $200-400/mo |
+
+### 2.10 Administrative Roles
+
+| Role | Code | Description | Typical Salary (SL) |
+|------|------|-------------|---------------------|
+| **Accounts Receivable Clerk** | `AR_CLERK` | Manages customer payments, follows up on outstanding invoices. | $200-400/mo |
+| **Accounts Payable Clerk** | `AP_CLERK` | Pays suppliers, manages expenses, reconciles accounts. | $200-400/mo |
+| **Insurance Coordinator** | `INSURANCE_COORD` | Works with insurance companies, processes claims, supplements. | $300-500/mo |
 | **Marketing Coordinator** | `MARKETING` | Manages campaigns, social media, customer retention programs. | $300-500/mo |
 | **HR Administrator** | `HR_ADMIN` | Manages employee records, time tracking, payroll coordination. | $300-500/mo |
+| **Training Coordinator** | `TRAINING` | Staff development, certification tracking, safety training. | $250-450/mo |
 
-### 2.7 External Roles
+### 2.11 External Roles
 
 | Role | Code | Description |
 |------|------|-------------|
 | **Customer** | `CUSTOMER` | Portal access to view vehicles, history, approve estimates, book appointments. |
-| **Vendor** | `VENDOR` | Supplier portal access to view/fulfill purchase orders, update pricing. |
+| **Fleet Customer** | `FLEET_CUSTOMER` | Business customer managing multiple vehicles, bulk pricing. |
+| **Insurance Adjuster** | `ADJUSTER` | External insurance rep with limited view access for claims. |
+| **Vendor / Supplier** | `VENDOR` | Supplier portal access to view/fulfill purchase orders, update pricing. |
 | **Affiliate Partner** | `AFFILIATE` | Referral partner access to track commissions and referrals. |
+| **Manufacturer Rep** | `MFG_REP` | Factory representative with warranty/recall access. |
 
 ---
 
