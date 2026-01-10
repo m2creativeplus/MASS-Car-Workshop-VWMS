@@ -112,10 +112,10 @@ export default function BlogPage() {
 
       {/* Featured Post */}
       {filteredPosts[0] && (
-        <Card className="overflow-hidden bg-gradient-to-r from-orange-500/10 to-red-500/10 border-orange-500/20">
+        <Card className="overflow-hidden bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/20">
           <div className="grid md:grid-cols-2 gap-6 p-6">
             <div className="space-y-4">
-              <Badge className="bg-orange-500">Featured</Badge>
+              <Badge className="bg-amber-500">Featured</Badge>
               <h2 className="text-2xl font-bold">{filteredPosts[0].title}</h2>
               <p className="text-muted-foreground">{filteredPosts[0].excerpt}</p>
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -128,9 +128,11 @@ export default function BlogPage() {
                   {filteredPosts[0].publishedAt}
                 </span>
               </div>
-              <Button className="bg-orange-500 hover:bg-orange-600">
-                Read Article <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              <Link href={`/dashboard/blog/${filteredPosts[0].slug}`}>
+                <Button className="bg-amber-500 hover:bg-amber-600">
+                  Read Article <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
             </div>
             <div className="bg-slate-800 rounded-lg h-48 md:h-auto flex items-center justify-center">
               <BookOpen className="h-16 w-16 text-slate-600" />
