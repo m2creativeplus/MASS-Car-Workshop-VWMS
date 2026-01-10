@@ -171,40 +171,54 @@ export default function HomePage() {
           <div className="max-w-4xl">
             <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 px-4 py-2 mb-8">
               <Globe className="w-4 h-4 mr-2" />
-              Somaliland's First Industrial-Grade Automotive OS
+              Built for 300-450 Somaliland Garages
             </Badge>
             
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-8">
-              <span className="text-white">The National</span>
+              <span className="text-white">The Operating System for</span>
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-red-500 to-orange-400">
-                Mobility Operating System
+                Mobility Services
               </span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-slate-400 mb-6 max-w-3xl font-light">
-              Turning Informal Operations into Trusted, Intelligent Systems.
+            <p className="text-xl md:text-2xl text-slate-300 mb-6 max-w-3xl font-light">
+              Turning informal operations into trusted, intelligent systems.
             </p>
 
             <p className="text-lg text-slate-500 mb-12 max-w-2xl leading-relaxed">
-              Most software assumes a perfect world. <span className="text-white font-medium">MASS OSS</span> was built for the real one. 
-              In high-context, emerging markets, work happens in the shadows—verbal promises, paper job cards, and cash drawers. 
-              <span className="text-orange-400"> We bring the light.</span>
+              Workshops don't fail because of lack of effort. They fail because <span className="text-white">systems fail to reflect reality</span>. 
+              MASS OSS brings <span className="text-orange-400">operational truth</span>—visibility into every job, every part, every payment.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <Link href="/login">
                 <Button size="lg" className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white px-8 py-6 text-lg gap-2 w-full sm:w-auto shadow-lg shadow-orange-500/25">
-                  Explore the Ecosystem
+                  Explore the Platform
                   <ArrowRight className="w-5 h-5" />
                 </Button>
               </Link>
-              <Link href="/contact">
+              <Link href="/compare">
                 <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8 py-6 text-lg gap-2">
-                  <Building2 className="w-5 h-5" />
-                  Partner with MASS Authority
+                  Compare to Tekmetric
                 </Button>
               </Link>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="flex flex-wrap gap-8 text-sm">
+              <div>
+                <span className="text-2xl font-bold text-orange-500">50+</span>
+                <span className="text-slate-400 ml-2">User Roles</span>
+              </div>
+              <div>
+                <span className="text-2xl font-bold text-orange-500">65+</span>
+                <span className="text-slate-400 ml-2">Modules</span>
+              </div>
+              <div>
+                <span className="text-2xl font-bold text-orange-500">ZAAD</span>
+                <span className="text-slate-400 ml-2">& eDahab Ready</span>
+              </div>
             </div>
           </div>
         </div>

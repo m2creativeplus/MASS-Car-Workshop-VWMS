@@ -1,128 +1,422 @@
-import { Button } from "@/components/ui/button"
-import { CheckCircle2, Zap, Shield, Globe, BarChart3, Users, Wrench, Calendar, Truck, Package, FileText, Bell } from "lucide-react"
-import Link from "next/link"
+"use client"
 
-const features = [
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { 
+  ArrowRight,
+  Camera,
+  Mic,
+  TrendingUp,
+  Building2,
+  Layers,
+  CheckCircle2,
+  Calendar,
+  Wrench,
+  Car,
+  FileText,
+  ClipboardCheck,
+  Package,
+  Users,
+  DollarSign,
+  BarChart3,
+  Bell,
+  Globe,
+  Shield,
+  Smartphone,
+  Zap,
+  Database,
+  Lock,
+  Cloud,
+  PieChart,
+  Truck,
+  Settings
+} from "lucide-react"
+
+// Core Modules
+const CORE_MODULES = [
+  {
+    icon: Calendar,
+    title: "Appointment Scheduling",
+    description: "Smart scheduling with SMS/WhatsApp reminders. No-show tracking and rescheduling automation.",
+    tag: "Core"
+  },
   {
     icon: Wrench,
-    title: "Job Management",
-    desc: "Create, track, and manage repair jobs from intake to invoice. Real-time status updates and technician assignment."
+    title: "Work Orders",
+    description: "Kanban-style job tracking from check-in to delivery. Real-time status visibility for every job.",
+    tag: "Core"
+  },
+  {
+    icon: Car,
+    title: "Vehicle Management",
+    description: "Complete vehicle history, service records, and predictive maintenance alerts.",
+    tag: "Core"
   },
   {
     icon: Users,
-    title: "CRM",
-    desc: "Complete customer profiles with service history, vehicle details, and communication logs."
+    title: "Customer CRM",
+    description: "Customer profiles, communication history, and relationship management.",
+    tag: "Core"
   },
   {
-    icon: Package,
-    title: "Inventory Control",
-    desc: "Track parts in real-time. Low stock alerts, supplier management, and automatic quantity updates."
-  },
-  {
-    icon: Calendar,
-    title: "Scheduling",
-    desc: "Visual calendar for appointments. Drag-and-drop rescheduling and automated SMS reminders."
-  },
-  {
-    icon: Shield,
-    title: "Digital Inspections (DVI)",
-    desc: "Build trust with photo/video inspections. Send reports directly to customers for digital approval."
+    icon: ClipboardCheck,
+    title: "Digital Vehicle Inspection",
+    description: "Photo evidence, condition ratings, and automated estimate generation from inspections.",
+    tag: "Core"
   },
   {
     icon: FileText,
     title: "Estimates & Invoicing",
-    desc: "Professional templates. Convert estimates to invoices in one click. Support for tax and discounts."
+    description: "Professional quotes, digital approvals, and instant invoicing with payment tracking.",
+    tag: "Core"
   },
   {
-    icon: Globe,
-    title: "Online Booking",
-    desc: "24/7 self-service booking portal for your customers. Customizable slots and services."
+    icon: Package,
+    title: "Inventory Management",
+    description: "Real-time stock levels, reorder alerts, and purchase order automation.",
+    tag: "Core"
   },
   {
-    icon: BarChart3,
-    title: "Reports & Analytics",
-    desc: "Understand your business with detailed reports on revenue, technician efficiency, and parts usage."
+    icon: DollarSign,
+    title: "Point of Sale",
+    description: "Counter sales, parts retail, and integrated payment processing.",
+    tag: "Core"
+  },
+]
+
+// AI Features
+const AI_FEATURES = [
+  {
+    icon: Camera,
+    title: "Gemini Vision Part Scanner",
+    description: "Point your camera at any part. AI identifies it, finds cross-references, and shows local market pricing instantly.",
+    color: "from-purple-500 to-pink-500"
   },
   {
-    icon: Bell,
-    title: "Automated Reminders",
-    desc: "Send service due reminders, appointment confirmations, and pickup notifications automatically."
+    icon: Mic,
+    title: "Somali Voice-Job Logger",
+    description: "Mechanics speak in colloquial Somali. AI transcribes and structures into professional job cards automatically.",
+    color: "from-blue-500 to-cyan-500"
   },
   {
-    icon: Truck,
-    title: "Fleet Management",
-    desc: "Specialized tools for managing fleet accounts, bulk billing, and vehicle tracking."
+    icon: TrendingUp,
+    title: "Market Pulse Intelligence",
+    description: "Live data from social media and marketplaces provides real-time benchmarks for vehicle valuations and repair costs.",
+    color: "from-emerald-500 to-teal-500"
+  },
+  {
+    icon: Building2,
+    title: "Authority Bridge API",
+    description: "Direct integration for vehicle registration, safety compliance, and government reporting.",
+    color: "from-orange-500 to-red-500"
+  },
+]
+
+// Payment Integration
+const PAYMENTS = [
+  { name: "ZAAD", description: "Instant mobile money acceptance" },
+  { name: "eDahab", description: "Alternative mobile payment rail" },
+  { name: "Cash", description: "Traditional cash with digital tracking" },
+  { name: "Bank Transfer", description: "For fleet and institutional billing" },
+]
+
+// Technical Features
+const TECHNICAL = [
+  { icon: Cloud, title: "Cloud-First", description: "Convex-powered real-time sync across all devices" },
+  { icon: Lock, title: "Enterprise Security", description: "Role-based access control with 50+ granular permissions" },
+  { icon: Database, title: "Data Sovereignty", description: "You own your data. Export anytime, no lock-in." },
+  { icon: Globe, title: "Multi-Language", description: "English, Somali, Arabic interfaces" },
+]
+
+// Department Modules
+const DEPARTMENTS = [
+  {
+    title: "Mechanical",
+    modules: ["Engine Diagnostics", "Brake Systems", "Suspension Work", "AC/Heating", "Transmission"]
+  },
+  {
+    title: "Body Shop",
+    modules: ["Collision Estimates", "Insurance Claims", "Frame Repair", "PDR Tracking"]
+  },
+  {
+    title: "Paint Shop",
+    modules: ["Color Matching", "Job Costing", "Booth Scheduling", "Material Tracking"]
+  },
+  {
+    title: "Admin",
+    modules: ["Payroll Integration", "Time Tracking", "Reports", "Multi-Location"]
   },
 ]
 
 export default function FeaturesPage() {
   return (
-    <div className="flex flex-col">
+    <div className="min-h-screen bg-slate-950 text-white">
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-20">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+                <Layers className="h-7 w-7 text-white" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-bold text-xl text-white">MASS OSS</span>
+                <span className="text-[10px] uppercase text-orange-400 tracking-wider">Features</span>
+              </div>
+            </Link>
+            <div className="hidden md:flex items-center gap-6">
+              <Link href="/" className="text-slate-400 hover:text-white text-sm">Home</Link>
+              <Link href="/about" className="text-slate-400 hover:text-white text-sm">About</Link>
+              <Link href="/features" className="text-white text-sm font-medium">Features</Link>
+              <Link href="/login">
+                <Button className="bg-gradient-to-r from-orange-500 to-red-600 text-white">
+                  Get Started
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
       {/* Hero */}
-      <section className="py-20 bg-slate-950 border-b border-white/5">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Power-Packed <span className="text-orange-500">Features</span></h1>
-          <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-            Tools designed by mechanics, for mechanics. Everything you need to scale your workshop.
+      <section className="pt-32 pb-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 px-4 py-2 mb-6">
+            65+ Dashboard Modules
+          </Badge>
+          
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            <span className="text-white">Everything You Need to Run</span>
+            <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-500">
+              A Modern Workshop
+            </span>
+          </h1>
+          
+          <p className="text-xl text-slate-400 max-w-3xl mx-auto mb-8">
+            From appointment booking to AI-powered diagnostics. Built for Somaliland's mobility ecosystem.
           </p>
+
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link href="/login">
+              <Button size="lg" className="bg-gradient-to-r from-orange-500 to-red-600 text-white gap-2">
+                Try Demo <ArrowRight className="w-5 h-5" />
+              </Button>
+            </Link>
+            <Link href="/about">
+              <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10">
+                Learn More
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Feature Grid */}
+      {/* Core Modules */}
+      <section className="py-20 bg-slate-900/50 border-y border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-sm uppercase tracking-widest text-orange-500 mb-4">Core Platform</h2>
+            <p className="text-3xl md:text-4xl font-bold text-white">
+              Workshop Management Essentials
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {CORE_MODULES.map((module) => {
+              const Icon = module.icon
+              return (
+                <Card key={module.title} className="bg-slate-900 border-white/10 hover:border-orange-500/30 transition-colors">
+                  <CardContent className="p-6">
+                    <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center mb-4">
+                      <Icon className="w-6 h-6 text-orange-500" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">{module.title}</h3>
+                    <p className="text-slate-400 text-sm">{module.description}</p>
+                  </CardContent>
+                </Card>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* AI Features */}
       <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, i) => (
-              <div key={i} className="p-8 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group">
-                <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <feature.icon className="h-7 w-7 text-orange-500" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                <p className="text-slate-400 leading-relaxed">{feature.desc}</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 px-4 py-2 mb-4">
+              <Zap className="w-4 h-4 mr-2" /> AI-Powered
+            </Badge>
+            <p className="text-3xl md:text-4xl font-bold text-white">
+              Intelligence Built In
+            </p>
+            <p className="text-slate-400 mt-4 max-w-2xl mx-auto">
+              Not bolted-on AI marketing. Real intelligence that solves real problems.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {AI_FEATURES.map((feature) => {
+              const Icon = feature.icon
+              return (
+                <Card key={feature.title} className="bg-slate-900 border-white/10 overflow-hidden">
+                  <CardContent className="p-8">
+                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-6`}>
+                      <Icon className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-3">{feature.title}</h3>
+                    <p className="text-slate-400 text-lg">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Payment Rails */}
+      <section className="py-20 bg-slate-900/50 border-y border-white/5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-sm uppercase tracking-widest text-orange-500 mb-4">Local Payment Rails</h2>
+              <h3 className="text-3xl md:text-4xl font-bold text-white mb-6">
+                Built for Somaliland's Economy
+              </h3>
+              <p className="text-slate-400 text-lg mb-8">
+                No Western credit card processors. MASS OSS is hard-wired into the local economy with native mobile money integrations.
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                {PAYMENTS.map((payment) => (
+                  <div key={payment.name} className="p-4 bg-slate-900 rounded-xl border border-white/10">
+                    <div className="font-bold text-white mb-1">{payment.name}</div>
+                    <div className="text-sm text-slate-400">{payment.description}</div>
+                  </div>
+                ))}
               </div>
+            </div>
+            <div className="space-y-4">
+              {TECHNICAL.map((item) => {
+                const Icon = item.icon
+                return (
+                  <div key={item.title} className="flex items-start gap-4 p-4 bg-slate-900 rounded-xl border border-white/10">
+                    <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
+                      <Icon className="w-5 h-5 text-orange-500" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-white">{item.title}</div>
+                      <div className="text-sm text-slate-400">{item.description}</div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Department Modules */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-sm uppercase tracking-widest text-orange-500 mb-4">Department-Specific</h2>
+            <p className="text-3xl md:text-4xl font-bold text-white">
+              Tools for Every Team
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {DEPARTMENTS.map((dept) => (
+              <Card key={dept.title} className="bg-slate-900 border-white/10">
+                <CardHeader>
+                  <CardTitle className="text-orange-500">{dept.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {dept.modules.map((module) => (
+                      <li key={module} className="flex items-center gap-2 text-slate-300 text-sm">
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                        {module}
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Feature Highlight */}
-      <section className="py-20 bg-white/5 border-y border-white/10">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center gap-12">
-            <div className="flex-1">
-              <h2 className="text-3xl font-bold text-white mb-6">Stop Chasing Paperwork</h2>
-              <ul className="space-y-4">
-                {[
-                  "Eliminate lost repair orders",
-                  "Reduce phone calls by 40%",
-                  "Get paid faster with digital invoices",
-                  "Access your shop from anywhere"
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-slate-300">
-                    <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-8">
-                <Link href="/register">
-                  <Button size="lg" className="bg-orange-500 hover:bg-orange-600 text-white">
-                    Start Modernizing Today
-                  </Button>
-                </Link>
-              </div>
-            </div>
-            
-            {/* Visual placeholder */}
-            <div className="flex-1 w-full aspect-video rounded-xl bg-slate-900 border border-white/10 shadow-2xl overflow-hidden relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-950" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                 <span className="text-slate-500 font-mono">[ Interface Screenshot ]</span>
-              </div>
-            </div>
+      {/* Role-Based Access */}
+      <section className="py-20 bg-gradient-to-r from-orange-500/10 to-red-500/10 border-y border-orange-500/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-sm uppercase tracking-widest text-orange-500 mb-4">Enterprise-Grade Security</h2>
+          <p className="text-3xl md:text-4xl font-bold text-white mb-6">
+            50+ User Roles & Permissions
+          </p>
+          <p className="text-slate-400 text-lg max-w-3xl mx-auto mb-8">
+            From Shop Owner to Apprentice Technician, from Body Shop Manager to Paint Mixer. 
+            Every role has precisely the access they need—nothing more, nothing less.
+          </p>
+          <div className="flex flex-wrap justify-center gap-2">
+            {["OWNER", "GENERAL_MANAGER", "SERVICE_ADVISOR", "MASTER_TECH", "BODY_TECH", "PAINTER", "PARTS_MANAGER", "CASHIER"].map((role) => (
+              <Badge key={role} variant="outline" className="text-orange-400 border-orange-400/30">
+                {role}
+              </Badge>
+            ))}
+            <Badge variant="outline" className="text-slate-400 border-slate-400/30">
+              +42 more
+            </Badge>
           </div>
         </div>
       </section>
+
+      {/* CTA */}
+      <section className="py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Ready to Transform Your Workshop?
+          </h2>
+          <p className="text-slate-400 text-lg mb-8">
+            Join the operators who have already made the shift from paper to pulse.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/login">
+              <Button size="lg" className="bg-gradient-to-r from-orange-500 to-red-600 text-white px-8 gap-2">
+                Start Free Demo <ArrowRight className="w-5 h-5" />
+              </Button>
+            </Link>
+            <Link href="/contact">
+              <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8">
+                Talk to Sales
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-slate-900 border-t border-white/5 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
+                <Layers className="h-5 w-5 text-white" />
+              </div>
+              <span className="font-bold text-white">MASS OSS</span>
+            </div>
+            <div className="flex items-center gap-6 text-sm text-slate-400">
+              <Link href="/" className="hover:text-white">Home</Link>
+              <Link href="/about" className="hover:text-white">About</Link>
+              <Link href="/features" className="hover:text-white">Features</Link>
+              <Link href="/login" className="hover:text-white">Login</Link>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
