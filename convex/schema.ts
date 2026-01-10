@@ -2,9 +2,103 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 // ============================================================
-// MASS Car Workshop - Complete Convex Schema (13 Tables)
-// Type-safe definitions for Vehicles, Inventory, Work Orders, POS
+// MASS Car Workshop - Complete Convex Schema
+// 50+ International Standard Job Roles (Tekmetric/Mitchell1 Benchmarks)
 // ============================================================
+
+// All user role codes based on international automotive industry standards
+const userRoleValidator = v.union(
+  // Enterprise
+  v.literal("SUPER_ADMIN"),
+  
+  // Management
+  v.literal("OWNER"),
+  v.literal("DEALER_PRINCIPAL"),
+  v.literal("GENERAL_MANAGER"),
+  v.literal("SERVICE_MANAGER"),
+  
+  // Front Office
+  v.literal("SERVICE_ADVISOR"),
+  v.literal("SERVICE_WRITER"),
+  v.literal("CSR"),
+  v.literal("RECEPTIONIST"),
+  v.literal("CASHIER"),
+  
+  // Parts Department
+  v.literal("PARTS_MANAGER"),
+  v.literal("PARTS_COUNTER"),
+  v.literal("WARRANTY_ADMIN"),
+  
+  // Mechanical Department
+  v.literal("SHOP_FOREMAN"),
+  v.literal("MASTER_TECH"),
+  v.literal("DIAG_TECH"),
+  v.literal("TECH_B"),
+  v.literal("TECH_C"),
+  v.literal("LUBE_TECH"),
+  v.literal("TIRE_TECH"),
+  v.literal("ALIGNMENT_TECH"),
+  v.literal("TRANS_TECH"),
+  v.literal("DIESEL_TECH"),
+  v.literal("EV_TECH"),
+  v.literal("HVAC_TECH"),
+  
+  // Body Shop Department
+  v.literal("BODY_SHOP_MGR"),
+  v.literal("BODY_ESTIMATOR"),
+  v.literal("BODY_MASTER"),
+  v.literal("BODY_TECH"),
+  v.literal("FRAME_TECH"),
+  v.literal("FABRICATOR"),
+  v.literal("PDR_TECH"),
+  v.literal("GLASS_TECH"),
+  
+  // Paint Shop Department
+  v.literal("PAINT_SHOP_MGR"),
+  v.literal("PAINTER_MASTER"),
+  v.literal("PAINTER"),
+  v.literal("PREP_TECH"),
+  v.literal("COLORIST"),
+  v.literal("BUFFER"),
+  
+  // Specialty Technicians
+  v.literal("UPHOLSTERY_TECH"),
+  v.literal("AUDIO_TECH"),
+  v.literal("TINT_TECH"),
+  v.literal("DETAILER"),
+  v.literal("WRAP_TECH"),
+  v.literal("WELDER"),
+  v.literal("MOTO_TECH"),
+  
+  // Support Staff
+  v.literal("LOT_ATTENDANT"),
+  v.literal("STOCK_CLERK"),
+  v.literal("SHOP_HELPER"),
+  v.literal("DRIVER"),
+  v.literal("TOW_OPERATOR"),
+  
+  // Administrative
+  v.literal("AR_CLERK"),
+  v.literal("AP_CLERK"),
+  v.literal("INSURANCE_COORD"),
+  v.literal("MARKETING"),
+  v.literal("HR_ADMIN"),
+  v.literal("TRAINING"),
+  
+  // External
+  v.literal("CUSTOMER"),
+  v.literal("FLEET_CUSTOMER"),
+  v.literal("ADJUSTER"),
+  v.literal("VENDOR"),
+  v.literal("AFFILIATE"),
+  v.literal("MFG_REP"),
+  
+  // Legacy compatibility
+  v.literal("admin"),
+  v.literal("staff"),
+  v.literal("technician"),
+  v.literal("customer")
+);
 
 export default defineSchema({
   // ============ 1. USERS (Profile & Authentication) ============
@@ -13,17 +107,17 @@ export default defineSchema({
     firstName: v.string(),
     lastName: v.string(),
     phone: v.optional(v.string()),
-    role: v.union(
-      v.literal("admin"),
-      v.literal("staff"),
-      v.literal("technician"),
-      v.literal("customer")
-    ),
+    role: userRoleValidator,
+    jobTitle: v.optional(v.string()), // Display title
+    department: v.optional(v.string()), // Mechanical, Body Shop, Paint, Admin, etc.
     isActive: v.boolean(),
     avatarUrl: v.optional(v.string()),
     lastLoginAt: v.optional(v.string()),
+    hireDate: v.optional(v.string()),
+    certifications: v.optional(v.array(v.string())), // ASE, I-CAR, etc.
   }).index("by_email", ["email"])
     .index("by_role", ["role"]),
+
 
   // ============ 1.1 ORGANIZATIONS (Tenants) ============
   organizations: defineTable({
@@ -41,15 +135,15 @@ export default defineSchema({
   userOrgRoles: defineTable({
     userId: v.id("users"),
     orgId: v.id("organizations"),
-    role: v.union(
-      v.literal("admin"),
-      v.literal("staff"),
-      v.literal("technician")
-    ),
+    role: userRoleValidator,
+    department: v.optional(v.string()),
     isActive: v.boolean(),
+    assignedAt: v.optional(v.string()),
+    assignedBy: v.optional(v.id("users")),
   }).index("by_user", ["userId"])
     .index("by_org", ["orgId"])
-    .index("by_user_org", ["userId", "orgId"]),
+    .index("by_user_org", ["userId", "orgId"])
+    .index("by_department", ["department"]),
 
   // ============ 2. CUSTOMERS (CRM) ============
   customers: defineTable({
