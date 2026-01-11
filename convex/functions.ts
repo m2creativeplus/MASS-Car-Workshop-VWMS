@@ -1950,3 +1950,49 @@ export const seedDemoUsers = mutation({
     return "Seeding Completed";
   },
 });
+
+// ============ MARKETING CAMPAIGNS ============
+export const getCampaigns = query({
+  args: { orgId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("campaigns")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .collect();
+  },
+});
+
+export const createCampaign = mutation({
+  args: {
+    name: v.string(),
+    type: v.union(v.literal("email"), v.literal("sms"), v.literal("push")),
+    targetAudience: v.string(),
+    subject: v.optional(v.string()),
+    body: v.string(),
+    scheduledAt: v.optional(v.string()),
+    orgId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("campaigns", {
+      ...args,
+      sentCount: 0,
+      status: args.scheduledAt ? "scheduled" : "draft",
+    });
+  },
+});
+
+export const updateCampaignStatus = mutation({
+  args: {
+    id: v.id("campaigns"),
+    status: v.union(
+      v.literal("draft"),
+      v.literal("scheduled"),
+      v.literal("sending"),
+      v.literal("completed"),
+      v.literal("cancelled")
+    ),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, { status: args.status });
+  },
+});

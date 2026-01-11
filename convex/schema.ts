@@ -1296,7 +1296,100 @@ export default defineSchema({
     .index("by_status", ["status"])
     .index("by_user", ["userId"]),
 
-  // ============ 40. SITE SETTINGS (Dynamic Config) ============
+  // ============ 40. MARKETING CAMPAIGNS ============
+  campaigns: defineTable({
+    name: v.string(),
+    type: v.union(v.literal("email"), v.literal("sms"), v.literal("push")),
+    targetAudience: v.string(), // "all_customers", "inactive_30_days", "service_due", etc.
+    subject: v.optional(v.string()),
+    body: v.string(),
+    scheduledAt: v.optional(v.string()),
+    sentAt: v.optional(v.string()),
+    sentCount: v.number(),
+    openCount: v.optional(v.number()),
+    clickCount: v.optional(v.number()),
+    openRate: v.optional(v.number()),
+    status: v.union(
+      v.literal("draft"),
+      v.literal("scheduled"),
+      v.literal("sending"),
+      v.literal("completed"),
+      v.literal("cancelled")
+    ),
+    createdBy: v.optional(v.id("users")),
+    orgId: v.string(),
+  }).index("by_org", ["orgId"])
+    .index("by_status", ["status"]),
+
+  // ============ 41. AFFILIATES ============
+  affiliates: defineTable({
+    name: v.string(),
+    email: v.string(),
+    phone: v.optional(v.string()),
+    code: v.string(), // Unique referral code
+    commissionRate: v.number(), // Percentage
+    totalEarnings: v.number(),
+    balance: v.number(), // Unpaid balance
+    status: v.union(v.literal("active"), v.literal("inactive"), v.literal("pending")),
+    paymentMethod: v.optional(v.string()),
+    paymentDetails: v.optional(v.string()),
+    orgId: v.string(),
+  }).index("by_code", ["code"])
+    .index("by_org", ["orgId"])
+    .index("by_status", ["status"]),
+
+  // ============ 42. REFERRALS ============
+  referrals: defineTable({
+    affiliateId: v.id("affiliates"),
+    sourceType: v.union(v.literal("job"), v.literal("order")),
+    sourceId: v.string(),
+    amount: v.number(), // Commission amount
+    status: v.union(v.literal("pending"), v.literal("paid"), v.literal("cancelled")),
+    createdAt: v.string(),
+    paidAt: v.optional(v.string()),
+    orgId: v.string(),
+  }).index("by_affiliate", ["affiliateId"])
+    .index("by_org", ["orgId"]),
+
+  // ============ 43. FAQs (CMS) ============
+  faqs: defineTable({
+    question: v.string(),
+    answer: v.string(),
+    category: v.optional(v.string()),
+    order: v.number(),
+    isActive: v.boolean(),
+    orgId: v.string(),
+  }).index("by_org", ["orgId"])
+    .index("by_category", ["category"]),
+
+  // ============ 44. DYNAMIC PAGES (CMS) ============
+  dynamicPages: defineTable({
+    title: v.string(),
+    slug: v.string(),
+    content: v.string(),
+    metaTitle: v.optional(v.string()),
+    metaDescription: v.optional(v.string()),
+    template: v.optional(v.string()),
+    isPublished: v.boolean(),
+    publishedAt: v.optional(v.string()),
+    orgId: v.string(),
+  }).index("by_slug", ["slug"])
+    .index("by_org", ["orgId"]),
+
+  // ============ 45. NOTIFICATION TEMPLATES ============
+  notificationTemplates: defineTable({
+    name: v.string(),
+    type: v.union(v.literal("email"), v.literal("sms"), v.literal("whatsapp")),
+    subject: v.optional(v.string()),
+    body: v.string(),
+    variables: v.array(v.string()), // {{customer_name}}, {{vehicle}}, etc.
+    triggerEvent: v.optional(v.string()), // "appointment_reminder", "invoice_created", etc.
+    isActive: v.boolean(),
+    orgId: v.string(),
+  }).index("by_org", ["orgId"])
+    .index("by_type", ["type"]),
+
+  // ============ 46. SITE SETTINGS (Dynamic Config) ============
   siteSettings: defineTable({
     key: v.string(),
     value: v.string(), // JSON stringified for complex values
