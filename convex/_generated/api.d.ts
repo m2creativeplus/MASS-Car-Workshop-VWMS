@@ -21,6 +21,7 @@ import type * as permissions from "../permissions.js";
 import type * as seed from "../seed.js";
 import type * as seedDemo from "../seedDemo.js";
 import type * as seeding from "../seeding.js";
+import type * as settings from "../settings.js";
 import type * as store from "../store.js";
 
 import type {
@@ -43,6 +44,7 @@ declare const fullApi: ApiFromModules<{
   seed: typeof seed;
   seedDemo: typeof seedDemo;
   seeding: typeof seeding;
+  settings: typeof settings;
   store: typeof store;
 }>;
 

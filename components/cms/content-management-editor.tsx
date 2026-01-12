@@ -31,8 +31,14 @@ import {
   Languages,
   Image as ImageIcon,
   Save,
-  Loader2
+  Loader2,
+  Settings
 } from "lucide-react"
+import { EmailSmtpSettings } from "./email-smtp-settings"
+import { EmailTemplatesEditor } from "./email-templates-editor"
+import { OAuthSettings } from "./oauth-settings"
+import { TrustedBadgesSettings } from "./trusted-badges-settings"
+import { ColorPickerSettings } from "./color-picker-settings"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/components/ui/use-toast"
 
@@ -313,6 +319,9 @@ export function ContentManagementEditor() {
           <TabsTrigger value="articles">Articles ({blogPosts.length})</TabsTrigger>
           <TabsTrigger value="faqs">FAQs ({faqs.length})</TabsTrigger>
           <TabsTrigger value="seo">SEO Settings</TabsTrigger>
+          <TabsTrigger value="settings" className="gap-1">
+            <Settings className="w-3.5 h-3.5" /> Settings
+          </TabsTrigger>
         </TabsList>
 
         {/* PAGES TAB */}
@@ -515,6 +524,34 @@ export function ContentManagementEditor() {
               </Button>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* SETTINGS TAB */}
+        <TabsContent value="settings" className="space-y-6">
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+              <Settings className="w-5 h-5 text-orange-500" />
+              System Settings
+            </h3>
+            <p className="text-sm text-slate-500">
+              Configure email, authentication, theme, and branding settings
+            </p>
+          </div>
+          
+          {/* Email SMTP */}
+          <EmailSmtpSettings />
+          
+          {/* Email Templates */}
+          <EmailTemplatesEditor />
+          
+          {/* OAuth Settings */}
+          <OAuthSettings />
+          
+          {/* Trusted Badges */}
+          <TrustedBadgesSettings />
+          
+          {/* Color Picker */}
+          <ColorPickerSettings />
         </TabsContent>
       </Tabs>
     </div>
