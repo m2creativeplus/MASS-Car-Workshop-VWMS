@@ -62,8 +62,14 @@ function DashboardLayoutContent({
 
   const router = useRouter()
 
+  // CRITICAL FIX: Check authLoading BEFORE checking user
+  // This prevents false redirects during React re-renders when auth state is temporarily undefined
+  if (authLoading) {
+    return <div className="flex h-screen items-center justify-center">Authenticating...</div>
+  }
+
   if (!user) {
-    // Redirect to login if not authenticated
+    // Redirect to login if not authenticated (and auth is definitely not loading)
     if (typeof window !== 'undefined') {
       router.replace("/login")
     }
