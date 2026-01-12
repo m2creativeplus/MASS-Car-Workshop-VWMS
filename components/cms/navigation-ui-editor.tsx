@@ -1,18 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useQuery, useMutation } from "convex/react"
+import { api } from "@/convex/_generated/api"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import { 
   Menu,
   GripVertical,
-  Eye,
-  EyeOff,
   LayoutDashboard,
   Wrench,
   Users,
@@ -27,26 +24,33 @@ import {
   Settings,
   Save,
   Loader2,
-  ChevronRight,
-  Plus,
-  Trash2
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useToast } from "@/components/ui/use-toast"
 
-// Menu Items with role visibility
-const MENU_ITEMS = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["owner", "admin", "staff", "tech"] },
-  { id: "work-orders", label: "Work Orders", icon: Wrench, roles: ["owner", "admin", "staff", "tech"] },
-  { id: "customers", label: "Customers", icon: Users, roles: ["owner", "admin", "staff"] },
-  { id: "vehicles", label: "Vehicles", icon: Car, roles: ["owner", "admin", "staff", "tech"] },
-  { id: "appointments", label: "Appointments", icon: Calendar, roles: ["owner", "admin", "staff"] },
-  { id: "inventory", label: "Inventory", icon: Package, roles: ["owner", "admin"] },
-  { id: "pos", label: "POS / Sales", icon: DollarSign, roles: ["owner", "admin", "staff"] },
-  { id: "inspections", label: "Inspections", icon: ClipboardCheck, roles: ["owner", "admin", "staff", "tech"] },
-  { id: "reports", label: "Reports", icon: BarChart3, roles: ["owner", "admin"] },
-  { id: "delivery", label: "Delivery", icon: Truck, roles: ["owner", "admin"] },
-  { id: "ai-tools", label: "AI Tools", icon: Bot, roles: ["owner", "admin"] },
-  { id: "settings", label: "Settings", icon: Settings, roles: ["owner", "admin"] },
+// Default Menu Items (initial state if nothing in DB)
+const DEFAULT_MENU_ITEMS = [
+  { id: "dashboard", label: "Dashboard", icon: "LayoutDashboard", path: "/dashboard", roles: ["owner", "admin", "staff", "tech"], order: 0, isActive: true },
+  { id: "work-orders", label: "Work Orders", icon: "Wrench", path: "/dashboard/work-orders", roles: ["owner", "admin", "staff", "tech"], order: 1, isActive: true },
+  { id: "customers", label: "Customers", icon: "Users", path: "/dashboard/customers", roles: ["owner", "admin", "staff"], order: 2, isActive: true },
+  { id: "vehicles", label: "Vehicles", icon: "Car", path: "/dashboard/vehicles", roles: ["owner", "admin", "staff", "tech"], order: 3, isActive: true },
+  { id: "appointments", label: "Appointments", icon: "Calendar", path: "/dashboard/appointments", roles: ["owner", "admin", "staff"], order: 4, isActive: true },
+  { id: "inventory", label: "Inventory", icon: "Package", path: "/dashboard/inventory", roles: ["owner", "admin"], order: 5, isActive: true },
+  { id: "pos", label: "POS / Sales", icon: "DollarSign", path: "/dashboard/pos", roles: ["owner", "admin", "staff"], order: 6, isActive: true },
+  { id: "inspections", label: "Inspections", icon: "ClipboardCheck", path: "/dashboard/inspections", roles: ["owner", "admin", "staff", "tech"], order: 7, isActive: true },
+  { id: "reports", label: "Reports", icon: "BarChart3", path: "/dashboard/reports", roles: ["owner", "admin"], order: 8, isActive: true },
+  { id: "delivery", label: "Delivery", icon: "Truck", path: "/dashboard/delivery", roles: ["owner", "admin"], order: 9, isActive: true },
+  { id: "ai-tools", label: "AI Tools", icon: "Bot", path: "/dashboard/ai", roles: ["owner", "admin"], order: 10, isActive: true },
+  { id: "settings", label: "Settings", icon: "Settings", path: "/dashboard/settings", roles: ["owner", "admin"], order: 11, isActive: true },
+]
+
+const DEFAULT_WIDGETS = [
+  { id: "revenue", label: "Revenue Overview", enabled: true, roles: ["owner", "admin"] },
+  { id: "jobs-today", label: "Jobs Today", enabled: true, roles: ["owner", "admin", "staff", "tech"] },
+  { id: "appointments", label: "Upcoming Appointments", enabled: true, roles: ["owner", "admin", "staff"] },
+  { id: "inventory-alerts", label: "Inventory Alerts", enabled: true, roles: ["owner", "admin"] },
+  { id: "customer-stats", label: "Customer Stats", enabled: false, roles: ["owner", "admin"] },
+  { id: "vehicle-status", label: "Vehicle Status", enabled: true, roles: ["owner", "admin", "staff", "tech"] },
 ]
 
 const ROLES = [
@@ -56,21 +60,36 @@ const ROLES = [
   { id: "tech", label: "Technician", color: "bg-slate-500" },
 ]
 
-// Dashboard Widgets
-const DASHBOARD_WIDGETS = [
-  { id: "revenue", label: "Revenue Overview", enabled: true, roles: ["owner", "admin"] },
-  { id: "jobs-today", label: "Jobs Today", enabled: true, roles: ["owner", "admin", "staff", "tech"] },
-  { id: "appointments", label: "Upcoming Appointments", enabled: true, roles: ["owner", "admin", "staff"] },
-  { id: "inventory-alerts", label: "Inventory Alerts", enabled: true, roles: ["owner", "admin"] },
-  { id: "customer-stats", label: "Customer Stats", enabled: false, roles: ["owner", "admin"] },
-  { id: "vehicle-status", label: "Vehicle Status", enabled: true, roles: ["owner", "admin", "staff", "tech"] },
-]
+const ICON_MAP: Record<string, any> = {
+  LayoutDashboard, Wrench, Users, Car, Calendar, Package, 
+  DollarSign, ClipboardCheck, BarChart3, Truck, Bot, Settings
+}
 
 export function NavigationUIEditor() {
-  const [menuItems, setMenuItems] = useState(MENU_ITEMS)
-  const [widgets, setWidgets] = useState(DASHBOARD_WIDGETS)
+  const { toast } = useToast()
+  const orgId = "default" // In production, get from context
+  
+  // CONVEX INTEGRATION
+  const savedConfig = useQuery(api.cms.getNavigationConfig, { orgId })
+  const saveConfig = useMutation(api.cms.saveNavigationConfig)
+  
+  const [menuItems, setMenuItems] = useState(DEFAULT_MENU_ITEMS)
+  const [widgets, setWidgets] = useState(DEFAULT_WIDGETS)
   const [selectedRole, setSelectedRole] = useState("owner")
   const [isSaving, setIsSaving] = useState(false)
+  const [hasChanges, setHasChanges] = useState(false)
+  
+  // Load saved config from Convex
+  useEffect(() => {
+    if (savedConfig) {
+      if (savedConfig.menuItems?.length) {
+        setMenuItems(savedConfig.menuItems)
+      }
+      if (savedConfig.dashboardWidgets?.length) {
+        setWidgets(savedConfig.dashboardWidgets)
+      }
+    }
+  }, [savedConfig])
 
   const toggleMenuItemForRole = (itemId: string, role: string) => {
     setMenuItems(prev => prev.map(item => {
@@ -82,6 +101,32 @@ export function NavigationUIEditor() {
       }
       return item
     }))
+    setHasChanges(true)
+  }
+  
+  const toggleWidget = (widgetId: string, enabled: boolean) => {
+    setWidgets(prev => prev.map(w => 
+      w.id === widgetId ? { ...w, enabled } : w
+    ))
+    setHasChanges(true)
+  }
+  
+  // SAVE TO CONVEX
+  const handleSave = async () => {
+    setIsSaving(true)
+    try {
+      await saveConfig({
+        menuItems,
+        dashboardWidgets: widgets,
+        orgId
+      })
+      toast({ title: "Saved!", description: "Navigation configuration saved to database." })
+      setHasChanges(false)
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to save configuration", variant: "destructive" })
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -94,12 +139,19 @@ export function NavigationUIEditor() {
             Navigation & UI Configuration
           </h2>
           <p className="text-slate-500">
-            Control sidebar menu visibility and dashboard widgets per role
+            Control sidebar menu visibility and dashboard widgets per role - <span className="text-emerald-600 font-medium">Persisted to Convex</span>
           </p>
         </div>
-        <Button disabled={isSaving} className="gap-2 bg-orange-600 hover:bg-orange-700">
+        <Button 
+          onClick={handleSave} 
+          disabled={isSaving || !hasChanges} 
+          className={cn(
+            "gap-2",
+            hasChanges ? "bg-orange-600 hover:bg-orange-700" : "bg-slate-400"
+          )}
+        >
           {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-          Save Configuration
+          {hasChanges ? "Save Configuration" : "No Changes"}
         </Button>
       </div>
 
@@ -110,12 +162,12 @@ export function NavigationUIEditor() {
             <CardHeader>
               <CardTitle>Sidebar Menu Items</CardTitle>
               <CardDescription>
-                Drag to reorder. Toggle visibility per role.
+                Toggle visibility per role. Changes save to database.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              {menuItems.map((item, index) => {
-                const Icon = item.icon
+              {menuItems.map((item) => {
+                const Icon = ICON_MAP[item.icon] || Menu
                 return (
                   <div 
                     key={item.id}
@@ -170,11 +222,7 @@ export function NavigationUIEditor() {
                   <div className="flex items-center gap-3">
                     <Switch 
                       checked={widget.enabled}
-                      onCheckedChange={(checked) => {
-                        setWidgets(prev => prev.map(w => 
-                          w.id === widget.id ? { ...w, enabled: checked } : w
-                        ))
-                      }}
+                      onCheckedChange={(checked) => toggleWidget(widget.id, checked)}
                     />
                     <span className="font-medium">{widget.label}</span>
                   </div>
@@ -228,9 +276,10 @@ export function NavigationUIEditor() {
             <CardContent>
               <div className="bg-slate-900 rounded-lg p-4 space-y-1">
                 {menuItems
-                  .filter(item => item.roles.includes(selectedRole))
+                  .filter(item => item.roles.includes(selectedRole) && item.isActive)
+                  .sort((a, b) => a.order - b.order)
                   .map((item) => {
-                    const Icon = item.icon
+                    const Icon = ICON_MAP[item.icon] || Menu
                     return (
                       <div 
                         key={item.id}

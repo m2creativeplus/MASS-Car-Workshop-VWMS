@@ -424,3 +424,137 @@ export const updateTicketStatus = mutation({
     return await ctx.db.patch(args.id, updates);
   },
 });
+
+// ============ NAVIGATION CONFIG ============
+
+export const getNavigationConfig = query({
+  args: { orgId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("navigationConfig")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .first();
+  },
+});
+
+export const saveNavigationConfig = mutation({
+  args: {
+    menuItems: v.array(v.object({
+      id: v.string(),
+      label: v.string(),
+      icon: v.string(),
+      path: v.string(),
+      roles: v.array(v.string()),
+      order: v.number(),
+      isActive: v.boolean(),
+    })),
+    dashboardWidgets: v.array(v.object({
+      id: v.string(),
+      label: v.string(),
+      enabled: v.boolean(),
+      roles: v.array(v.string()),
+    })),
+    orgId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("navigationConfig")
+      .withIndex("by_org", (q) => q.eq("orgId", args.orgId))
+      .first();
+    
+    const data = {
+      menuItems: args.menuItems,
+      dashboardWidgets: args.dashboardWidgets,
+      updatedAt: new Date().toISOString(),
+      orgId: args.orgId,
+    };
+    
+    if (existing) {
+      return await ctx.db.patch(existing._id, data);
+    } else {
+      return await ctx.db.insert("navigationConfig", data);
+    }
+  },
+});
+
+// ============ CMS CONTENT (Key-Value) ============
+
+export const getSectionContent = query({
+  args: { section: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("cmsContent")
+      .withIndex("by_section", (q) => q.eq("section", args.section))
+      .collect();
+  },
+});
+
+export const updateContent = mutation({
+  args: {
+    section: v.string(),
+    key: v.string(),
+    value: v.string(),
+    type: v.union(v.literal("text"), v.literal("html"), v.literal("json"), v.literal("image")),
+  },
+  handler: async (ctx, args) => {
+    // Find existing content by section + key
+    const existing = await ctx.db
+      .query("cmsContent")
+      .withIndex("by_section", (q) => q.eq("section", args.section))
+      .collect();
+    
+    const match = existing.find(e => e.key === args.key);
+    
+    const data = {
+      section: args.section,
+      key: args.key,
+      value: args.value,
+      type: args.type,
+      updatedAt: new Date().toISOString(),
+    };
+    
+    if (match) {
+      return await ctx.db.patch(match._id, data);
+    } else {
+      return await ctx.db.insert("cmsContent", data);
+    }
+  },
+});
+
+// ============ ALL BLOG POSTS (No org filter for listing) ============
+
+export const getAllBlogPosts = query({
+  args: { status: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    let posts = await ctx.db.query("blogPosts").collect();
+    
+    if (args.status) {
+      posts = posts.filter((p) => p.status === args.status);
+    }
+    
+    return posts.sort((a, b) => 
+      (b.publishedAt || b._creationTime.toString()).localeCompare(
+        a.publishedAt || a._creationTime.toString()
+      )
+    );
+  },
+});
+
+// ============ ALL DYNAMIC PAGES ============
+
+export const getAllDynamicPages = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("dynamicPages").collect();
+  },
+});
+
+// ============ ALL FAQS ============
+
+export const getAllFaqs = query({
+  args: {},
+  handler: async (ctx) => {
+    const faqs = await ctx.db.query("faqs").collect();
+    return faqs.filter(f => f.isActive).sort((a, b) => a.order - b.order);
+  },
+});

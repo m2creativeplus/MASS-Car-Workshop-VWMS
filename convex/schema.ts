@@ -1405,5 +1405,27 @@ export default defineSchema({
     updatedBy: v.optional(v.id("users")),
   }).index("by_key", ["key"])
     .index("by_category", ["category"]),
+
+  // ============ 47. NAVIGATION CONFIG ============
+  navigationConfig: defineTable({
+    menuItems: v.array(v.object({
+      id: v.string(),
+      label: v.string(),
+      icon: v.string(),
+      path: v.string(),
+      roles: v.array(v.string()),
+      order: v.number(),
+      isActive: v.boolean(),
+    })),
+    dashboardWidgets: v.array(v.object({
+      id: v.string(),
+      label: v.string(),
+      enabled: v.boolean(),
+      roles: v.array(v.string()),
+    })),
+    updatedAt: v.string(),
+    updatedBy: v.optional(v.id("users")),
+    orgId: v.string(),
+  }).index("by_org", ["orgId"]),
 });
 
