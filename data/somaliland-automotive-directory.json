@@ -9,55 +9,111 @@
   "car_dealers": [
     {
       "id": "dealer_001",
-      "name": "Dahabshiil Motors",
-      "type": "Authorized Dealer",
-      "brands": ["Hyundai", "Toyota", "IVECO", "SinoTruck"],
-      "location": {
+      "identity": {
+        "name": "Dahabshiil Motors",
+        "business_category": "Authorized Car Dealer",
+        "verified_status": "Verified",
+        "logo_url": "https://dahabshiilmotors.com/logo.png"
+      },
+      "location_details": {
         "city": "Hargeisa",
         "address": "Road #1, opposite Kaah Fuel Station",
-        "plus_code": null
+        "building_name": "Dahabshiil Motors HQ",
+        "plus_code": "H28X+45 Hargeisa",
+        "google_maps_url": "https://goo.gl/maps/example",
+        "coordinates": { "lat": 9.56, "lng": 44.06 }
       },
-      "contact": {
+      "contact_info": {
         "phone_primary": "+252 65 987 8885",
         "phone_secondary": "+252 63 3280611",
-        "whatsapp": "+252 63 3280611",
-        "website": "https://dahabshiilmotors.com",
-        "facebook": "dahabshiilmotors"
+        "email": "sales@dahabshiilmotors.com",
+        "whatsapp": "+252 63 3280611"
       },
-      "services": ["New Vehicle Sales", "After-Sales Service", "Parts"],
+      "digital_footprint": {
+        "website_url": "https://dahabshiilmotors.com",
+        "social_media": {
+          "facebook": "https://facebook.com/dahabshiilmotors",
+          "instagram": "https://instagram.com/dahabshiilmotors",
+          "tiktok": null,
+          "linkedin": null,
+          "youtube": null
+        }
+      },
+      "operational_details": {
+        "opening_hours": "Sat-Thu 08:00-17:00",
+        "years_in_business": 15,
+        "payment_methods": ["Cash", "Zaad", "e-Dahab", "Bank Transfer"],
+        "brands": ["Hyundai", "Toyota", "IVECO", "SinoTruck"],
+        "services": ["New Vehicle Sales", "After-Sales Service", "Parts"]
+      },
+      "digital_audit": {
+        "website_score": 25,
+        "social_media_score": 20,
+        "contactability_score": 25,
+        "maps_score": 20,
+        "overall_rank": "A",
+        "audit_notes": "Strong digital presence with active website and social channels."
+      },
       "source": "Web Research"
     },
     {
       "id": "dealer_002",
-      "name": "Hargeisa Automotive Company",
-      "type": "Authorized Toyota Dealer",
-      "brands": ["Toyota"],
-      "partner": "Groupe Marill / Marill Somalia",
-      "location": {
+      "identity": {
+        "name": "Hargeisa Automotive Company",
+        "business_category": "Authorized Toyota Dealer",
+        "verified_status": "Verified"
+      },
+      "location_details": {
         "city": "Hargeisa",
         "address": "Suld M. Farah Road, next to UNDP Hargeisa office",
-        "plus_code": null
+        "google_maps_url": null
       },
-      "contact": {
+      "contact_info": {
         "phone_primary": "+252 63 3333905",
         "website": "https://marill-automotive.com"
       },
+      "digital_footprint": {
+        "website_url": "https://marill-automotive.com",
+        "social_media": {}
+      },
+      "operational_details": {
+        "opening_hours": "Sat-Thu 08:00-16:00",
+        "brands": ["Toyota"],
+        "services": ["New 4x4 Sales", "After-Sales Service", "Spare Parts", "Repairs"]
+      },
+      "digital_audit": {
+        "website_score": 20,
+        "social_media_score": 10,
+        "contactability_score": 20,
+        "maps_score": 10,
+        "overall_rank": "B",
+        "audit_notes": "Official partner website exists but limited social activity."
+      },
+      "partner": "Groupe Marill / Marill Somalia",
       "models_available": ["Land Cruiser 300", "Land Cruiser 70 Series (76, 78, 79)", "Hilux", "Fortuner"],
-      "services": ["New 4x4 Sales", "After-Sales Service", "Spare Parts", "Repairs"],
       "source": "Web Research"
     },
     {
       "id": "dealer_003",
-      "name": "WABCO General Trading",
-      "type": "Authorized ISUZU Dealer",
-      "brands": ["ISUZU"],
-      "location": {
+      "identity": {
+        "name": "WABCO General Trading",
+        "business_category": "Authorized ISUZU Dealer",
+        "verified_status": "Verified"
+      },
+      "location_details": {
         "city": "Hargeisa",
         "address": "Main Road, Burj Omaar Building, 5th Floor Room 506"
       },
-      "contact": {
+      "contact_info": {
         "phone_primary": "+252 63 6999951",
         "website": "https://isuzu-somalia.com"
+      },
+      "digital_footprint": {
+        "website_url": "https://isuzu-somalia.com",
+        "social_media": {}
+      },
+      "operational_details": {
+        "brands": ["ISUZU"]
       },
       "source": "Web Research"
     },
@@ -635,29 +691,47 @@
     }
   ],
   "additional_spare_parts_hargeisa": [
-    { "name": "Abco Auto Spare Parts", "city": "Hargeisa", "source": "cybo.com" },
-    { "name": "Jameeco Wayn Spare Parts", "city": "Hargeisa", "source": "cybo.com" },
-    { "name": "Giirre Spare Parts", "city": "Hargeisa", "source": "cybo.com" },
-    { "name": "Nuur Used Spare Parts", "city": "Hargeisa", "source": "cybo.com" },
-    { "name": "Daryeel Spare Parts 2 (DSP)", "city": "Hargeisa", "source": "cybo.com" },
-    { "name": "Esco Auto Spare Parts", "city": "Hargeisa", "source": "cybo.com" },
-    { "name": "Xcc Spare Parts And Home Of Engines", "city": "Hargeisa", "source": "cybo.com" },
-    { "name": "Daryeel Spare Parts HQ", "city": "Hargeisa", "source": "cybo.com" },
-    { "name": "Rooble Battery And Metal Exchange", "city": "Hargeisa", "source": "cybo.com" },
-    { "name": "Shire Spare Parts", "city": "Hargeisa", "source": "cybo.com" },
-    { "name": "Alnoor Autospare Parts", "city": "Hargeisa", "source": "cybo.com" },
-    { "name": "Geeska Africa Spare Parts", "city": "Hargeisa", "source": "cybo.com" },
-    { "name": "Ali Baarjeex Car Accessories and Car Wash", "city": "Hargeisa", "source": "cybo.com" },
-    { "name": "Wehliye Spare Parts", "city": "Hargeisa", "source": "kulmie.com" }
+    { "name": "Abco Auto Spare Parts", "location_details": { "city": "Hargeisa" }, "source": "kulmie.com" },
+    { "name": "Jameeco Wayn Spare Parts", "location_details": { "city": "Hargeisa", "address": "26 June" }, "source": "near-place.com" },
+    { "name": "Giirre Spare Parts", "location_details": { "city": "Hargeisa" }, "source": "near-place.com" },
+    { "name": "Nuur Used Spare Parts", "location_details": { "city": "Hargeisa" }, "source": "cybo.com" },
+    { "name": "Daryeel Spare Parts HQ", "location_details": { "city": "Hargeisa" }, "contact_info": { "phone_primary": "+252 63 4425754" }, "source": "kulmie.com" },
+    { "name": "Esco Auto Spare Parts", "location_details": { "city": "Hargeisa" }, "source": "cybo.com" },
+    { "name": "Xcc Spare Parts And Home Of Engines", "location_details": { "city": "Hargeisa", "address": "Arwada Road" }, "source": "near-place.com" },
+    { "name": "Rooble Battery And Metal Exchange", "location_details": { "city": "Hargeisa" }, "source": "cybo.com" },
+    { "name": "Shire Spare Parts", "location_details": { "city": "Hargeisa" }, "source": "cybo.com" },
+    { "name": "Alnoor Autospare Parts", "location_details": { "city": "Hargeisa" }, "source": "cybo.com" },
+    { "name": "Geeska Africa Spare Parts", "location_details": { "city": "Hargeisa" }, "source": "cybo.com" },
+    { "name": "Ali Baarjeex Car Accessories and Car Wash", "location_details": { "city": "Hargeisa" }, "source": "cybo.com" },
+    { "name": "Wehliye Spare Parts", "location_details": { "city": "Hargeisa" }, "source": "kulmie.com" },
+    { "name": "Carab Auto-Electric service and Spare part", "location_details": { "city": "Hargeisa" }, "contact_info": { "phone_primary": "+252 63 4248732" }, "source": "kulmie.com" },
+    { "name": "Al rahma spare parts", "location_details": { "city": "Hargeisa" }, "contact_info": { "phone_primary": "+252 907 785 582" }, "source": "kulmie.com" },
+    { "name": "Kulan auto spare parts & car decorations", "location_details": { "city": "Hargeisa" }, "contact_info": { "phone_primary": "+252 65 4496451" }, "source": "kulmie.com" },
+    { "name": "Indhacase and Sons Shop", "location_details": { "city": "Hargeisa", "address": "Wadada Daami" }, "source": "near-place.com" },
+    { "name": "NatioNal Auto Spare parts Dhama co.", "location_details": { "city": "Hargeisa", "address": "Ahmed Takhtuur Rd" }, "source": "near-place.com" },
+    { "name": "Alnajax Used Spare Parts", "location_details": { "city": "Hargeisa", "address": "Near Geeska Spare Parts" }, "source": "near-place.com" },
+    { "name": "Aflax Auto Spare Part", "location_details": { "city": "Hargeisa", "address": "Suldaan Saeed Highway" }, "source": "near-place.com" },
+    { "name": "Oomaar spare parts", "location_details": { "city": "Hargeisa" }, "source": "near-place.com" },
+    { "name": "MASNO SPARE PARTS AND BANJAR", "location_details": { "city": "Hargeisa" }, "source": "near-place.com" },
+    { "name": "Iid Sparepart", "location_details": { "city": "Hargeisa" }, "source": "near-place.com" },
+    { "name": "Nuur Spare Parts- Cars Accessories & Tyres", "location_details": { "city": "Hargeisa" }, "source": "kulmie.com" }
   ],
   "additional_car_dealers": [
-    { "name": "Sanwaraabe Motors", "city": "Hargeisa", "source": "cybo.com" },
-    { "name": "Abdikadir Motors and Car Seller", "city": "Hargeisa", "source": "kulmie.com" },
-    { "name": "Saban Motor's", "city": "Hargeisa", "source": "kulmie.com" },
-    { "name": "Ahmednor Girgire", "city": "Hargeisa", "source": "cybo.com" },
-    { "name": "Dj Hamze Shop", "city": "Hargeisa", "source": "cybo.com" },
-    { "name": "Xasan Xuseen", "city": "Hargeisa", "source": "cybo.com" },
-    { "name": "Toyota Maril", "city": "Hargeisa", "source": "cybo.com" }
+    { "name": "Sanwaraabe Motors", "location_details": { "city": "Hargeisa" }, "source": "cybo.com" },
+    { "name": "Abdikadir Motors and Car Seller", "location_details": { "city": "Hargeisa" }, "source": "kulmie.com" },
+    { "name": "Saban Motor's", "location_details": { "city": "Hargeisa" }, "source": "kulmie.com" },
+    { "name": "Ahmednor Girgire", "location_details": { "city": "Hargeisa" }, "source": "cybo.com" },
+    { "name": "Dj Hamze Shop", "location_details": { "city": "Hargeisa" }, "source": "cybo.com" },
+    { "name": "Xasan Xuseen", "location_details": { "city": "Hargeisa" }, "source": "cybo.com" },
+    { "name": "Toyota Maril", "location_details": { "city": "Hargeisa" }, "source": "cybo.com" },
+    { "name": "Vip Motors", "location_details": { "city": "Hargeisa", "address": "Road No. 1" }, "contact_info": { "phone_primary": "+252 63 3836048" }, "source": "kulmie.com" },
+    { "name": "Abushaxar Motors", "location_details": { "city": "Hargeisa" }, "source": "kulmie.com" },
+    { "name": "Dubai Motors Sales And Rental Cars", "location_details": { "city": "Hargeisa" }, "contact_info": { "phone_primary": "+252 63 4075532" }, "source": "kulmie.com" },
+    { "name": "Khaalid Banjarle", "location_details": { "city": "Hargeisa" }, "source": "fastbase.com" },
+    { "name": "Dahab Car Accessories", "location_details": { "city": "Hargeisa" }, "source": "fastbase.com" },
+    { "name": "Goud Motors", "location_details": { "city": "Hargeisa" }, "source": "fastbase.com" },
+    { "name": "Cheema Motors", "location_details": { "city": "Hargeisa" }, "source": "fastbase.com" },
+    { "name": "Be Forward Somalia Hargeisa Office", "location_details": { "city": "Hargeisa" }, "source": "fastbase.com" }
   ],
   "car_rentals": [
     {
