@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
 import { 
   Upload, 
   Image as ImageIcon, 
@@ -17,259 +17,280 @@ import {
   Loader2,
   Sparkles,
   Layers,
-  RefreshCw
+  MonitorPlay,
+  Share2,
+  Maximize2
 } from "lucide-react";
+
+interface SmartScene {
+  id: string;
+  name: string;
+  category: "Studio" | "Showroom" | "Outdoor" | "Creative";
+  thumbnail: string;
+  description: string;
+}
 
 interface ProcessedImage {
   id: string;
   original: string;
   processed?: string;
   status: "pending" | "processing" | "done" | "error";
+  sceneId: string;
+  progress: number;
 }
 
-const BACKGROUND_TEMPLATES = [
-  { id: "white", name: "Studio White", color: "#FFFFFF" },
-  { id: "showroom", name: "Showroom", color: "#1A1A1A" },
-  { id: "outdoor", name: "Outdoor Green", color: "#2D5016" },
-  { id: "gradient", name: "Premium Gradient", color: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" },
+const SMART_SCENES: SmartScene[] = [
+  { 
+    id: "studio-white", 
+    name: "Pure Studio", 
+    category: "Studio",
+    thumbnail: "bg-white",
+    description: "Clean white infinity cove for marketplace listings" 
+  },
+  { 
+    id: "studio-grey", 
+    name: "Nardo Grey", 
+    category: "Studio", 
+    thumbnail: "bg-slate-200",
+    description: "Modern grey studio with soft overhead lighting"
+  },
+  { 
+    id: "showroom-lux", 
+    name: "Luxury Showroom", 
+    category: "Showroom", 
+    thumbnail: "bg-slate-900 border-b-4 border-slate-800",
+    description: "High-end dark showroom with spotlights" 
+  },
+  { 
+    id: "scenic-alp", 
+    name: "Alpine Road", 
+    category: "Outdoor", 
+    thumbnail: "bg-green-100",
+    description: "Mountain road with natural daylight"
+  },
 ];
 
-/**
- * Vehicle Photo Studio
- * Features: Background removal, AI enhancement, batch processing
- * 
- * Uses: rembg (open-source), Real-ESRGAN (upscaling)
- * Source: M2 Dev Library spyne-clone-blueprint.json
- */
 export function VehiclePhotoStudio() {
   const [images, setImages] = useState<ProcessedImage[]>([]);
-  const [selectedBackground, setSelectedBackground] = useState("white");
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [activeScene, setActiveScene] = useState<string>("studio-white");
+  const [isQueueRunning, setIsQueueRunning] = useState(false);
 
   const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
     const newImages: ProcessedImage[] = Array.from(files).map((file, i) => ({
-      id: `img-${Date.now()}-${i}`,
+      id: `task-${Date.now()}-${i}`,
       original: URL.createObjectURL(file),
-      status: "pending" as const,
+      status: "pending",
+      sceneId: activeScene,
+      progress: 0
     }));
 
     setImages(prev => [...prev, ...newImages]);
-  }, []);
+  }, [activeScene]);
 
-  const processImages = async () => {
-    setIsProcessing(true);
+  const runQueue = async () => {
+    setIsQueueRunning(true);
     
-    // Simulate processing (replace with actual rembg API call)
-    for (const img of images) {
-      if (img.status === "pending") {
-        setImages(prev => prev.map(i => 
-          i.id === img.id ? { ...i, status: "processing" } : i
-        ));
-        
-        // Simulate API delay
-        await new Promise(r => setTimeout(r, 1500));
-        
-        setImages(prev => prev.map(i => 
-          i.id === img.id ? { ...i, status: "done", processed: i.original } : i
-        ));
+    // Process images sequentially
+    for (let i = 0; i < images.length; i++) {
+      if (images[i].status === "pending") {
+        await processSingleImage(images[i].id);
       }
     }
     
-    setIsProcessing(false);
+    setIsQueueRunning(false);
   };
 
-  const removeImage = (id: string) => {
-    setImages(prev => prev.filter(i => i.id !== id));
+  const processSingleImage = async (id: string) => {
+    // 1. Start Processing
+    setImages(prev => prev.map(img => 
+      img.id === id ? { ...img, status: "processing", progress: 10 } : img
+    ));
+
+    // Simulate AI steps with realistic delays
+    const steps = [
+      { progress: 30, delay: 800 }, // Segment Car
+      { progress: 60, delay: 1000 }, // Generate Shadow
+      { progress: 90, delay: 800 }, // Composite Scene
+      { progress: 100, delay: 500 } // Finalize
+    ];
+
+    for (const step of steps) {
+      await new Promise(r => setTimeout(r, step.delay));
+      setImages(prev => prev.map(img => 
+        img.id === id ? { ...img, progress: step.progress } : img
+      ));
+    }
+
+    // Complete
+    setImages(prev => prev.map(img => 
+      img.id === id ? { 
+        ...img, 
+        status: "done", 
+        // In a real app, this would be the URL returned by the API
+        // For demo, we just use the original but would overlay the scene
+        processed: img.original 
+      } : img
+    ));
   };
 
-  const downloadAll = () => {
-    images.forEach(img => {
-      if (img.processed) {
-        const link = document.createElement('a');
-        link.href = img.processed;
-        link.download = `vehicle-${img.id}.png`;
-        link.click();
-      }
-    });
+  const clearQueue = () => {
+    setImages([]);
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Sparkles className="h-6 w-6 text-orange-500" />
-            Vehicle Photo Studio
-          </h1>
-          <p className="text-muted-foreground">
-            AI-powered background removal and enhancement
-          </p>
+    <div className="flex flex-col h-[calc(100vh-100px)] gap-6">
+      {/* Top Bar: Controls */}
+      <div className="flex items-center justify-between bg-white p-4 rounded-xl border shadow-sm">
+        <div className="flex items-center gap-4">
+           <div className="h-10 w-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+             <Wand2 className="h-6 w-6" />
+           </div>
+           <div>
+             <h2 className="font-bold text-lg">Virtual Studio Pro</h2>
+             <p className="text-xs text-muted-foreground">AI Scene Generation & Shadow Synthesis</p>
+           </div>
         </div>
-        <Badge className="bg-green-100 text-green-700">Free • Open Source</Badge>
+
+        <div className="flex items-center gap-3">
+           <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-md text-sm">
+             <Layers className="h-4 w-4 text-slate-500" />
+             <span className="font-medium">{images.length} Assets</span>
+           </div>
+           <Button 
+             onClick={runQueue} 
+             disabled={isQueueRunning || images.length === 0}
+             className="bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-500/20"
+           >
+             {isQueueRunning ? (
+               <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Processing Queue...</>
+             ) : (
+               <><MonitorPlay className="h-4 w-4 mr-2" /> Start Batch Process</>
+             )}
+           </Button>
+        </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Upload Section */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Upload className="h-5 w-5" />
-              Upload Photos
-            </CardTitle>
-            <CardDescription>
-              Drag and drop or click to upload vehicle photos
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="border-2 border-dashed rounded-xl p-8 text-center hover:border-orange-500 transition-colors cursor-pointer">
-              <Input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleFileUpload}
-                className="hidden"
-                id="photo-upload"
-              />
-              <label htmlFor="photo-upload" className="cursor-pointer">
-                <ImageIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="font-medium">Drop images here or click to browse</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Supports JPG, PNG, WEBP up to 10MB
-                </p>
-              </label>
-            </div>
-
-            {/* Image Grid */}
-            {images.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
-                {images.map(img => (
-                  <div key={img.id} className="relative group">
-                    <div className="aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                      <img 
-                        src={img.processed || img.original} 
-                        alt="Vehicle"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
-                      <Button size="icon" variant="ghost" className="text-white">
-                        <Download className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        size="icon" 
-                        variant="ghost" 
-                        className="text-white"
-                        onClick={() => removeImage(img.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <Badge 
-                      className={`absolute top-2 right-2 ${
-                        img.status === "done" ? "bg-green-500" :
-                        img.status === "processing" ? "bg-blue-500" :
-                        img.status === "error" ? "bg-red-500" : "bg-gray-500"
-                      }`}
-                    >
-                      {img.status === "processing" && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-                      {img.status === "done" && <CheckCircle2 className="h-3 w-3 mr-1" />}
-                      {img.status}
-                    </Badge>
+      <div className="grid lg:grid-cols-12 gap-6 flex-1 min-h-0">
+        
+        {/* Left: Queue & Preview */}
+        <div className="lg:col-span-8 flex flex-col gap-6 overflow-hidden">
+          {/* Main Preview Area */}
+          <div className="flex-1 bg-slate-900 rounded-xl overflow-hidden relative border border-slate-700 shadow-2xl flex items-center justify-center group">
+             {images.length === 0 ? (
+               <div className="text-center p-12">
+                  <div className="h-24 w-24 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Upload className="h-10 w-10 text-slate-500" />
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  <h3 className="text-xl font-bold text-white mb-2">Drop Vehicle Photos Here</h3>
+                  <p className="text-slate-400 max-w-sm mx-auto mb-8">
+                    Upload high-res images. Our AI will automatically remove backgrounds and place them in your selected studio scene.
+                  </p>
+                  <label className="cursor-pointer">
+                    <Input type="file" multiple accept="image/*" className="hidden" onChange={handleFileUpload} />
+                    <Button size="lg" className="bg-white text-slate-900 hover:bg-slate-200 font-semibold" asChild>
+                      <span>Select Files</span>
+                    </Button>
+                  </label>
+               </div>
+             ) : (
+               <div className="relative w-full h-full p-4 overflow-y-auto">
+                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                   {images.map((img) => (
+                     <div key={img.id} className="relative group/card bg-slate-800 rounded-lg overflow-hidden border border-slate-700">
+                        <div className="aspect-[4/3] relative">
+                          <img src={img.processed || img.original} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-all flex items-end p-3">
+                             <div className="flex gap-2 w-full">
+                               <Button size="sm" variant="secondary" className="h-8 flex-1 text-xs">Preview</Button>
+                               <Button size="icon" variant="destructive" className="h-8 w-8" onClick={() => setImages(prev => prev.filter(i => i.id !== img.id))}>
+                                 <Trash2 className="h-3 w-3" />
+                               </Button>
+                             </div>
+                          </div>
+                        </div>
+                        
+                        {/* Status Bar */}
+                        <div className="p-3 bg-slate-800 border-t border-slate-700">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-xs font-medium text-slate-300 truncate max-w-[100px]">{img.id}</span>
+                            <Badge variant={img.status === 'done' ? 'default' : 'secondary'} className="text-[10px] h-5">
+                              {img.status}
+                            </Badge>
+                          </div>
+                          {img.status === 'processing' && (
+                            <div className="space-y-1">
+                               <Progress value={img.progress} className="h-1" />
+                               <span className="text-[10px] text-slate-500 text-right block">{img.progress}%</span>
+                            </div>
+                          )}
+                        </div>
+                     </div>
+                   ))}
+                 </div>
+               </div>
+             )}
+          </div>
+        </div>
 
-        {/* Settings Panel */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Wand2 className="h-5 w-5" />
-              Processing Options
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Background Selection */}
-            <div className="space-y-3">
-              <Label>Background</Label>
-              <div className="grid grid-cols-2 gap-2">
-                {BACKGROUND_TEMPLATES.map(bg => (
-                  <button
-                    key={bg.id}
-                    onClick={() => setSelectedBackground(bg.id)}
-                    className={`p-3 rounded-lg border-2 transition-all ${
-                      selectedBackground === bg.id 
-                        ? "border-orange-500" 
-                        : "border-muted hover:border-orange-300"
-                    }`}
-                  >
-                    <div 
-                      className="w-full h-8 rounded mb-2"
-                      style={{ background: bg.color }}
-                    />
-                    <span className="text-xs font-medium">{bg.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Enhancements */}
-            <div className="space-y-3">
-              <Label>AI Enhancements</Label>
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" defaultChecked className="rounded" />
-                  Remove background (rembg)
-                </label>
-                <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" defaultChecked className="rounded" />
-                  Auto color correction
-                </label>
-                <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" className="rounded" />
-                  4x AI Upscale (Real-ESRGAN)
-                </label>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="space-y-2 pt-4">
-              <Button 
-                className="w-full bg-orange-500 hover:bg-orange-600"
-                onClick={processImages}
-                disabled={isProcessing || images.length === 0}
-              >
-                {isProcessing ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <Wand2 className="h-4 w-4 mr-2" />
-                    Process All Photos
-                  </>
-                )}
-              </Button>
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={downloadAll}
-                disabled={images.filter(i => i.status === "done").length === 0}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Download All
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Right: Scene Selector */}
+        <div className="lg:col-span-4 flex flex-col gap-6 h-full overflow-hidden">
+           <Card className="h-full flex flex-col border-0 shadow-lg">
+             <CardHeader className="pb-4">
+               <CardTitle className="text-lg">Scene Selection</CardTitle>
+               <CardDescription>Choose the environment for your vehicle</CardDescription>
+             </CardHeader>
+             <CardContent className="flex-1 overflow-y-auto pr-2">
+                <div className="space-y-6">
+                  {['Studio', 'Showroom', 'Outdoor'].map((cat) => (
+                    <div key={cat}>
+                      <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">{cat} Scenes</h4>
+                      <div className="grid gap-3">
+                        {SMART_SCENES.filter(s => s.category === cat).map((scene) => (
+                          <div 
+                            key={scene.id}
+                            onClick={() => setActiveScene(scene.id)}
+                            className={`
+                              group cursor-pointer rounded-xl border-2 p-1 transition-all
+                              ${activeScene === scene.id ? 'border-blue-600 bg-blue-50' : 'border-transparent hover:border-slate-200 hover:bg-slate-50'}
+                            `}
+                          >
+                            <div className="flex gap-3">
+                              <div className={`h-16 w-24 rounded-lg shadow-sm border ${scene.thumbnail} flex-shrink-0`} />
+                              <div className="py-1">
+                                <h5 className={`font-semibold text-sm ${activeScene === scene.id ? 'text-blue-700' : 'text-slate-700'}`}>
+                                  {scene.name}
+                                </h5>
+                                <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+                                  {scene.description}
+                                </p>
+                              </div>
+                              {activeScene === scene.id && (
+                                <div className="ml-auto flex items-center pr-2">
+                                  <CheckCircle2 className="h-5 w-5 text-blue-600" />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+             </CardContent>
+             
+             <div className="p-4 border-t bg-slate-50">
+               <Button variant="outline" className="w-full" onClick={clearQueue}>
+                 <Trash2 className="h-4 w-4 mr-2" />
+                 Clear Queue
+               </Button>
+             </div>
+           </Card>
+        </div>
       </div>
     </div>
   );
 }
+
