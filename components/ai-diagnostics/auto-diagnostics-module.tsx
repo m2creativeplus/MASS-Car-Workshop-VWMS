@@ -19,6 +19,7 @@ import {
   Image as ImageIcon
 } from "lucide-react"
 import { analyzePart as aiAnalyzePart } from "@/lib/ai-diagnostics"
+import { OBDCodeLookup } from "./obd-code-lookup"
 
 interface DiagnosisResult {
   partName: string
@@ -102,7 +103,7 @@ export function AutoDiagnosticsModule() {
   }
 
   return (
-    <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-950 p-6">
+    <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-950 p-6 overflow-y-auto">
       
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
@@ -111,8 +112,13 @@ export function AutoDiagnosticsModule() {
             <Sparkles className="h-5 w-5 text-orange-500" />
             AI Auto-Diagnostics
           </h2>
-          <p className="text-sm text-slate-500">Upload a photo of a part for instant AI analysis</p>
+          <p className="text-sm text-slate-500">Visual AI analysis + OBD-II code lookup</p>
         </div>
+      </div>
+
+      {/* OBD Code Lookup - NEW */}
+      <div className="mb-6">
+        <OBDCodeLookup />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1">

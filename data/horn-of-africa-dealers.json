@@ -1,0 +1,178 @@
+{
+  "category": "horn-of-africa-dealers",
+  "description": "Verified automotive dealers and workshops in the Horn of Africa region",
+  "lastUpdated": "2026-01-17",
+  "source": "M2 Dev Library",
+  
+  "somaliland": {
+    "capital": "Hargeisa",
+    "dealers": [
+      {
+        "id": "sl-001",
+        "name": "Dahabshiil Motors",
+        "type": "Premier distributor",
+        "brands": ["Hyundai", "Toyota"],
+        "models": ["Tucson 2024", "LC300 VX-R", "Santafe", "Prado"],
+        "url": "https://dahabshiilmotors.com",
+        "featured": true,
+        "location": {
+          "city": "Hargeisa",
+          "country": "Somaliland"
+        },
+        "services": ["New car sales", "After-sales service", "Spare parts"],
+        "verified": true
+      },
+      {
+        "id": "sl-002",
+        "name": "Hargeisa Automotive Company",
+        "type": "Official dealer",
+        "brands": ["Toyota 4x4"],
+        "partner": "Marill Somalia",
+        "location": {
+          "city": "Hargeisa",
+          "country": "Somaliland"
+        },
+        "services": ["4x4 vehicles", "Parts"],
+        "verified": true
+      },
+      {
+        "id": "sl-003",
+        "name": "MATCO Motors",
+        "type": "Workshop & Sales",
+        "established": 2014,
+        "url": "https://matcomotors.com",
+        "location": {
+          "city": "Hargeisa",
+          "country": "Somaliland"
+        },
+        "services": ["Modern automotive services", "Car sales", "Repairs"],
+        "verified": true
+      },
+      {
+        "id": "sl-004",
+        "name": "WABCO General Trading",
+        "type": "Official dealer",
+        "brands": ["ISUZU"],
+        "url": "https://isuzu-somalia.com",
+        "location": {
+          "city": "Hargeisa",
+          "country": "Somaliland"
+        },
+        "services": ["Commercial vehicles", "Trucks", "Parts"],
+        "verified": true
+      }
+    ],
+    "marketData": {
+      "popularBrands": ["Toyota", "Hyundai", "Isuzu", "Nissan"],
+      "popularModels": ["Toyota Land Cruiser", "Toyota Prado", "Hyundai Tucson", "Isuzu D-Max"],
+      "importSources": ["Japan", "UAE", "India"],
+      "paymentMethods": ["Cash", "Zaad", "eDahab", "Bank Transfer"]
+    }
+  },
+
+  "somalia": {
+    "capital": "Mogadishu",
+    "dealers": [
+      {
+        "id": "so-001",
+        "name": "SKA International Group",
+        "type": "Official dealer",
+        "brands": ["Toyota", "IVECO"],
+        "url": "https://ska-arabia.com",
+        "services": ["Sales", "Maintenance", "Spare parts"],
+        "location": {
+          "city": "Mogadishu",
+          "country": "Somalia"
+        }
+      },
+      {
+        "id": "so-002",
+        "name": "Gaadhi.com",
+        "type": "Online marketplace",
+        "brands": ["Toyota", "Lexus", "Honda", "GMC"],
+        "url": "https://gaadhi.com",
+        "services": ["Used cars", "New cars", "Vehicle listings"],
+        "location": {
+          "city": "Mogadishu",
+          "country": "Somalia"
+        }
+      },
+      {
+        "id": "so-003",
+        "name": "Horizon Vehicles",
+        "type": "Japanese imports",
+        "url": "https://horizonvehicles.com",
+        "services": ["Japan import", "Used vehicles"],
+        "location": {
+          "city": "Mogadishu",
+          "country": "Somalia"
+        }
+      }
+    ],
+    "marketData": {
+      "vehicleImports2023": "$240M",
+      "carImports2023": "$121M",
+      "globalRank": 139,
+      "growth2024Q1": "57%",
+      "popularBrands": ["Toyota", "Hyundai", "Suzuki", "Nissan", "Honda"],
+      "importOrigins": [
+        {"country": "India", "value": "$74.2M"},
+        {"country": "UAE", "value": "$40M"},
+        {"country": "Turkey", "value": "$1.88M"}
+      ]
+    }
+  },
+
+  "djibouti": {
+    "capital": "Djibouti City",
+    "dealers": [
+      {
+        "id": "dj-001",
+        "name": "Marill Automotive SARL",
+        "type": "Official dealer",
+        "brands": ["Toyota"],
+        "url": "https://marill-automotive.com"
+      },
+      {
+        "id": "dj-002",
+        "name": "Inchcape Djibouti Automotive (IDA)",
+        "type": "Multi-brand",
+        "services": ["Diagnostics", "Repairs", "EV services"],
+        "url": "https://inchcapedjibouti.com"
+      },
+      {
+        "id": "dj-003",
+        "name": "CarDjibouti.com",
+        "type": "Online marketplace",
+        "brands": ["Toyota", "Lexus", "Hyundai", "Mercedes-Benz"],
+        "url": "https://cardjibouti.com"
+      }
+    ],
+    "marketData": {
+      "vehicleImports2023": "$621M",
+      "carImports2023": "$379M",
+      "globalRank": 121,
+      "popularBrands": ["Toyota", "Suzuki", "Hyundai", "Lexus", "Mercedes-Benz"]
+    }
+  },
+
+  "regionTrends": [
+    "Secondhand vehicle imports from Middle East and Japan",
+    "Growing EV adoption with government incentives",
+    "Japanese and Korean brands dominating",
+    "Online car marketplaces emerging",
+    "Commercial vehicle demand increasing"
+  ],
+
+  "onlinePlatforms": [
+    {"name": "Gaadhi.com", "region": "Somalia", "url": "https://gaadhi.com"},
+    {"name": "CarDjibouti.com", "region": "Djibouti", "url": "https://cardjibouti.com"},
+    {"name": "EV24.africa", "region": "All Africa", "url": "https://ev24.africa"}
+  ],
+
+  "importFacilitators": {
+    "japan": ["BE FORWARD", "SBT Japan", "Carapis"],
+    "uae": ["Dubai Used Cars", "Al-Futtaim"],
+    "ports": ["Berbera (Somaliland)", "Mogadishu", "Djibouti Port"]
+  }
+}

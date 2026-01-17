@@ -28,9 +28,12 @@ import {
   User,
   Calendar,
   Gauge,
-  Hash
+  Hash,
+  Search,
+  Zap
 } from "lucide-react"
 import { database, Vehicle as DbVehicle } from "@/lib/database"
+import { decodeVIN, isValidVIN, isJapaneseVIN } from "@/lib/vin-decoder"
 
 interface Vehicle {
   id: string
@@ -123,6 +126,42 @@ export function Vehicles({ orgId }: { orgId: string }) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null)
   const [formData, setFormData] = useState(emptyVehicle)
+  const [vinLoading, setVinLoading] = useState(false)
+  const [vinError, setVinError] = useState<string | null>(null)
+  const [vinSuccess, setVinSuccess] = useState(false)
+
+  // VIN Lookup Handler
+  const handleVINLookup = async () => {
+    if (!formData.vin || !isValidVIN(formData.vin)) {
+      setVinError('Please enter a valid 17-character VIN')
+      return
+    }
+    
+    setVinLoading(true)
+    setVinError(null)
+    setVinSuccess(false)
+    
+    try {
+      const result = await decodeVIN(formData.vin)
+      
+      if (result.success) {
+        setFormData(prev => ({
+          ...prev,
+          make: result.make || prev.make,
+          model: result.model || prev.model,
+          year: result.year || prev.year,
+        }))
+        setVinSuccess(true)
+        setTimeout(() => setVinSuccess(false), 3000) // Clear success after 3s
+      } else {
+        setVinError(result.errorMessage || 'Failed to decode VIN')
+      }
+    } catch (error) {
+      setVinError('Network error - please try again')
+    } finally {
+      setVinLoading(false)
+    }
+  }
 
   // NOTE: removed fetchVehicles() as we use real-time subscription via useQuery
 
@@ -386,8 +425,34 @@ export function Vehicles({ orgId }: { orgId: string }) {
                 <Input value={formData.licensePlate} onChange={(e) => setFormData({...formData, licensePlate: e.target.value})} placeholder="SL-XXXXX-X" />
               </div>
               <div>
-                <Label>VIN</Label>
-                <Input value={formData.vin} onChange={(e) => setFormData({...formData, vin: e.target.value})} placeholder="17-character VIN" />
+                <Label className="flex items-center gap-2">
+                  VIN
+                  {isJapaneseVIN(formData.vin) && <Badge className="bg-red-500 text-[10px] py-0">Japan</Badge>}
+                </Label>
+                <div className="flex gap-2">
+                  <Input 
+                    value={formData.vin} 
+                    onChange={(e) => {
+                      setFormData({...formData, vin: e.target.value.toUpperCase()})
+                      setVinError(null)
+                      setVinSuccess(false)
+                    }} 
+                    placeholder="17-character VIN"
+                    className={vinSuccess ? 'border-green-500' : vinError ? 'border-red-500' : ''}
+                  />
+                  <Button 
+                    type="button"
+                    size="icon"
+                    onClick={handleVINLookup}
+                    disabled={vinLoading || !formData.vin}
+                    className="bg-blue-500 hover:bg-blue-600 shrink-0"
+                    title="Auto-fill vehicle details from VIN"
+                  >
+                    {vinLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
+                  </Button>
+                </div>
+                {vinError && <p className="text-xs text-red-500 mt-1">{vinError}</p>}
+                {vinSuccess && <p className="text-xs text-green-500 mt-1">✓ Vehicle info auto-filled!</p>}
               </div>
             </div>
             <div>
