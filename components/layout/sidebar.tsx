@@ -37,6 +37,10 @@ import {
   Calculator,
   Store,
   Smartphone,
+  Sparkles,
+  Box,
+  Zap,
+  RotateCw,
 } from "lucide-react"
 import { useConvexAuth } from "@/components/auth/convex-auth-provider"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -76,6 +80,14 @@ const menuItems = [
   { id: "blog", label: "Blog & News", icon: BookOpen, roles: ["admin", "staff"], isNew: true },
   { id: "ai-tools", label: "AI Assistant", icon: Bot, roles: ["admin", "staff", "technician"] },
   { id: "diagnostics", label: "AI Diagnostics", icon: Bot, roles: ["admin", "staff", "technician"] },
+  
+  // NEW AI Tools
+  { id: "photo-studio", label: "Photo Studio", icon: Sparkles, roles: ["admin", "staff"], isNew: true },
+  { id: "configurator", label: "3D Configurator", icon: Box, roles: ["admin", "staff"], isNew: true },
+  
+  // NEW Marketplace
+  { id: "ev-marketplace", label: "EV Marketplace", icon: Zap, roles: ["admin", "staff"], isNew: true },
+  { id: "dealer-network", label: "Dealer Network", icon: Building2, roles: ["admin", "staff"], isNew: true },
   
   // Portals (NEW)
   { id: "portal", label: "Customer Portal", icon: Users, roles: ["admin", "staff", "customer"], isNew: true },

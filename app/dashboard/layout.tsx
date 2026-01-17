@@ -54,7 +54,12 @@ function DashboardLayoutContent({
       "inspection-templates": "DVI Templates",
       "declined-jobs": "Declined Jobs Tracker",
       "catalog": "Parts Catalog",
-      "contact": "Contact Support"
+      "contact": "Contact Support",
+      // NEW PAGES
+      "photo-studio": "Vehicle Photo Studio",
+      "configurator": "3D Vehicle Configurator",
+      "ev-marketplace": "EV Marketplace",
+      "dealer-network": "Dealer Network",
     }
     // Handle dynamic ID matching if needed, for now exact match
     return titles[path] || "Dashboard"
