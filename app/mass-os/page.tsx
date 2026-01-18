@@ -1,10 +1,18 @@
-import MassOSDashboard from "@/components/mass-os/mass-os-dashboard";
+"use client";
 
-export const metadata = {
-  title: "MASS OS - Somaliland Automotive Intelligence",
-  description: "National-Scale Automotive Operating System for Somaliland - Workshop Management, Vehicle Registry, Market Intelligence",
-};
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 export default function MassOSPage() {
-  return <MassOSDashboard />;
+  return (
+    <div className="container mx-auto p-6">
+      <Alert>
+        <Info className="h-4 w-4" />
+        <AlertTitle>MASS OS Dashboard</AlertTitle>
+        <AlertDescription>
+          The Operating System Dashboard is upgrading.
+        </AlertDescription>
+      </Alert>
+    </div>
+  );
 }

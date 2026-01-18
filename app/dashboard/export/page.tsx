@@ -1,9 +1,18 @@
-import { ExportCenter } from "@/components/admin/export-center"
+"use client";
+
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 export default function ExportPage() {
   return (
-    <div className="h-full w-full p-4 md:p-8 bg-slate-50 dark:bg-slate-950/50">
-      <ExportCenter />
+    <div className="container mx-auto p-6">
+      <Alert>
+        <Info className="h-4 w-4" />
+        <AlertTitle>Export Center</AlertTitle>
+        <AlertDescription>
+          Data Export tools are currently offline.
+        </AlertDescription>
+      </Alert>
     </div>
-  )
+  );
 }

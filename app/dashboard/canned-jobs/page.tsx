@@ -1,9 +1,18 @@
 "use client";
 
-import dynamic from "next/dynamic";
-
-const CannedJobsLibrary = dynamic(() => import("@/components/canned-jobs/canned-jobs-library").then(m => m.CannedJobsLibrary || m.default || m), { ssr: false });
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 export default function CannedJobsPage() {
-  return <CannedJobsLibrary />;
+  return (
+    <div className="container mx-auto p-6">
+      <Alert>
+        <Info className="h-4 w-4" />
+        <AlertTitle>Module Under Maintenance</AlertTitle>
+        <AlertDescription>
+          The Canned Jobs Library is currently being optimized and will be back online shortly.
+        </AlertDescription>
+      </Alert>
+    </div>
+  );
 }

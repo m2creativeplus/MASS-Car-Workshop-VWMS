@@ -1,9 +1,18 @@
 "use client";
 
-import dynamic from "next/dynamic";
-
-const EstimatesModule = dynamic(() => import("@/components/estimates/estimates-module").then(m => m.EstimatesModule || m.default || m), { ssr: false });
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 export default function EstimatesPage() {
-  return <EstimatesModule />;
+  return (
+    <div className="container mx-auto p-6">
+      <Alert>
+        <Info className="h-4 w-4" />
+        <AlertTitle>Estimates Module</AlertTitle>
+        <AlertDescription>
+          The Estimates dashboard is currently offline for maintenance.
+        </AlertDescription>
+      </Alert>
+    </div>
+  );
 }

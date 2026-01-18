@@ -1,16 +1,18 @@
 "use client";
 
-import dynamic from "next/dynamic";
-
-const VehicleConfigurator = dynamic(
-  () => import("@/components/ai-tools/vehicle-configurator").then(mod => ({ default: mod.VehicleConfigurator })),
-  { ssr: false, loading: () => <div className="animate-pulse h-96 bg-muted rounded-xl" /> }
-);
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 export default function ConfiguratorPage() {
   return (
-    <div className="p-6">
-      <VehicleConfigurator />
+    <div className="container mx-auto p-6">
+      <Alert>
+        <Info className="h-4 w-4" />
+        <AlertTitle>Module Under Maintenance</AlertTitle>
+        <AlertDescription>
+          The Vehicle Configurator is currently being optimized and will be back online shortly.
+        </AlertDescription>
+      </Alert>
     </div>
   );
 }

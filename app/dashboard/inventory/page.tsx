@@ -1,25 +1,18 @@
-"use client"
+"use client";
 
-import { InventoryManagement } from "@/components/inventory/inventory-management"
-import { useOrganization } from "@/components/providers/organization-provider"
-import { Loader2 } from "lucide-react"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 export default function InventoryPage() {
-  const { organization, isLoading } = useOrganization()
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto text-orange-500" />
-          <p className="text-slate-500 dark:text-slate-400">Loading inventory...</p>
-        </div>
-      </div>
-    )
-  }
-
-  const orgId = organization?._id || "demo-org-001"
-
-  return <InventoryManagement orgId={orgId} />
+  return (
+    <div className="container mx-auto p-6">
+      <Alert>
+        <Info className="h-4 w-4" />
+        <AlertTitle>Inventory System</AlertTitle>
+        <AlertDescription>
+          Inventory Management is being upgraded. Please use the spreadsheet backup for now.
+        </AlertDescription>
+      </Alert>
+    </div>
+  );
 }
-

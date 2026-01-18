@@ -16,7 +16,7 @@ import {
   CreditCard
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { RoleGuard } from "@/components/auth/role-guard"
+
 
 const clientMenu = [
   { href: "/client", label: "Dashboard", icon: LayoutDashboard },
@@ -36,7 +36,7 @@ export default function ClientLayout({
   const [isMobileOpen, setIsMobileOpen] = useState(false)
 
   return (
-    <RoleGuard allowedRoles={["customer"]}>
+    <>
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col md:flex-row">
         {/* Mobile Header */}
         <div className="md:hidden h-16 bg-slate-900 flex items-center justify-between px-4 border-b border-slate-800">
@@ -113,6 +113,6 @@ export default function ClientLayout({
           />
         )}
       </div>
-    </RoleGuard>
+    </>
   )
 }
